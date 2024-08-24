@@ -1,0 +1,250 @@
+use super::Environment;
+use crate::{
+    ability::PlayerAbility,
+    effect::{EffectActivateContext, EffectTriggerContext},
+    error::Error,
+    field::FieldCardState,
+    log::LogAction,
+    opcode::Opcode,
+    player::PlayerZone,
+    sequence::CardSequence,
+    zone::{CardZone, MoveReason, Zone},
+};
+use tracing::error;
+
+impl Environment {
+    pub fn execute(&mut self, opcode: &Opcode) -> Result<Vec<LogAction>, Error> {
+        self.ts_counter += 1;
+        match opcode {
+            Opcode::StartGame => Ok(vec![LogAction::GameStarted]),
+            Opcode::ChangeTurn {
+                turn,
+                player,
+                phase,
+            } => {
+                self.state.turn = *turn;
+                self.state.players.set_player_in_turn(*player);
+                self.state.phase = phase.clone();
+                self.state.players.iter_mut().for_each(|player| {
+                    player.reset_counters();
+                });
+                Ok(vec![LogAction::TurnChanged {
+                    turn: *turn,
+                    player: *player,
+                    phase: phase.clone(),
+                }])
+            }
+            Opcode::ChangePhase { phase } => {
+                self.state.phase = phase.clone();
+                Ok(vec![LogAction::PhaseChanged {
+                    phase: phase.clone(),
+                }])
+            }
+            Opcode::SetLife { player, life } => {
+                self.state.players.get_mut(*player).stats.life = *life;
+                Ok(vec![LogAction::LifeChanged {
+                    player: *player,
+                    life: *life,
+                }])
+            }
+            Opcode::ReduceCost { player } => {
+                self.state
+                    .players
+                    .get_mut(*player)
+                    .hand
+                    .items_mut()
+                    .for_each(|item| {
+                        item.cost_delta = item.cost_delta.saturating_sub(1);
+                    });
+                Ok(vec![])
+            }
+            Opcode::GenerateShards {
+                player,
+                source,
+                color,
+                amount,
+            } => {
+                let abilities = &self.state.players.get(*player).abilities;
+                let propagate = abilities
+                    .iter()
+                    .find_map(|a| {
+                        if let PlayerAbility::Propagate(n) = a {
+                            Some(*n)
+                        } else {
+                            None
+                        }
+                    })
+                    .unwrap_or_default();
+                let amount = ((*amount as i32) + propagate).max(0) as u32;
+                let player = self.state.players.get_mut(*player);
+                player.shards.add(*color, amount);
+                Ok(vec![LogAction::ShardsGenerated {
+                    player: player.id,
+                    source: *source,
+                    color: *color,
+                    amount,
+                }])
+            }
+            Opcode::ConsumeShards {
+                player,
+                source,
+                color,
+                amount,
+            } => {
+                let player = self.state.players.get_mut(*player);
+                player.shards.consume(*color, *amount)?;
+                Ok(vec![LogAction::ShardsConsumed {
+                    player: player.id,
+                    source: *source,
+                    color: *color,
+                    amount: *amount,
+                }])
+            }
+            Opcode::DrawCard { player } => {
+                let player = self.state.players.get_mut(*player);
+                if let Some(mut card) = player.deck.remove_top() {
+                    let id = card.id();
+                    let from = *card.zone();
+                    let to = PlayerZone::new(player.id, Zone::Hand);
+                    card.set_timestamp(self.ts_counter);
+                    card.set_zone(to);
+                    player.hand.push(card);
+                    player.counters.draw += 1;
+                    return Ok(vec![LogAction::CardMoved {
+                        card: id,
+                        from,
+                        to,
+                        reason: MoveReason::Draw,
+                    }]);
+                }
+                Ok(vec![])
+            }
+            Opcode::CastCard { player, card } => {
+                let player = self.state.players.get_mut(*player);
+                if let Some(mut card) = player.hand.remove(*card) {
+                    let id = card.id();
+                    let from = *card.zone();
+                    let to = PlayerZone::new(player.id, Zone::Field);
+                    card.set_timestamp(self.ts_counter);
+                    card.set_zone(to);
+                    player.field.push(card);
+                    player.counters.cast_creatures += 1;
+                    return Ok(vec![LogAction::CardMoved {
+                        card: id,
+                        from,
+                        to,
+                        reason: MoveReason::Casted,
+                    }]);
+                }
+                Ok(vec![])
+            }
+            Opcode::MoveCard {
+                card,
+                from,
+                to,
+                reason,
+            } => {
+                let player = self.state.players.get_mut(from.player);
+                let card = match from.zone {
+                    Zone::Deck => player.deck.remove(*card),
+                    Zone::Hand => player.hand.remove(*card),
+                    Zone::Field => player.field.remove(*card),
+                    Zone::Graveyard => player.graveyard.remove(*card),
+                    _ => None,
+                };
+                if let Some(mut card) = card {
+                    let id = card.id();
+                    card.set_timestamp(self.ts_counter);
+                    card.set_zone(*to);
+                    card.reset_computed();
+                    let player = self.state.players.get_mut(to.player);
+                    match to.zone {
+                        Zone::Deck => player.deck.push(card),
+                        Zone::Hand => player.hand.push(card),
+                        Zone::Field => player.field.push(card),
+                        Zone::Graveyard => player.graveyard.push(card),
+                        _ => (),
+                    }
+                    return Ok(vec![LogAction::CardMoved {
+                        card: id,
+                        from: *from,
+                        to: *to,
+                        reason: *reason,
+                    }]);
+                }
+                Ok(vec![])
+            }
+            Opcode::TriggerEvent {
+                source,
+                target,
+                event,
+            } => {
+                let source = self.state.find_card(*source)?;
+                let target = self.state.find_card(*target)?;
+                let mut ctx = EffectActivateContext::new(&self.state, source, target);
+
+                if let Err(err) = target.effect().activate(*event, &mut ctx) {
+                    error!("Error triggering effect: {:?}", err);
+                };
+
+                let (continuous, stack) = ctx.into_inner();
+                let log = stack
+                    .iter()
+                    .map(|id| LogAction::EffectTriggered {
+                        source: target.id(),
+                        id: *id,
+                    })
+                    .collect::<Vec<_>>();
+
+                let mut ctx = EffectTriggerContext::new(&self.state, target);
+                let mut effect = target.effect();
+                for id in stack.into_iter().chain(continuous) {
+                    if let Err(err) = effect.trigger(id, &mut ctx) {
+                        error!("Error triggering effect: {:?}", err);
+                    }
+                }
+                let (continuous, stack) = ctx.into_inner();
+                self.continuous.extend(continuous);
+                self.stack.extend(stack);
+                self.state.find_card_mut(target.id())?.set_effect(effect);
+
+                Ok(log)
+            }
+            Opcode::SetFieldCardState { card, state } => {
+                for player in self.state.players.iter_mut() {
+                    player.field.set_card_state(*card, *state);
+                }
+                Ok(vec![])
+            }
+            Opcode::SetBattleState { card, state } => {
+                for player in self.state.players.iter_mut() {
+                    player.field.set_card_battle_state(*card, *state);
+                }
+                Ok(vec![])
+            }
+            Opcode::ResetBattleState => {
+                for player in self.state.players.iter_mut() {
+                    for item in player.field.items_mut() {
+                        if item.battle.is_none() {
+                            item.state = FieldCardState::Active;
+                        }
+                        item.battle = None;
+                    }
+                }
+                Ok(vec![])
+            }
+            Opcode::Attack { attacker, target } => Ok(vec![LogAction::Attacked {
+                attacker: *attacker,
+                target: *target,
+            }]),
+            Opcode::InflictDamage { player, damage } => {
+                let player = self.state.players.get_mut(*player);
+                player.stats.life = player.stats.life.saturating_sub(*damage);
+                Ok(vec![LogAction::DamageInflicted {
+                    player: player.id,
+                    damage: *damage,
+                }])
+            }
+        }
+    }
+}

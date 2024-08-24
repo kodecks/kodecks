@@ -1,0 +1,11 @@
+[package]
+name = "kodecks-bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bitflags = "2.6.0"
+rand = { version = "0.8.5", features = ["small_rng"] }
+rayon = { version = "1.10.0", optional = true }
+kodecks = { path = "../kodecks" }
+tracing = "0.1.40"
