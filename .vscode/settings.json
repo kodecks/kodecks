@@ -19,6 +19,7 @@
     "srgba",
     "thiserror",
     "tinystr",
+    "turbofish",
     "Unorm",
     "Wyrm"
   ],

@@ -9,6 +9,7 @@ mod oil_leaking_droid;
 mod pyrosnail;
 mod radio_deer;
 mod scrapyard_raven;
+mod turbofish;
 mod vigilant_lynx;
 mod volcanic_wyrm;
 mod wind_up_spider;
@@ -38,4 +39,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "oill" => oil_leaking_droid::ARCHETYPE,
     "volcanic-wyrm" => volcanic_wyrm::ARCHETYPE,
     "volc" => volcanic_wyrm::ARCHETYPE,
+    "turbofish" => turbofish::ARCHETYPE,
+    "turb" => turbofish::ARCHETYPE,
 };
