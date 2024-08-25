@@ -18,3 +18,4 @@ card-bambooster = Bambooster
     .text = When <<Bambooster>> attacks, it deals damage equal to its power to its controller.
 card-vigilant-lynx = Vigilant Lynx
     .text = Whenever a creature your opponent controls enters the field, <<Vigilant Lynx>> gets +200 power until end of turn.
+card-turbofish = Turbofish
