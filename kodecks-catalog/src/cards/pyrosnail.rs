@@ -9,7 +9,7 @@ card_def!(
     cost: 2,
     card_type: CardType::Creature,
     power: 100,
-    abilities: &[KeywordAbility::Toxic, KeywordAbility::Volatile][..],
+    abilities: &[KeywordAbility::Volatile][..],
 );
 
 impl Effect for CardDef {

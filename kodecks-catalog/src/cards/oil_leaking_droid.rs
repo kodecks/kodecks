@@ -6,7 +6,7 @@ card_def!(
     "oill",
     "Oil-Leaking Droid",
     color: Color::RUBY,
-    cost: 1,
+    cost: 2,
     card_type: CardType::Creature,
     power: 100,
     abilities: &[KeywordAbility::Toxic][..],
