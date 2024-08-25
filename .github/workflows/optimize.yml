@@ -1,0 +1,29 @@
+name: Optimize
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "**/*.png"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "**/*.png"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y optipng zopfli
+      - name: Optimize
+        run: scripts/optimize.sh
+      - name: Check Git Index
+        run: if [[ -n $(git status --porcelain) ]]; then exit 1; fi
