@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use kodecks::{
     action,
     env::LocalEnvironment,
-    field::{FieldBattleState, FieldCardState},
+    field::{FieldBattleState, FieldState},
     id::ObjectId,
     phase::Phase,
     player::{PlayerId, PlayerZone},
@@ -49,9 +49,9 @@ impl From<action::AvailableActionList> for AvailableActionList {
 #[derive(Resource, Default)]
 pub struct Board {
     pub player_hand: Vec<ObjectId>,
-    pub player_field: Vec<(ObjectId, FieldCardState)>,
+    pub player_field: Vec<(ObjectId, FieldState)>,
     pub opponent_hand: Vec<ObjectId>,
-    pub opponent_field: Vec<(ObjectId, FieldCardState)>,
+    pub opponent_field: Vec<(ObjectId, FieldState)>,
 
     attackers: Vec<ObjectId>,
     blocking_pairs: Vec<(ObjectId, ObjectId)>,

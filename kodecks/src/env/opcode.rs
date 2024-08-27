@@ -3,7 +3,7 @@ use crate::{
     ability::PlayerAbility,
     effect::{EffectActivateContext, EffectTriggerContext},
     error::Error,
-    field::FieldCardState,
+    field::FieldState,
     log::LogAction,
     opcode::Opcode,
     player::PlayerZone,
@@ -210,7 +210,7 @@ impl Environment {
 
                 Ok(log)
             }
-            Opcode::SetFieldCardState { card, state } => {
+            Opcode::SetFieldState { card, state } => {
                 for player in self.state.players.iter_mut() {
                     player.field.set_card_state(*card, *state);
                 }
@@ -226,7 +226,7 @@ impl Environment {
                 for player in self.state.players.iter_mut() {
                     for item in player.field.items_mut() {
                         if item.battle.is_none() {
-                            item.state = FieldCardState::Active;
+                            item.state = FieldState::Active;
                         }
                         item.battle = None;
                     }

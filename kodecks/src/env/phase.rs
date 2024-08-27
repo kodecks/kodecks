@@ -6,7 +6,7 @@ use crate::{
     config::DebugFlags,
     error::Error,
     event::{CardEvent, EventReason},
-    field::{FieldBattleState, FieldCardState},
+    field::{FieldBattleState, FieldState},
     filter_vec,
     opcode::{Opcode, OpcodeList},
     phase::Phase,
@@ -297,9 +297,9 @@ impl Environment {
                             card: attacker.id(),
                             state: Some(FieldBattleState::Attacked),
                         },
-                        Opcode::SetFieldCardState {
+                        Opcode::SetFieldState {
                             card: attacker.id(),
-                            state: FieldCardState::Exhausted,
+                            state: FieldState::Exhausted,
                         },
                     ]));
 
