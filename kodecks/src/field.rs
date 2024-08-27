@@ -170,8 +170,9 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Display, Serialize, Deserialize)]
 pub enum FieldState {
+    #[default]
     Active,
     Exhausted,
 }
