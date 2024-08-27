@@ -33,6 +33,7 @@ impl Effect for CardDef {
                     let commands = vec![ActionCommand::DestroyCard {
                         source: card,
                         target: card,
+                        reason: EventReason::Effect,
                     }];
                     return Ok(EffectReport::default().with_commands(commands));
                 }
