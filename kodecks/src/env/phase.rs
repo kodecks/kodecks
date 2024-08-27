@@ -2,9 +2,10 @@ use super::Environment;
 use crate::{
     ability::KeywordAbility,
     action::Action,
+    command::ActionCommand,
     config::DebugFlags,
     error::Error,
-    event::CardEvent,
+    event::{CardEvent, EventReason},
     field::{FieldBattleState, FieldCardState},
     filter_vec,
     opcode::{Opcode, OpcodeList},
@@ -312,6 +313,7 @@ impl Environment {
                             CardEvent::DealtDamage {
                                 player: target_player,
                                 amount: attacker_power,
+                                reason: EventReason::Battle,
                             },
                             attacker,
                             attacker,
@@ -333,8 +335,12 @@ impl Environment {
                         if (blocker_power > 0 && attacker_power < blocker_power)
                             || blocker_has_toxic
                         {
-                            if let Ok(log) =
-                                self.apply_event(CardEvent::Destroyed, attacker, attacker)
+                            if let Ok(log) = (ActionCommand::DestroyCard {
+                                source: blocker.id(),
+                                target: attacker.id(),
+                                reason: EventReason::Battle,
+                            })
+                            .into_opcodes(self)
                             {
                                 logs.extend(log);
                             }
@@ -347,8 +353,12 @@ impl Environment {
                         if (attacker_power > 0 && blocker_power <= attacker_power)
                             || attacker_has_toxic
                         {
-                            if let Ok(log) =
-                                self.apply_event(CardEvent::Destroyed, blocker, blocker)
+                            if let Ok(log) = (ActionCommand::DestroyCard {
+                                source: attacker.id(),
+                                target: blocker.id(),
+                                reason: EventReason::Battle,
+                            })
+                            .into_opcodes(self)
                             {
                                 logs.extend(log);
                             }

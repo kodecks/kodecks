@@ -28,7 +28,7 @@ impl Environment {
         };
 
         match event {
-            CardEvent::Destroyed => {
+            CardEvent::Destroyed { .. } => {
                 let from = *target.zone();
                 let to = PlayerZone::new(from.player, Zone::Graveyard);
                 let volatile = target

@@ -7,8 +7,14 @@ use strum::Display;
 #[non_exhaustive]
 pub enum CardEvent {
     Casted,
-    Destroyed,
-    DealtDamage { player: PlayerId, amount: u32 },
+    Destroyed {
+        reason: EventReason,
+    },
+    DealtDamage {
+        player: PlayerId,
+        amount: u32,
+        reason: EventReason,
+    },
     Attacking,
     Blocking,
     Attacked,
@@ -19,7 +25,7 @@ impl CardEvent {
     pub fn filter(&self) -> EventFilter {
         match self {
             CardEvent::Casted => EventFilter::CASTED,
-            CardEvent::Destroyed => EventFilter::DESTROYED,
+            CardEvent::Destroyed { .. } => EventFilter::DESTROYED,
             CardEvent::DealtDamage { .. } => EventFilter::DEALT_DAMAGE,
             CardEvent::Attacking => EventFilter::ATTACKING,
             CardEvent::Blocking => EventFilter::BLOCKING,
@@ -40,4 +46,11 @@ bitflags! {
         const ATTACKED = 1 << 5;
         const ANY_CASTED = 1 << 6;
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EventReason {
+    Battle,
+    Effect,
 }

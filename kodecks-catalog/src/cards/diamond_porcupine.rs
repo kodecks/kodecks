@@ -33,8 +33,12 @@ impl Effect for CardDef {
         Ok(())
     }
 
-    fn activate(&mut self, _event: CardEvent, ctx: &mut EffectActivateContext) -> Result<()> {
-        ctx.trigger_stack("main");
+    fn activate(&mut self, event: CardEvent, ctx: &mut EffectActivateContext) -> Result<()> {
+        if let CardEvent::DealtDamage { reason, .. } = event {
+            if reason == EventReason::Battle {
+                ctx.trigger_stack("main");
+            }
+        }
         Ok(())
     }
 }
