@@ -3,7 +3,7 @@ use crate::{
     action::{Action, AvailableActionList, PlayerAvailableActions},
     card::CardSnapshot,
     error::Error,
-    field::{FieldCardState, FieldItem},
+    field::{FieldState, FieldItem},
     game::Report,
     id::ObjectId,
     phase::Phase,
@@ -58,7 +58,7 @@ impl LocalEnvironment {
             if let Some(card) = CardZone::remove(&mut player.hand, card) {
                 player.field.push(FieldItem {
                     card,
-                    state: FieldCardState::Active,
+                    state: FieldState::Active,
                     battle: None,
                 });
             }

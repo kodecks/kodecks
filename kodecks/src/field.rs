@@ -16,7 +16,7 @@ pub struct Field {
 impl Field {
     pub fn active_cards(&self) -> impl Iterator<Item = &Card> {
         self.cards.iter().filter_map(|field_card| {
-            if field_card.state == FieldCardState::Active {
+            if field_card.state == FieldState::Active {
                 Some(&field_card.card)
             } else {
                 None
@@ -45,7 +45,7 @@ impl Field {
             })
     }
 
-    pub fn set_card_state(&mut self, id: ObjectId, state: FieldCardState) {
+    pub fn set_card_state(&mut self, id: ObjectId, state: FieldState) {
         if let Some(field_card) = self
             .cards
             .iter_mut()
@@ -96,7 +96,7 @@ impl CardZone for Field {
     fn push(&mut self, card: Card) {
         self.cards.push(FieldItem {
             card,
-            state: FieldCardState::Active,
+            state: FieldState::Active,
             battle: None,
         });
     }
@@ -135,7 +135,7 @@ impl CardSequence for Field {
     fn add_top(&mut self, card: Card) {
         self.cards.push(FieldItem {
             card,
-            state: FieldCardState::Active,
+            state: FieldState::Active,
             battle: None,
         });
     }
@@ -144,7 +144,7 @@ impl CardSequence for Field {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FieldItem<T: CardId> {
     pub card: T,
-    pub state: FieldCardState,
+    pub state: FieldState,
     pub battle: Option<FieldBattleState>,
 }
 
@@ -164,14 +164,14 @@ where
     fn score(&self) -> i32 {
         self.card.score()
             + match self.state {
-                FieldCardState::Active => 1,
-                FieldCardState::Exhausted => 0,
+                FieldState::Active => 1,
+                FieldState::Exhausted => 0,
             }
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize)]
-pub enum FieldCardState {
+pub enum FieldState {
     Active,
     Exhausted,
 }

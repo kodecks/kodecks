@@ -4,7 +4,7 @@ use crate::{
     config::DebugFlags,
     deck::{Deck, DeckList},
     env::GameState,
-    field::{Field, FieldCardState, FieldItem},
+    field::{Field, FieldItem, FieldState},
     graveyard::Graveyard,
     hand::{Hand, HandItem},
     id::ObjectId,
@@ -425,7 +425,7 @@ impl CardZone for Vec<FieldItem<CardSnapshot>> {
     fn push(&mut self, card: CardSnapshot) {
         self.push(FieldItem {
             card,
-            state: FieldCardState::Active,
+            state: FieldState::Active,
             battle: None,
         });
     }

@@ -3,7 +3,7 @@ use std::fmt;
 use crate::{
     color::Color,
     event::CardEvent,
-    field::{FieldBattleState, FieldCardState},
+    field::{FieldBattleState, FieldState},
     id::ObjectId,
     phase::Phase,
     player::{PlayerId, PlayerZone},
@@ -59,9 +59,9 @@ pub enum Opcode {
         target: ObjectId,
         event: CardEvent,
     },
-    SetFieldCardState {
+    SetFieldState {
         card: ObjectId,
-        state: FieldCardState,
+        state: FieldState,
     },
     Attack {
         attacker: ObjectId,

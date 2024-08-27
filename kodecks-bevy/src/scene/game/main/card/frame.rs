@@ -1,7 +1,7 @@
 use super::Card;
 use crate::scene::game::board::{AvailableActionList, Board};
 use bevy::prelude::*;
-use kodecks::field::FieldCardState;
+use kodecks::field::FieldState;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CardFrame {
@@ -137,7 +137,7 @@ pub fn update_frame_overlay(
             .player_field
             .iter()
             .chain(board.opponent_field.iter())
-            .any(|(card, state)| card == &id && state == &FieldCardState::Exhausted);
+            .any(|(card, state)| card == &id && state == &FieldState::Exhausted);
         let selectable = list.selectable_cards().iter().any(|card| *card == id);
         if *frame == CardFrame::Shadow {
             let castable = list.castable_cards().iter().any(|card| *card == id);
