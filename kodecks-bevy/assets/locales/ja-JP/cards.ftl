@@ -19,3 +19,5 @@ card-bambooster = バンブースター
 card-vigilant-lynx = 警戒するヤマネコ
     .text = 相手がコントロールするクリーチャーが場に出た時、ターン終了時まで<<警戒するヤマネコ>>は+200パワーを得る。
 card-turbofish = ターボフィッシュ
+card-flash-bang-jellyfish = 閃光クラゲ
+    .text = <<閃光クラゲ>>が場に出た時、全てのクリーチャーは疲労状態になる。

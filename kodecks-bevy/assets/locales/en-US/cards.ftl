@@ -19,3 +19,5 @@ card-bambooster = Bambooster
 card-vigilant-lynx = Vigilant Lynx
     .text = Whenever a creature your opponent controls enters the field, <<Vigilant Lynx>> gets +200 power until end of turn.
 card-turbofish = Turbofish
+card-flash-bang-jellyfish = Flash-Bang Jellyfish
+    .text = When <<Flash-Bang Jellyfish>> enters the field, all creatures become exhausted.
