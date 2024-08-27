@@ -2,6 +2,7 @@ use kodecks::prelude::*;
 
 mod bambooster;
 mod diamond_porcupine;
+mod flash_bang_jellyfish;
 mod leaf_veined_gecko;
 mod mire_alligator;
 mod moss_grown_mastodon;
@@ -41,4 +42,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "volc" => volcanic_wyrm::ARCHETYPE,
     "turbofish" => turbofish::ARCHETYPE,
     "turb" => turbofish::ARCHETYPE,
+    "flash-bang-jellyfish" => flash_bang_jellyfish::ARCHETYPE,
+    "flas" => flash_bang_jellyfish::ARCHETYPE,
 };
