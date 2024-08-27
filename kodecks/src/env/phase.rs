@@ -297,11 +297,18 @@ impl Environment {
                             card: attacker.id(),
                             state: Some(FieldBattleState::Attacked),
                         },
-                        Opcode::SetFieldState {
-                            card: attacker.id(),
-                            state: FieldState::Exhausted,
-                        },
                     ]));
+
+                    if let Ok(log) = (ActionCommand::SetFieldState {
+                        source: attacker.id(),
+                        target: attacker.id(),
+                        state: FieldState::Exhausted,
+                        reason: EventReason::Battle,
+                    })
+                    .into_opcodes(self)
+                    {
+                        logs.extend(log);
+                    }
 
                     if blocker.is_none() && attacker_power > 0 {
                         logs.push(OpcodeList::new(vec![Opcode::InflictDamage {

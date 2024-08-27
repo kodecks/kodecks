@@ -3,6 +3,7 @@ use crate::{
     env::Environment,
     error::Error,
     event::{CardEvent, EventReason},
+    field::FieldState,
     id::ObjectId,
     opcode::{Opcode, OpcodeList},
     player::PlayerId,
@@ -19,6 +20,12 @@ pub enum ActionCommand {
     DestroyCard {
         source: ObjectId,
         target: ObjectId,
+        reason: EventReason,
+    },
+    SetFieldState {
+        source: ObjectId,
+        target: ObjectId,
+        state: FieldState,
         reason: EventReason,
     },
     GenerateShards {
@@ -52,6 +59,12 @@ impl ActionCommand {
                 let source = env.state.find_card(source)?;
                 let target = env.state.find_card(target)?;
                 env.apply_event(CardEvent::Destroyed { reason }, source, target)
+            }
+            ActionCommand::SetFieldState { target, state, .. } => {
+                Ok(vec![OpcodeList::new(vec![Opcode::SetFieldState {
+                    card: target,
+                    state,
+                }])])
             }
             ActionCommand::GenerateShards {
                 player,
