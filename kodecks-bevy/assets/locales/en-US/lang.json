@@ -9,16 +9,16 @@
             "size": 32.0
         },
         "card_text": {
-            "font": "fonts/Jersey20-Regular.ttf",
-            "size": 24.0
-        },
-        "card_ability": {
-            "font": "fonts/Jersey20-Regular.ttf",
+            "font": "fonts/gohufont-14.ttf",
             "size": 20.0
         },
+        "card_ability": {
+            "font": "fonts/gohufont-14.ttf",
+            "size": 18.0
+        },
         "dialog": {
-            "font": "fonts/Jersey20-Regular.ttf",
-            "size": 28.0
+            "font": "fonts/gohufont-14.ttf",
+            "size": 24.0
         },
         "button": {
             "font": "fonts/Jersey20-Regular.ttf",

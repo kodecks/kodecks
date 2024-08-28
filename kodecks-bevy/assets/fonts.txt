@@ -1,2 +1,3 @@
 https://github.com/kodecks/assets/raw/main/fonts/DotGothic16-Regular.ttf
 https://github.com/kodecks/assets/raw/main/fonts/Jersey20-Regular.ttf
+https://github.com/kodecks/assets/raw/main/fonts/gohufont-uni-14.ttf
