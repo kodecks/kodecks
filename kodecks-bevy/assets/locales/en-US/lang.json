@@ -9,15 +9,15 @@
             "size": 32.0
         },
         "card_text": {
-            "font": "fonts/gohufont-14.ttf",
+            "font": "fonts/gohufont-uni-14.ttf",
             "size": 20.0
         },
         "card_ability": {
-            "font": "fonts/gohufont-14.ttf",
+            "font": "fonts/gohufont-uni-14.ttf",
             "size": 18.0
         },
         "dialog": {
-            "font": "fonts/gohufont-14.ttf",
+            "font": "fonts/gohufont-uni-14.ttf",
             "size": 24.0
         },
         "button": {
