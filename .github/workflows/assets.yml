@@ -5,10 +5,12 @@ on:
     branches: ["main"]
     paths:
       - "**/*.png"
+      - "**/*.txt"
   pull_request:
     branches: ["main"]
     paths:
       - "**/*.png"
+      - "**/*.txt"
 
 env:
   CARGO_TERM_COLOR: always
