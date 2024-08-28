@@ -5,7 +5,7 @@ use bevy::{
     prelude::*,
 };
 
-const CAMERA_POSITION: Vec3 = Vec3::new(0.0, 10., 1.0);
+const CAMERA_POSITION: Vec3 = Vec3::new(0.0, 11.0, 1.0);
 const CAMERA_TARGET: Vec3 = Vec3::new(0.0, 0.0, 0.8);
 
 pub struct CameraPlugin;

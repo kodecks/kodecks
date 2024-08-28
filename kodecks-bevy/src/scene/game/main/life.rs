@@ -58,9 +58,9 @@ fn init(
 
     commands.spawn((
         PbrBundle {
-            mesh: meshes.add(Plane3d::default().mesh().size(2.4, 0.6)),
+            mesh: meshes.add(Plane3d::default().mesh().size(2.0, 0.5)),
             material: material.clone(),
-            transform: Transform::from_translation(Vec3::new(0., 0.2, 2.2)),
+            transform: Transform::from_translation(Vec3::new(0., 0.2, 3.2)),
             ..default()
         },
         LifeOverlay::Player,
@@ -69,9 +69,9 @@ fn init(
 
     commands.spawn((
         PbrBundle {
-            mesh: meshes.add(Plane3d::default().mesh().size(2.4, 0.6)),
+            mesh: meshes.add(Plane3d::default().mesh().size(2.0, 0.5)),
             material: material.clone(),
-            transform: Transform::from_translation(Vec3::new(0., 0.2, -1.8)),
+            transform: Transform::from_translation(Vec3::new(0., 0.2, -2.8)),
             ..default()
         },
         LifeOverlay::Opponent,
@@ -184,7 +184,7 @@ fn update(
         ));
 
         let mut transform = *transform;
-        transform.translation.y = 0.5;
+        transform.translation.y = 1.0;
         transform.translation.z -= 0.3;
         commands.spawn((
             PbrBundle {

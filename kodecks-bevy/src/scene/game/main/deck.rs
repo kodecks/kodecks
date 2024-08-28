@@ -108,7 +108,7 @@ fn init(
         PbrBundle {
             mesh: deck_mesh.clone(),
             material: deck_material.clone(),
-            transform: Transform::from_translation(Vec3::new(5.0, 1.0, 3.0)).with_scale(Vec3::new(
+            transform: Transform::from_translation(Vec3::new(6.0, 1.0, 2.5)).with_scale(Vec3::new(
                 0.8 / CARD_WIDTH,
                 1.0,
                 0.8 / CARD_WIDTH,
@@ -122,7 +122,7 @@ fn init(
         PbrBundle {
             mesh: deck_mesh.clone(),
             material: deck_material.clone(),
-            transform: Transform::from_translation(Vec3::new(5.0, 1.0, -1.5))
+            transform: Transform::from_translation(Vec3::new(6.0, 1.0, -1.0))
                 .with_scale(Vec3::new(0.8 / CARD_WIDTH, 1.0, 0.8 / CARD_WIDTH))
                 .with_rotation(Quat::from_rotation_y(std::f32::consts::PI)),
             ..default()
@@ -134,7 +134,7 @@ fn init(
         PbrBundle {
             mesh: deck_mesh.clone(),
             material: graveyard_material.clone(),
-            transform: Transform::from_translation(Vec3::new(3.9, 1.0, 3.0)).with_scale(Vec3::new(
+            transform: Transform::from_translation(Vec3::new(4.9, 1.0, 2.5)).with_scale(Vec3::new(
                 0.8 / CARD_WIDTH,
                 1.0,
                 0.8 / CARD_WIDTH,
@@ -153,7 +153,7 @@ fn init(
         PbrBundle {
             mesh: deck_mesh.clone(),
             material: graveyard_material,
-            transform: Transform::from_translation(Vec3::new(3.9, 1.0, -1.5))
+            transform: Transform::from_translation(Vec3::new(4.9, 1.0, -1.0))
                 .with_scale(Vec3::new(0.8 / CARD_WIDTH, 1.0, 0.8 / CARD_WIDTH))
                 .with_rotation(Quat::from_rotation_y(std::f32::consts::PI)),
             ..default()

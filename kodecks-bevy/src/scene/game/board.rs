@@ -229,7 +229,7 @@ impl Board {
                     let x_offset = index as f32 - (self.player_hand.len() - 1) as f32 / 2.0;
                     let x = 0.8 * x_offset;
                     let y = 2.0 + 0.01 * index as f32;
-                    let z = 3.6;
+                    let z = 4.0;
 
                     let mut transform = Transform::from_xyz(0.0, 4.0, z)
                         .looking_at(camera_pos + Vec3::new(0.0, 0.0, z), Vec3::Y);
@@ -269,8 +269,8 @@ impl Board {
             if let Some(index) = self.opponent_hand.iter().position(|&y| y == card) {
                 let x_offset = index as f32 - (self.opponent_hand.len() - 1) as f32 / 2.0;
                 let x = 1.1 * x_offset;
-                let y = 3.0 + 0.01 * index as f32;
-                let z = -2.5;
+                let y = 0.5 + 0.001 * index as f32;
+                let z = -3.8;
 
                 let mut transform = Transform::from_xyz(0.0, 4.0, z)
                     .looking_at(camera_pos + Vec3::new(0.0, 0.0, z), Vec3::Y);

@@ -151,8 +151,8 @@ fn update(
                     },
                     0.2,
                     match shard.side {
-                        Side::Player => 2.8,
-                        Side::Opponent => -2.4,
+                        Side::Player => 2.6,
+                        Side::Opponent => -2.2,
                     },
                 );
                 *material = match shard.color {
