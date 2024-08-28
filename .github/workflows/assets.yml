@@ -14,7 +14,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  optimize:
+  check_assets:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,6 +23,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y optipng zopfli
+      - name: Download assets
+        run: scripts/download.sh
       - name: Optimize
         run: scripts/optimize.sh
       - name: Check Git Index
