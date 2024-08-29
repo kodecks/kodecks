@@ -26,7 +26,7 @@ impl Effect for CardDef {
                     .flat_map(|p| p.field.iter())
                     .map(|card| ActionCommand::SetFieldState {
                         source: ctx.source().id(),
-                        target: card.id(),
+                        target: card.timed_id(),
                         state: kodecks::field::FieldState::Exhausted,
                         reason: EventReason::Effect,
                     });

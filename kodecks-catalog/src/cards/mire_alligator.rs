@@ -30,9 +30,10 @@ impl Effect for CardDef {
                     return Ok(EffectReport::default());
                 }
                 if let Some(Action::SelectCard { card }) = action {
+                    let target = ctx.state().find_card(card)?;
                     let commands = vec![ActionCommand::DestroyCard {
-                        source: card,
-                        target: card,
+                        source: ctx.source().id(),
+                        target: target.timed_id(),
                         reason: EventReason::Effect,
                     }];
                     return Ok(EffectReport::default().with_commands(commands));
