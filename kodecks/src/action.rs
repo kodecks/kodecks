@@ -1,4 +1,4 @@
-use crate::{command::ActionCommand, id::ObjectId, message::Instruction, player::PlayerId};
+use crate::{command::ActionCommand, id::ObjectId, message::MessageDialog, player::PlayerId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -42,7 +42,7 @@ impl Ord for AvailableAction {
 pub struct PlayerAvailableActions {
     pub player: PlayerId,
     pub actions: AvailableActionList,
-    pub instruction: Option<Instruction>,
+    pub message_dialog: Option<MessageDialog>,
 }
 
 impl PlayerAvailableActions {
@@ -50,7 +50,7 @@ impl PlayerAvailableActions {
         Self {
             player,
             actions: AvailableActionList::new(),
-            instruction: None,
+            message_dialog: None,
         }
     }
 
