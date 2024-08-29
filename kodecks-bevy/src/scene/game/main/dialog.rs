@@ -5,6 +5,7 @@ use crate::scene::{
 };
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
+use fluent_content::Request;
 use kodecks::message::{Message, MessagePosition};
 
 pub struct DialogPlugin;
@@ -69,7 +70,9 @@ fn update_ui(
                 JustifyContent::End
             };
             let mut text = text_query.single_mut();
-            *text = Text::from_sections(translator.get(&message.id).chars().map(|c| TextSection {
+            let args = message.variables.fluent_args();
+            let request = Request::new(&message.id).args(&args);
+            *text = Text::from_sections(translator.get(request).chars().map(|c| TextSection {
                 value: c.to_string(),
                 style: TextStyle {
                     color: Color::srgba(1.0, 1.0, 1.0, 0.0),

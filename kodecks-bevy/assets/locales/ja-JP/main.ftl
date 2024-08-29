@@ -11,6 +11,8 @@ result-victory = Victory!
 result-defeat = Defeat...
 result-draw = Draw
 
+message-discard-excess-cards = 手札が{ $maxHandSize }枚になるまでカードを捨ててください。
+
 ability-toxic = 有毒
     .description = 戦闘後、クリーチャーとバトルしたクリーチャーを破壊する。
 ability-volatile = 揮発

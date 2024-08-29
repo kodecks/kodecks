@@ -11,6 +11,8 @@ result-victory = Victory!
 result-defeat = Defeat...
 result-draw = Draw
 
+message-discard-excess-cards = Discard cards until you have { $maxHandSize } cards in your hand.
+
 ability-toxic = Toxic
     .description = After the battle, destroy the creature that battled with this creature.
 ability-volatile = Volatile
