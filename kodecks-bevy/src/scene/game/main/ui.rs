@@ -1,6 +1,9 @@
 use super::engine::PlayerEvent;
 use crate::scene::{
-    game::board::{self, AvailableActionList, Board},
+    game::{
+        board::{self, AvailableActionList, Board},
+        event::InstructionsUpdated,
+    },
     translator::{TextPurpose, Translator},
     GlobalState,
 };
@@ -29,6 +32,7 @@ impl Plugin for UiPlugin {
             .add_systems(
                 Update,
                 (
+                    update_instructions.run_if(on_event::<InstructionsUpdated>()),
                     update_action_list.run_if(
                         resource_exists_and_changed::<AvailableActionList>
                             .or_else(resource_exists_and_changed::<Board>),
@@ -152,6 +156,30 @@ fn update_card_image(
             *image = UiImage::new(asset_server.load(format!("cards/{}/image.main.png", safe_name)));
         } else {
             *image = UiImage::default();
+        }
+    }
+}
+
+fn update_instructions(
+    translator: Res<Translator>,
+    mut text_query: Query<(&mut Text, &mut Style), With<InstructionText>>,
+    mut events: EventReader<InstructionsUpdated>,
+) {
+    let (mut text, mut style) = text_query.single_mut();
+    for InstructionsUpdated(message) in events.read() {
+        if let Some(message) = message {
+            let args = message.variables.fluent_args();
+            let request = Request::from(&message.id).args(&args);
+            *text = Text::from_sections(translator.get(request).chars().map(|c| TextSection {
+                value: c.to_string(),
+                style: TextStyle {
+                    color: Color::srgba(1.0, 1.0, 1.0, 1.0),
+                    ..translator.style(TextPurpose::CardText)
+                },
+            }));
+            style.display = Display::Flex;
+        } else {
+            style.display = Display::None;
         }
     }
 }
@@ -285,6 +313,9 @@ pub struct KeywordList;
 
 #[derive(Component)]
 pub struct Keyword;
+
+#[derive(Component)]
+struct InstructionText;
 
 #[derive(Clone, Copy, Component)]
 pub enum CardInfo {
@@ -495,6 +526,8 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                             Pickable::IGNORE,
                         ))
                         .with_children(|parent| {
+                            parent.spawn((TextBundle::default(), Label, InstructionText));
+
                             parent
                                 .spawn((
                                     ImageBundle {

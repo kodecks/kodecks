@@ -1,4 +1,9 @@
-use crate::{command::ActionCommand, id::ObjectId, message::MessageDialog, player::PlayerId};
+use crate::{
+    command::ActionCommand,
+    id::ObjectId,
+    message::{Message, MessageDialog},
+    player::PlayerId,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -42,6 +47,7 @@ impl Ord for AvailableAction {
 pub struct PlayerAvailableActions {
     pub player: PlayerId,
     pub actions: AvailableActionList,
+    pub instructions: Option<Message>,
     pub message_dialog: Option<MessageDialog>,
 }
 
@@ -50,6 +56,7 @@ impl PlayerAvailableActions {
         Self {
             player,
             actions: AvailableActionList::new(),
+            instructions: None,
             message_dialog: None,
         }
     }

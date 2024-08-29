@@ -46,16 +46,11 @@ impl Effect for CardDef {
                         }]
                         .into_iter()
                         .collect(),
-                        message_dialog: Some(MessageDialog {
-                            messages: vec![MessageBox {
-                                message: Message {
-                                    id: "mire_alligator".to_string(),
-                                    ..Default::default()
-                                },
-                                ..Default::default()
-                            }],
+                        instructions: Some(Message {
+                            id: "card-mire-alligator.message".to_string(),
                             ..Default::default()
                         }),
+                        message_dialog: None,
                     }),
                 )
             });

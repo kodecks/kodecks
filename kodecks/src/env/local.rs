@@ -67,6 +67,7 @@ impl LocalEnvironment {
             available_actions: Some(PlayerAvailableActions {
                 player: self.players.player_in_turn(),
                 actions: AvailableActionList::new(),
+                instructions: None,
                 message_dialog: None,
             }),
             logs: vec![],
