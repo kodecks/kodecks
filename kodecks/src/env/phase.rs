@@ -395,6 +395,8 @@ impl Environment {
                         to: PlayerZone::new(self.state.players.player_in_turn(), Zone::Graveyard),
                         reason: MoveReason::Discarded,
                     }])]);
+                } else if player_in_turn.hand.len() > self.state.config.max_hand_size as usize {
+                    return Ok(vec![]);
                 }
                 let active_player = self.state.players.next(self.state.players.player_in_turn());
                 let turn = self.state.turn + 1;
