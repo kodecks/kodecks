@@ -46,9 +46,12 @@ impl Effect for CardDef {
                         }]
                         .into_iter()
                         .collect(),
-                        instruction: Some(Instruction {
-                            messages: vec![Message {
-                                id: "card-mire-alligator.message".into(),
+                        message_dialog: Some(MessageDialog {
+                            messages: vec![MessageBox {
+                                message: Message {
+                                    id: "mire_alligator".to_string(),
+                                    ..Default::default()
+                                },
                                 ..Default::default()
                             }],
                             ..Default::default()

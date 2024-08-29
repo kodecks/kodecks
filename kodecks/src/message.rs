@@ -2,8 +2,8 @@ use crate::{action::AvailableAction, id::ObjectId, variable::VariableList};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct Instruction {
-    pub messages: Vec<Message>,
+pub struct MessageDialog {
+    pub messages: Vec<MessageBox>,
     pub allowed_action: Option<AvailableAction>,
 }
 
@@ -11,14 +11,19 @@ pub struct Instruction {
 pub struct Message {
     pub id: String,
     pub variables: VariableList,
-    pub position: MessagePosition,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct MessageBox {
+    pub message: Message,
+    pub position: MessageBoxPosition,
     pub pointers: Vec<Pointer>,
     pub custom_trigger: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum MessagePosition {
+pub enum MessageBoxPosition {
     #[default]
     Auto,
     Top,

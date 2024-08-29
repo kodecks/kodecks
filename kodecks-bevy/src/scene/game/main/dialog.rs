@@ -1,12 +1,12 @@
 use crate::scene::{
-    game::event::InstructionUpdated,
+    game::event::MessageDialogUpdated,
     translator::{TextPurpose, Translator},
     GlobalState,
 };
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use fluent_content::Request;
-use kodecks::message::{Message, MessagePosition};
+use kodecks::message::{MessageBox, MessageBoxPosition};
 
 pub struct DialogPlugin;
 
@@ -15,7 +15,7 @@ impl Plugin for DialogPlugin {
         app.add_systems(
             Update,
             (
-                handle_event.run_if(on_event::<InstructionUpdated>()),
+                handle_event.run_if(on_event::<MessageDialogUpdated>()),
                 update_ui.run_if(resource_changed_or_removed::<DialogMessages>()),
                 update_text.run_if(resource_exists::<DialogMessages>),
             )
@@ -28,7 +28,7 @@ impl Plugin for DialogPlugin {
 
 #[derive(Resource, Default)]
 pub struct DialogMessages {
-    pub messages: Vec<Message>,
+    pub messages: Vec<MessageBox>,
 }
 
 #[derive(Component)]
@@ -37,8 +37,8 @@ struct DialogBackground;
 #[derive(Component)]
 struct DialogText;
 
-fn handle_event(mut commands: Commands, mut event: EventReader<InstructionUpdated>) {
-    if let Some(InstructionUpdated(instruction)) = event.read().next() {
+fn handle_event(mut commands: Commands, mut event: EventReader<MessageDialogUpdated>) {
+    if let Some(MessageDialogUpdated(instruction)) = event.read().next() {
         if let Some(instruction) = instruction {
             commands.insert_resource(DialogMessages {
                 messages: instruction.messages.iter().rev().cloned().collect(),
@@ -63,15 +63,15 @@ fn update_ui(
         } else {
             *pick = Pickable::IGNORE;
         }
-        if let Some(message) = messages.messages.last() {
-            style.justify_content = if message.position == MessagePosition::Top {
+        if let Some(message_box) = messages.messages.last() {
+            style.justify_content = if message_box.position == MessageBoxPosition::Top {
                 JustifyContent::Start
             } else {
                 JustifyContent::End
             };
             let mut text = text_query.single_mut();
-            let args = message.variables.fluent_args();
-            let request = Request::new(&message.id).args(&args);
+            let args = message_box.message.variables.fluent_args();
+            let request = Request::from(&message_box.message.id).args(&args);
             *text = Text::from_sections(translator.get(request).chars().map(|c| TextSection {
                 value: c.to_string(),
                 style: TextStyle {

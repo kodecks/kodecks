@@ -3,7 +3,7 @@ use crate::{
     action::{Action, AvailableActionList, PlayerAvailableActions},
     card::CardSnapshot,
     error::Error,
-    field::{FieldState, FieldItem},
+    field::{FieldItem, FieldState},
     game::Report,
     id::ObjectId,
     phase::Phase,
@@ -67,7 +67,7 @@ impl LocalEnvironment {
             available_actions: Some(PlayerAvailableActions {
                 player: self.players.player_in_turn(),
                 actions: AvailableActionList::new(),
-                instruction: None,
+                message_dialog: None,
             }),
             logs: vec![],
             condition: self.game_condition,

@@ -11,7 +11,7 @@ use kodecks::{
     action::{Action, AvailableAction},
     id::ObjectId,
     log::LogAction,
-    message::Instruction,
+    message::MessageDialog,
     player::PlayerId,
     target::Target,
 };
@@ -24,7 +24,7 @@ pub struct EventPlugin;
 
 impl Plugin for EventPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<InstructionUpdated>()
+        app.add_event::<MessageDialogUpdated>()
             .add_event::<ShardUpdated>()
             .add_event::<LifeUpdated>()
             .add_event::<TurnChanged>()
@@ -53,7 +53,7 @@ impl Plugin for EventPlugin {
 }
 
 #[derive(Event)]
-pub struct InstructionUpdated(pub Option<Instruction>);
+pub struct MessageDialogUpdated(pub Option<MessageDialog>);
 
 #[derive(Event)]
 pub struct ShardUpdated;
@@ -162,7 +162,7 @@ fn update_loading(
 pub struct ServerEvents<'w> {
     server: ResMut<'w, EventQueue>,
     log: ResMut<'w, LogEventQueue>,
-    instruction: EventWriter<'w, InstructionUpdated>,
+    message_dialog: EventWriter<'w, MessageDialogUpdated>,
     life: EventWriter<'w, LifeUpdated>,
     shard: EventWriter<'w, ShardUpdated>,
     turn: EventWriter<'w, TurnChanged>,
@@ -234,11 +234,13 @@ fn recv_server_events(
         }
 
         if next_action.is_none() {
-            let instruction = event
+            let message_dialog = event
                 .available_actions
                 .as_ref()
-                .and_then(|actions| actions.instruction.clone());
-            events.instruction.send(InstructionUpdated(instruction));
+                .and_then(|actions| actions.message_dialog.clone());
+            events
+                .message_dialog
+                .send(MessageDialogUpdated(message_dialog));
         }
 
         for log in &event.logs {
