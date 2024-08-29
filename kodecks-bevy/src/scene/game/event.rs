@@ -13,6 +13,7 @@ use kodecks::{
     log::LogAction,
     message::MessageDialog,
     player::PlayerId,
+    prelude::Message,
     target::Target,
 };
 use kodecks_catalog::CATALOG;
@@ -25,6 +26,7 @@ pub struct EventPlugin;
 impl Plugin for EventPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<MessageDialogUpdated>()
+            .add_event::<InstructionsUpdated>()
             .add_event::<ShardUpdated>()
             .add_event::<LifeUpdated>()
             .add_event::<TurnChanged>()
@@ -54,6 +56,9 @@ impl Plugin for EventPlugin {
 
 #[derive(Event)]
 pub struct MessageDialogUpdated(pub Option<MessageDialog>);
+
+#[derive(Event)]
+pub struct InstructionsUpdated(pub Option<Message>);
 
 #[derive(Event)]
 pub struct ShardUpdated;
@@ -163,6 +168,7 @@ pub struct ServerEvents<'w> {
     server: ResMut<'w, EventQueue>,
     log: ResMut<'w, LogEventQueue>,
     message_dialog: EventWriter<'w, MessageDialogUpdated>,
+    instructions: EventWriter<'w, InstructionsUpdated>,
     life: EventWriter<'w, LifeUpdated>,
     shard: EventWriter<'w, ShardUpdated>,
     turn: EventWriter<'w, TurnChanged>,
@@ -242,6 +248,13 @@ fn recv_server_events(
                 .message_dialog
                 .send(MessageDialogUpdated(message_dialog));
         }
+
+        events.instructions.send(InstructionsUpdated(
+            event
+                .available_actions
+                .as_ref()
+                .and_then(|actions| actions.instructions.clone()),
+        ));
 
         for log in &event.logs {
             if matches!(

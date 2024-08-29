@@ -2,7 +2,7 @@ use super::Environment;
 use crate::{
     action::{AvailableAction, PlayerAvailableActions},
     filter_vec,
-    message::{Message, MessageBox, MessageDialog},
+    message::Message,
     phase::Phase,
     variable::VariableList,
     zone::CardZone,
@@ -52,6 +52,7 @@ impl Environment {
                 ]
                 .into_iter()
                 .collect(),
+                instructions: None,
                 message_dialog: None,
             })
         } else if let Phase::Block = &self.state.phase {
@@ -82,6 +83,7 @@ impl Environment {
                 ]
                 .into_iter()
                 .collect(),
+                instructions: None,
                 message_dialog: None,
             })
         } else if matches!(self.state.phase, Phase::End)
@@ -95,17 +97,12 @@ impl Environment {
                 }]
                 .into_iter()
                 .collect(),
-                message_dialog: Some(MessageDialog {
-                    messages: vec![MessageBox {
-                        message: Message {
-                            id: "message-discard-excess-cards".to_string(),
-                            variables: VariableList::new()
-                                .set("maxHandSize", self.state.config.max_hand_size as i32),
-                        },
-                        ..Default::default()
-                    }],
-                    ..Default::default()
+                instructions: Some(Message {
+                    id: "message-discard-excess-cards".to_string(),
+                    variables: VariableList::new()
+                        .set("maxHandSize", self.state.config.max_hand_size as i32),
                 }),
+                message_dialog: None,
             })
         } else {
             None
