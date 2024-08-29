@@ -1,7 +1,7 @@
 use crate::{
     card::Card,
     error::Error,
-    id::{CardId, ObjectId},
+    id::{CardId, ObjectId, TimedObjectId},
     sequence::CardSequence,
     zone::CardZone,
 };
@@ -102,5 +102,9 @@ where
 {
     fn id(&self) -> ObjectId {
         self.card.id()
+    }
+
+    fn timed_id(&self) -> TimedObjectId {
+        self.card.timed_id()
     }
 }

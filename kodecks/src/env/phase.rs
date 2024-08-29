@@ -8,6 +8,7 @@ use crate::{
     event::{CardEvent, EventReason},
     field::{FieldBattleState, FieldState},
     filter_vec,
+    id::CardId,
     opcode::{Opcode, OpcodeList},
     phase::Phase,
     player::PlayerZone,
@@ -301,7 +302,7 @@ impl Environment {
 
                     if let Ok(log) = (ActionCommand::SetFieldState {
                         source: attacker.id(),
-                        target: attacker.id(),
+                        target: attacker.timed_id(),
                         state: FieldState::Exhausted,
                         reason: EventReason::Battle,
                     })
@@ -344,7 +345,7 @@ impl Environment {
                         {
                             if let Ok(log) = (ActionCommand::DestroyCard {
                                 source: blocker.id(),
-                                target: attacker.id(),
+                                target: attacker.timed_id(),
                                 reason: EventReason::Battle,
                             })
                             .into_opcodes(self)
@@ -362,7 +363,7 @@ impl Environment {
                         {
                             if let Ok(log) = (ActionCommand::DestroyCard {
                                 source: attacker.id(),
-                                target: blocker.id(),
+                                target: blocker.timed_id(),
                                 reason: EventReason::Battle,
                             })
                             .into_opcodes(self)

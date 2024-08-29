@@ -1,4 +1,7 @@
-use crate::{color::Color, id::ObjectId};
+use crate::{
+    color::Color,
+    id::{ObjectId, TimedObjectId},
+};
 use thiserror::Error;
 
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
@@ -13,4 +16,6 @@ pub enum Error {
     KeyNotFound { key: String },
     #[error("Invalid value type")]
     InvalidValueType,
+    #[error("Target lost: {target}")]
+    TargetLost { target: TimedObjectId },
 }

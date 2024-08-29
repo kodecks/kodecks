@@ -4,7 +4,7 @@ use crate::{
     error::Error,
     event::{CardEvent, EventReason},
     field::FieldState,
-    id::ObjectId,
+    id::{CardId, ObjectId, TimedObjectId},
     opcode::{Opcode, OpcodeList},
     player::PlayerId,
 };
@@ -19,12 +19,12 @@ pub enum ActionCommand {
     },
     DestroyCard {
         source: ObjectId,
-        target: ObjectId,
+        target: TimedObjectId,
         reason: EventReason,
     },
     SetFieldState {
         source: ObjectId,
-        target: ObjectId,
+        target: TimedObjectId,
         state: FieldState,
         reason: EventReason,
     },
@@ -57,12 +57,19 @@ impl ActionCommand {
                 reason,
             } => {
                 let source = env.state.find_card(source)?;
-                let target = env.state.find_card(target)?;
-                env.apply_event(CardEvent::Destroyed { reason }, source, target)
+                let current_target = env.state.find_card(target.id)?;
+                if current_target.timed_id() != target {
+                    return Err(Error::TargetLost { target });
+                }
+                env.apply_event(CardEvent::Destroyed { reason }, source, current_target)
             }
             ActionCommand::SetFieldState { target, state, .. } => {
+                let current_target = env.state.find_card(target.id)?;
+                if current_target.timed_id() != target {
+                    return Err(Error::TargetLost { target });
+                }
                 Ok(vec![OpcodeList::new(vec![Opcode::SetFieldState {
-                    card: target,
+                    card: current_target.id(),
                     state,
                 }])])
             }
