@@ -1,5 +1,6 @@
 use kodecks::prelude::*;
 
+mod airborne_eagle_ray;
 mod bambooster;
 mod diamond_porcupine;
 mod flash_bang_jellyfish;
@@ -44,4 +45,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "turb" => turbofish::ARCHETYPE,
     "flash-bang-jellyfish" => flash_bang_jellyfish::ARCHETYPE,
     "flas" => flash_bang_jellyfish::ARCHETYPE,
+    "airborne-eagle-ray" => airborne_eagle_ray::ARCHETYPE,
+    "airb" => airborne_eagle_ray::ARCHETYPE,
 };

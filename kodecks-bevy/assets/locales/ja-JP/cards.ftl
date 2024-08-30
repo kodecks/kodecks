@@ -21,3 +21,6 @@ card-vigilant-lynx = 警戒するヤマネコ
 card-turbofish = ターボフィッシュ
 card-flash-bang-jellyfish = 閃光クラゲ
     .text = <<閃光クラゲ>>が場に出た時、全てのクリーチャーは疲労状態になる。
+card-airborne-eagle-ray = 飛行トビエイ
+    .text = <<飛行トビエイ>>が場に出た時、クリーチャー1体を持ち主の手札に戻す。
+    .message = 手札に戻すクリーチャーを選択してください。

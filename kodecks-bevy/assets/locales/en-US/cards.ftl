@@ -21,3 +21,6 @@ card-vigilant-lynx = Vigilant Lynx
 card-turbofish = Turbofish
 card-flash-bang-jellyfish = Flash-Bang Jellyfish
     .text = When <<Flash-Bang Jellyfish>> enters the field, all creatures become exhausted.
+card-airborne-eagle-ray = Airborne Eagle Ray
+    .text = When <<Airborne Eagle Ray>> enters the field, return target creature to its owner's hand.
+    .message = Choose a creature to return to the hand.
