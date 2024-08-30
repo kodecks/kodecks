@@ -22,6 +22,11 @@ pub enum ActionCommand {
         target: TimedObjectId,
         reason: EventReason,
     },
+    ReturnCardToHand {
+        source: ObjectId,
+        target: TimedObjectId,
+        reason: EventReason,
+    },
     SetFieldState {
         source: ObjectId,
         target: TimedObjectId,
@@ -62,6 +67,18 @@ impl ActionCommand {
                     return Err(Error::TargetLost { target });
                 }
                 env.apply_event(CardEvent::Destroyed { reason }, source, current_target)
+            }
+            ActionCommand::ReturnCardToHand {
+                source,
+                target,
+                reason,
+            } => {
+                let source = env.state.find_card(source)?;
+                let current_target = env.state.find_card(target.id)?;
+                if current_target.timed_id() != target {
+                    return Err(Error::TargetLost { target });
+                }
+                env.apply_event(CardEvent::ReturnedToHand { reason }, source, current_target)
             }
             ActionCommand::SetFieldState { target, state, .. } => {
                 let current_target = env.state.find_card(target.id)?;
