@@ -1,12 +1,11 @@
-use crate::score::Score;
-
 use super::Ability;
+use crate::score::Score;
 use serde::{Deserialize, Serialize};
 use std::{
     mem,
     ops::{Add, Sub},
 };
-use strum::{Display, EnumString, IntoStaticStr};
+use strum::{Display, EnumIter, EnumString, IntoStaticStr};
 
 #[derive(
     Debug,
@@ -16,11 +15,13 @@ use strum::{Display, EnumString, IntoStaticStr};
     Eq,
     PartialOrd,
     Ord,
+    Hash,
     Display,
     IntoStaticStr,
     Serialize,
     Deserialize,
     EnumString,
+    EnumIter,
 )]
 #[non_exhaustive]
 #[serde(rename_all = "snake_case")]

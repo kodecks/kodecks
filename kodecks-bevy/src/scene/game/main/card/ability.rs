@@ -1,8 +1,8 @@
 use super::Card;
 use crate::scene::game::board::Environment;
-use bevy::prelude::*;
-use bevy_asset_loader::prelude::*;
+use bevy::{prelude::*, utils::HashMap};
 use kodecks::{ability::KeywordAbility, zone::Zone};
+use strum::IntoEnumIterator;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AbilityOverlay {
@@ -10,15 +10,34 @@ pub struct AbilityOverlay {
     pub ability: Option<KeywordAbility>,
 }
 
-#[derive(AssetCollection, Resource)]
-pub struct AbilityAssets {
-    #[asset(standard_material)]
-    #[asset(path = "abilities/toxic.png")]
-    toxic: Handle<StandardMaterial>,
+pub fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let assets = KeywordAbility::iter()
+        .map(|ability| {
+            let image = asset_server.load(format!(
+                "abilities/{}.png",
+                ability.to_string().to_lowercase()
+            ));
+            (
+                ability,
+                materials.add(StandardMaterial {
+                    base_color_texture: Some(image),
+                    alpha_mode: AlphaMode::Blend,
+                    unlit: true,
+                    ..default()
+                }),
+            )
+        })
+        .collect();
+    commands.insert_resource(AbilityAssets { materials: assets });
+}
 
-    #[asset(standard_material)]
-    #[asset(path = "abilities/volatile.png")]
-    volatile: Handle<StandardMaterial>,
+#[derive(Resource)]
+pub struct AbilityAssets {
+    materials: HashMap<KeywordAbility, Handle<StandardMaterial>>,
 }
 
 pub fn update_ability_overlay(
@@ -45,11 +64,7 @@ pub fn update_ability_overlay(
                         overlay.ability = ability.cloned().filter(|_| zone.zone == Zone::Field);
 
                         if let Some(ability) = overlay.ability {
-                            *material = match ability {
-                                KeywordAbility::Toxic => assets.toxic.clone(),
-                                KeywordAbility::Volatile => assets.volatile.clone(),
-                                _ => continue,
-                            };
+                            *material = assets.materials[&ability].clone();
                             *visibility = Visibility::Visible;
                         } else {
                             *visibility = Visibility::Hidden;

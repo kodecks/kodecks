@@ -3090,6 +3090,7 @@ dependencies = [
  "serde_default",
  "serde_json",
  "serde_tuple",
+ "strum",
  "thiserror",
  "tinystr",
  "tracing",

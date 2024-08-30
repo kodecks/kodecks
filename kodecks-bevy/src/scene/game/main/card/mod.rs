@@ -5,7 +5,7 @@ use crate::painter::frames::CardFramePainter;
 use crate::painter::numbers::{Alignment, DrawOptions, NumberPainter};
 use crate::scene::game::board::{self, AvailableActionList, Board, Environment};
 use crate::scene::GlobalState;
-use ability::{AbilityAssets, AbilityOverlay};
+use ability::AbilityOverlay;
 use bevy::animation::{AnimationTarget, AnimationTargetId};
 use bevy::ecs::bundle::Bundle;
 use bevy::ecs::system::SystemParam;
@@ -16,7 +16,6 @@ use bevy::render::{
     render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
 use bevy::utils::{HashMap, HashSet};
-use bevy_asset_loader::asset_collection::AssetCollectionApp;
 use bevy_mod_picking::prelude::*;
 use frame::CardFrame;
 use image::{DynamicImage, RgbaImage};
@@ -41,11 +40,10 @@ pub struct CardPlugin;
 
 impl Plugin for CardPlugin {
     fn build(&self, app: &mut App) {
-        app.init_collection::<AbilityAssets>()
-            .init_state::<CardState>()
+        app.init_state::<CardState>()
             .init_resource::<CardFramePainter>()
             .add_event::<CardDrag>()
-            .add_systems(Startup, frame::setup)
+            .add_systems(Startup, (frame::setup, ability::setup))
             .add_systems(
                 Update,
                 (
