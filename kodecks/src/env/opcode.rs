@@ -6,7 +6,7 @@ use crate::{
     field::FieldState,
     log::LogAction,
     opcode::Opcode,
-    player::PlayerZone,
+    player::{PlayerCondition, PlayerZone},
     sequence::CardSequence,
     zone::{CardZone, MoveReason, Zone},
 };
@@ -116,6 +116,8 @@ impl Environment {
                         to,
                         reason: MoveReason::Draw,
                     }]);
+                } else {
+                    player.condition.get_or_insert(PlayerCondition::Lose);
                 }
                 Ok(vec![])
             }

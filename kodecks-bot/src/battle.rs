@@ -175,5 +175,5 @@ fn evaluate_battle(env: &Environment, player: PlayerId, action: Option<Action>) 
         }
     }
 
-    get_score(&env.state, player)
+    get_score(&env, player)
 }

@@ -1,5 +1,5 @@
 use kodecks::{
-    env::{GameCondition, GameState},
+    env::{Environment, GameCondition},
     player::PlayerId,
     score::Score,
 };
@@ -36,7 +36,8 @@ impl Ord for ComputedScore {
     }
 }
 
-pub fn get_score(state: &GameState, side: PlayerId) -> i32 {
+pub fn get_score(env: &Environment, side: PlayerId) -> i32 {
+    let state = &env.state;
     let player = state.players().get(side);
     let opponent = state.players().get(state.players.next(side));
     let mut score = 0i32;
@@ -69,7 +70,7 @@ pub fn get_score(state: &GameState, side: PlayerId) -> i32 {
         score -= 100;
     }
 
-    score += match state.check_game_condition() {
+    score += match env.game_condition() {
         GameCondition::Win(player) => {
             if player == side {
                 1000

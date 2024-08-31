@@ -5,10 +5,7 @@ use crate::{
     id::ObjectId,
     phase::Phase,
     player::{PlayerList, PlayerState, PlayerZone},
-    zone::CardZone,
 };
-
-use super::GameCondition;
 
 #[derive(Clone)]
 pub struct GameState {
@@ -49,19 +46,5 @@ impl GameState {
 
     pub fn players(&self) -> &PlayerList<PlayerState> {
         &self.players
-    }
-
-    pub fn check_game_condition(&self) -> GameCondition {
-        let survived_players = self
-            .players
-            .iter()
-            .filter(|player| !(player.stats.life == 0 || player.deck.is_empty()))
-            .collect::<Vec<_>>();
-
-        match survived_players.as_slice() {
-            [] => GameCondition::Draw,
-            [winner] => GameCondition::Win(winner.id),
-            _ => GameCondition::Progress,
-        }
     }
 }

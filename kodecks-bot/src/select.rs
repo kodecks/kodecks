@@ -32,7 +32,7 @@ pub fn find_select_combination(
 }
 
 fn evaluate_select(mut ctx: BotContext, action: Option<Action>) -> ComputedScore {
-    let initial_score = get_score(&ctx.env.state, ctx.player);
+    let initial_score = get_score(&ctx.env, ctx.player);
 
     let env = Arc::make_mut(&mut ctx.env);
     let mut next_action = action;
@@ -59,6 +59,6 @@ fn evaluate_select(mut ctx: BotContext, action: Option<Action>) -> ComputedScore
 
     ComputedScore {
         base: initial_score,
-        action: get_score(&env.state, ctx.player),
+        action: get_score(env, ctx.player),
     }
 }

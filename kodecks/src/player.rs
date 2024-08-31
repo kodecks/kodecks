@@ -174,6 +174,7 @@ pub struct PlayerState {
     pub shards: ShardList,
     pub stats: PlayerStats,
     pub counters: PlayerCounters,
+    pub condition: Option<PlayerCondition>,
     pub abilities: AbilityList<PlayerAbility>,
 }
 
@@ -194,6 +195,7 @@ impl Clone for PlayerState {
             shards: self.shards.clone(),
             stats: self.stats,
             counters: self.counters,
+            condition: self.condition,
             abilities: self.abilities.clone(),
         }
     }
@@ -210,6 +212,7 @@ impl PlayerState {
             shards: ShardList::new(),
             stats: PlayerStats::default(),
             counters: PlayerCounters::default(),
+            condition: None,
             abilities: AbilityList::default(),
         }
     }
@@ -275,6 +278,13 @@ impl Default for PlayerStats {
     fn default() -> Self {
         Self { life: 2000 }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PlayerCondition {
+    Win,
+    Lose,
 }
 
 #[derive(Debug, Default, Clone, Copy)]
