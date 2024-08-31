@@ -17,3 +17,5 @@ ability-toxic = 有毒
     .description = 戦闘後、クリーチャーとバトルしたクリーチャーを破壊する。
 ability-volatile = 揮発
     .description = このクリーチャーは死んだときにカケラを生成しない。
+ability-stealth = ステルス
+    .description = このクリーチャーはカード効果の対象に指定できない。

@@ -5,6 +5,7 @@ use crate::{
     linear::Linear,
     zone::CardZone,
 };
+use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -40,10 +41,23 @@ impl ComputedAttribute {
     }
 }
 
+bitflags! {
+    #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+    pub struct ComputedFlags: u32 {
+        const TARGETABLE = 0b00000001;
+    }
+}
+
+impl ComputedFlags {
+    pub fn is_targetable(&self) -> bool {
+        self.contains(Self::TARGETABLE)
+    }
+}
+
 pub trait ComputedSequence: CardZone<Item = Card> {
     fn update_computed(&mut self, states: Vec<ComputedAttribute>) {
         for (card, state) in self.iter_mut().zip(states) {
-            *card.computed_mut() = state;
+            card.set_computed(state);
         }
     }
 }
