@@ -63,5 +63,5 @@ fn evaluate_cast(mut ctx: BotContext, action: Option<Action>) -> i32 {
         }
     }
 
-    get_score(&env.state, ctx.player)
+    get_score(env, ctx.player)
 }

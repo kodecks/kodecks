@@ -10,7 +10,7 @@ use crate::{
     log::LogAction,
     opcode::OpcodeList,
     phase::Phase,
-    player::{PlayerId, PlayerList, PlayerState},
+    player::{PlayerCondition, PlayerId, PlayerList, PlayerState},
     stack::{Stack, StackItem},
     zone::CardZone,
 };
@@ -187,9 +187,8 @@ impl Environment {
                         error!("Error computing effects: {:?}", err);
                     }
 
-                    if !self.game_condition.is_ended() {
-                        self.game_condition = self.state.check_game_condition();
-                    }
+                    self.check_game_condition();
+
                     if !report
                         .available_actions
                         .as_ref()
@@ -246,9 +245,7 @@ impl Environment {
             None
         };
 
-        if !self.game_condition.is_ended() {
-            self.game_condition = self.state.check_game_condition();
-        }
+        self.check_game_condition();
 
         Report {
             available_actions,
@@ -259,6 +256,51 @@ impl Environment {
 
     pub fn last_available_actions(&self) -> Option<&PlayerAvailableActions> {
         self.last_available_actions.as_ref()
+    }
+
+    pub fn game_condition(&self) -> GameCondition {
+        self.game_condition
+    }
+
+    pub fn check_game_condition(&mut self) {
+        if self.game_condition.is_ended() {
+            return;
+        }
+
+        for player in self
+            .state
+            .players
+            .iter_mut()
+            .filter(|player| player.condition.is_none())
+        {
+            if player.stats.life == 0 {
+                player.condition = Some(PlayerCondition::Lose);
+            }
+        }
+
+        let won_players = self
+            .state
+            .players
+            .iter()
+            .filter(|player| player.condition == Some(PlayerCondition::Win))
+            .collect::<Vec<_>>();
+
+        let lost_players = self
+            .state
+            .players
+            .iter()
+            .filter(|player| player.condition == Some(PlayerCondition::Lose))
+            .collect::<Vec<_>>();
+
+        self.game_condition = if won_players.is_empty() && lost_players.is_empty() {
+            GameCondition::Progress
+        } else if let [won] = won_players.as_slice() {
+            GameCondition::Win(won.id)
+        } else if let [lost] = lost_players.as_slice() {
+            GameCondition::Win(self.state.players.next(lost.id))
+        } else {
+            GameCondition::Draw
+        };
     }
 }
 
