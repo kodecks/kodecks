@@ -28,6 +28,7 @@ use strum::{Display, EnumIter, EnumString, IntoStaticStr};
 pub enum KeywordAbility {
     Toxic,
     Volatile,
+    Stealth,
 }
 
 impl Ability for KeywordAbility {}
@@ -37,6 +38,7 @@ impl Score for KeywordAbility {
         match self {
             KeywordAbility::Toxic => 1,
             KeywordAbility::Volatile => -1,
+            KeywordAbility::Stealth => 1,
         }
     }
 }

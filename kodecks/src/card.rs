@@ -1,7 +1,7 @@
 use crate::{
     ability::{AnonymousAbility, KeywordAbility},
     color::Color,
-    computed::ComputedAttribute,
+    computed::{ComputedAttribute, ComputedFlags},
     deck::DeckItem,
     effect::{Effect, NoEffect},
     event::EventFilter,
@@ -52,6 +52,7 @@ pub struct Card {
     controller: PlayerId,
     archetype: &'static CardArchetype,
     computed: ComputedAttribute,
+    flags: ComputedFlags,
     event_filter: EventFilter,
     effect: Box<dyn Effect>,
     timestamp: u64,
@@ -78,6 +79,7 @@ impl Card {
             controller: owner,
             archetype,
             computed: archetype.into(),
+            flags: ComputedFlags::empty(),
             event_filter: effect.event_filter(),
             effect,
             timestamp: 0,
@@ -112,12 +114,22 @@ impl Card {
         &self.computed
     }
 
-    pub fn computed_mut(&mut self) -> &mut ComputedAttribute {
-        &mut self.computed
+    pub fn set_computed(&mut self, computed: ComputedAttribute) {
+        self.computed = computed;
+
+        let mut flags = ComputedFlags::empty();
+        let stealth = self.zone.zone == Zone::Field
+            && self.computed.abilities.contains(&KeywordAbility::Stealth);
+        flags.set(ComputedFlags::TARGETABLE, !stealth);
+        self.flags = flags;
     }
 
     pub fn reset_computed(&mut self) {
-        self.computed = self.archetype.into();
+        self.set_computed(self.archetype.into());
+    }
+
+    pub fn flags(&self) -> ComputedFlags {
+        self.flags
     }
 
     pub fn event_filter(&self) -> EventFilter {
@@ -159,6 +171,7 @@ impl Card {
             controller: self.controller,
             archetype: self.archetype,
             computed: self.computed.clone(),
+            flags: self.flags,
             event_filter: self.event_filter,
             effect: (self.archetype.effect)(),
             timestamp: self.timestamp,

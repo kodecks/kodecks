@@ -17,3 +17,5 @@ ability-toxic = Toxic
     .description = After the battle, destroy the creature that battled with this creature.
 ability-volatile = Volatile
     .description = This creature does not generate a shard when it dies.
+ability-stealth = Stealth
+    .description = This creature cannot be targeted by card effects.
