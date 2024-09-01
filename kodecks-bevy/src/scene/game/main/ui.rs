@@ -170,13 +170,13 @@ fn update_instructions(
         if let Some(message) = message {
             let args = message.variables.fluent_args();
             let request = Request::from(&message.id).args(&args);
-            *text = Text::from_sections(translator.get(request).chars().map(|c| TextSection {
-                value: c.to_string(),
-                style: TextStyle {
+            *text = Text::from_section(
+                translator.get(request),
+                TextStyle {
                     color: Color::srgba(1.0, 1.0, 1.0, 1.0),
                     ..translator.style(TextPurpose::CardText)
                 },
-            }));
+            );
             style.display = Display::Flex;
         } else {
             style.display = Display::None;
@@ -526,7 +526,25 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                             Pickable::IGNORE,
                         ))
                         .with_children(|parent| {
-                            parent.spawn((TextBundle::default(), Label, InstructionText));
+                            parent
+                                .spawn((NodeBundle {
+                                    style: Style {
+                                        width: Val::Percent(100.),
+                                        padding: UiRect::all(Val::Px(5.)),
+                                        ..default()
+                                    },
+                                    ..default()
+                                },))
+                                .with_children(|parent| {
+                                    parent.spawn((
+                                        TextBundle::from_section(
+                                            "",
+                                            translator.style(TextPurpose::CardText),
+                                        ),
+                                        Label,
+                                        InstructionText,
+                                    ));
+                                });
 
                             parent
                                 .spawn((
