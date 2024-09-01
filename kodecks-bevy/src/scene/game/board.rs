@@ -256,8 +256,8 @@ impl Board {
                 }
             } else if zone.zone == Zone::Deck {
                 let transform = Transform::from_rotation(Quat::from_rotation_z(PI))
-                    .with_translation(Vec3::new(5.0, 2.0, 2.5))
-                    .with_scale(Vec3::splat(0.8));
+                    .with_translation(Vec3::new(5.0, 0.0, 3.0))
+                    .with_scale(Vec3::splat(0.0));
                 return Some(transform);
             } else if zone.zone == Zone::Graveyard {
                 let transform = Transform::from_xyz(3.9, -0.5, 3.0).with_scale(Vec3::splat(0.8));
@@ -301,7 +301,8 @@ impl Board {
         } else if zone.zone == Zone::Deck {
             let mut transform =
                 Transform::from_rotation(Quat::from_rotation_z(std::f32::consts::PI))
-                    .with_translation(Vec3::new(6.0, 0.2, -3.0));
+                    .with_translation(Vec3::new(5.0, 0.0, -1.5))
+                    .with_scale(Vec3::splat(0.0));
             transform.rotate_local_y(std::f32::consts::PI);
             return Some(transform);
         } else if zone.zone == Zone::Graveyard {
