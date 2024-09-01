@@ -8,6 +8,7 @@ use bevy::ecs::system::SystemParam;
 use bevy::ecs::world::Command;
 use bevy::prelude::*;
 use bevy::utils::hashbrown::HashSet;
+use kodecks::player::PlayerZone;
 use kodecks::target::Target;
 use kodecks::zone::Zone;
 use std::f32::consts::PI;
@@ -240,7 +241,13 @@ fn start_move_animation(
                 let (zone, log) = if let Ok(zone) = res.env.find_zone(card.id) {
                     (zone, moved.contains(&card.id))
                 } else {
-                    return;
+                    (
+                        PlayerZone {
+                            player: card.owner,
+                            zone: Zone::Deck,
+                        },
+                        false,
+                    )
                 };
 
                 let mut animation = AnimationClip::default();
