@@ -1,19 +1,26 @@
 use crate::{
     action::{Action, PlayerAvailableActions},
+    card::{Card, Catalog},
     computed::ComputedSequence,
-    config::{DebugFlags, GameConfig},
+    config::DebugFlags,
     continuous::ContinuousEffectList,
     effect::EffectTriggerContext,
     error::Error,
     filter_vec,
     game::Report,
+    id::ObjectIdCounter,
     log::LogAction,
     opcode::OpcodeList,
     phase::Phase,
     player::{PlayerCondition, PlayerId, PlayerList, PlayerState},
+    profile::GameProfile,
+    sequence::CardSequence,
     stack::{Stack, StackItem},
     zone::CardZone,
 };
+use rand::rngs::SmallRng;
+use rand::seq::SliceRandom;
+use rand::SeedableRng;
 use serde::{Deserialize, Serialize};
 use std::{collections::VecDeque, fmt};
 use tracing::{error, warn};
@@ -37,15 +44,45 @@ pub struct Environment {
     game_condition: GameCondition,
     ts_counter: u64,
     last_available_actions: Option<PlayerAvailableActions>,
+    rng: SmallRng,
+    obj_counter: ObjectIdCounter,
 }
 
 impl Environment {
-    pub fn new(config: GameConfig, players: Vec<PlayerState>) -> Self {
+    pub fn new(profile: GameProfile, catalog: &'static Catalog) -> Self {
+        let mut rng: SmallRng = profile
+            .config
+            .rng_seed
+            .map(SmallRng::seed_from_u64)
+            .unwrap_or_else(SmallRng::from_entropy);
+
+        let mut obj_counter = ObjectIdCounter::default();
+        let mut players = profile
+            .players
+            .into_iter()
+            .map(|player| {
+                let mut state = PlayerState::new(player.id);
+                for item in &player.deck.cards {
+                    let archetype = &catalog[item.archetype_id];
+                    let card = Card::new(&mut obj_counter, item, archetype, player.id);
+                    state.deck.add_top(card);
+                }
+                if !profile.config.no_deck_shuffle {
+                    state.deck.shuffle(&mut obj_counter, &mut rng);
+                }
+                state
+            })
+            .collect::<Vec<_>>();
+
+        if !profile.config.no_player_shuffle {
+            players.shuffle(&mut rng);
+        }
+
         let current_player = players.first().as_ref().unwrap().id;
 
         Environment {
             state: GameState {
-                config,
+                config: profile.config,
                 turn: 0,
                 phase: Phase::Standby,
                 players: PlayerList::new(current_player, players),
@@ -56,6 +93,8 @@ impl Environment {
             game_condition: GameCondition::Progress,
             ts_counter: 0,
             last_available_actions: None,
+            rng,
+            obj_counter,
         }
     }
 
