@@ -112,10 +112,7 @@ impl Bot for DefaultBot {
             .filter(|(_, score)| score.score() > 0)
             .max_by_key(|(_, score)| *score);
 
-        let opponent = env
-            .state
-            .players()
-            .get(env.state.players.next(actions.player));
+        let opponent = env.state.players().next_player(actions.player);
         let attackers = opponent
             .field
             .attacking_cards()

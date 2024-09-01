@@ -48,8 +48,12 @@ impl LocalEnvironment {
         self.players.iter().flat_map(|player| player.cards())
     }
 
-    pub fn next_player(&self, player: PlayerId) -> PlayerId {
-        self.players.next(player)
+    pub fn next_id(&self, player: PlayerId) -> PlayerId {
+        self.players.next_id(player)
+    }
+
+    pub fn next_player(&self, player: PlayerId) -> &LocalPlayerState {
+        self.players.next_player(player)
     }
 
     pub fn tick(&mut self, action: Action) -> Report {
@@ -65,7 +69,7 @@ impl LocalEnvironment {
         }
         Report {
             available_actions: Some(PlayerAvailableActions {
-                player: self.players.player_in_turn(),
+                player: self.players.player_in_turn().id,
                 actions: AvailableActionList::new(),
                 instructions: None,
                 message_dialog: None,
@@ -79,7 +83,7 @@ impl LocalEnvironment {
 impl Environment {
     pub fn local(&self, receiver: PlayerId) -> LocalEnvironment {
         let players = PlayerList::new(
-            self.state.players.player_in_turn(),
+            self.state.players.player_in_turn().id,
             self.state
                 .players
                 .iter()

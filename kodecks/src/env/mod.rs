@@ -297,7 +297,7 @@ impl Environment {
         } else if let [won] = won_players.as_slice() {
             GameCondition::Win(won.id)
         } else if let [lost] = lost_players.as_slice() {
-            GameCondition::Win(self.state.players.next(lost.id))
+            GameCondition::Win(self.state.players.next_id(lost.id))
         } else {
             GameCondition::Draw
         };

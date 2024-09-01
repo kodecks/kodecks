@@ -110,7 +110,7 @@ fn update(
     let mut shards = vec![];
 
     let player_shards = &env.players.get(env.player).shards;
-    let opponent_shards = &env.players.get(env.next_player(env.player)).shards;
+    let opponent_shards = &env.players.next_player(env.player).shards;
 
     let mut player_count = 0;
     for color in Color::iter_all() {
