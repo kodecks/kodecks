@@ -97,10 +97,8 @@ impl Board {
     }
 
     pub fn update(&mut self, env: &LocalEnvironment) {
-        let player_id = env.player;
-        let opponent_id = env.next_player(player_id);
-        let player = env.players.get(player_id);
-        let opponent = env.players.get(opponent_id);
+        let player = env.players.get(env.player);
+        let opponent = env.players.next_player(env.player);
 
         self.player_hand = player.hand.iter().map(|item| item.card.id).collect();
 

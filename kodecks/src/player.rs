@@ -54,10 +54,6 @@ impl<T> PlayerList<T> {
         }
     }
 
-    pub fn player_in_turn(&self) -> PlayerId {
-        self.player_in_turn
-    }
-
     pub fn set_player_in_turn(&mut self, player: PlayerId) {
         self.player_in_turn = player;
     }
@@ -145,7 +141,7 @@ where
         PlayerListMutIter::new(self.player_in_turn, &mut self.players)
     }
 
-    pub fn next(&self, id: PlayerId) -> PlayerId {
+    pub fn next_id(&self, id: PlayerId) -> PlayerId {
         let pos = self
             .players
             .iter()
@@ -155,8 +151,17 @@ where
         self.players[next].id()
     }
 
+    pub fn next_player(&self, id: PlayerId) -> &T {
+        let next = self.next_id(id);
+        self.get(next)
+    }
+
     pub fn push(&mut self, player: T) {
         self.players.push(player);
+    }
+
+    pub fn player_in_turn(&self) -> &T {
+        self.get(self.player_in_turn)
     }
 }
 

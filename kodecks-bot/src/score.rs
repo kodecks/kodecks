@@ -39,7 +39,7 @@ impl Ord for ComputedScore {
 pub fn get_score(env: &Environment, side: PlayerId) -> i32 {
     let state = &env.state;
     let player = state.players().get(side);
-    let opponent = state.players().get(state.players.next(side));
+    let opponent = state.players().next_player(side);
     let mut score = 0i32;
 
     score += player.stats.life as i32 / 100;

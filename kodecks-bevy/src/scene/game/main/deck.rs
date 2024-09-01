@@ -179,7 +179,7 @@ fn update_decks(env: Res<Environment>, mut query: Query<(&Deck, &mut Transform, 
     for (deck, mut transform, mut visibility) in query.iter_mut() {
         let len = match deck {
             Deck::Player => env.players.get(env.player).deck,
-            Deck::Opponent => env.players.get(env.next_player(env.player)).deck,
+            Deck::Opponent => env.players.get(env.next_id(env.player)).deck,
         };
         let height = 0.005 * len as f32;
         transform.scale = Vec3::new(0.8 / CARD_WIDTH, height, 0.8 / CARD_WIDTH);
@@ -205,7 +205,7 @@ fn update_graveyards(
     for (graveyard, mut transform, mut material, mut visibility) in query.iter_mut() {
         let player = match graveyard {
             Graveyard::Player => env.players.get(env.player),
-            Graveyard::Opponent => env.players.get(env.next_player(env.player)),
+            Graveyard::Opponent => env.players.next_player(env.player),
         };
 
         let len = player.graveyard.len() + 1;
@@ -237,7 +237,7 @@ fn graveyard_hovered(
     for GraveyardHovered(player) in reader.read() {
         let player = match player {
             Graveyard::Player => env.players.get(env.player),
-            Graveyard::Opponent => env.players.get(env.next_player(env.player)),
+            Graveyard::Opponent => env.players.get(env.next_id(env.player)),
         };
         if let Some(card) = player.graveyard.last() {
             writer.send(UIEvent::CardHovered(card.id));

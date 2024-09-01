@@ -49,7 +49,7 @@ pub struct Server {
 impl Server {
     pub fn new(profile: GameProfile) -> Self {
         let game = Game::new(profile, &CATALOG);
-        let player_in_action = game.env().state.players.player_in_turn();
+        let player_in_action = game.env().state.players.player_in_turn().id;
         Self {
             game,
             available_actions: None,

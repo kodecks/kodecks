@@ -21,8 +21,7 @@ impl Environment {
         }
 
         let active_player = self.state.players.player_in_turn();
-        let player = &self.state.players.get(active_player);
-        let attackers = player
+        let attackers = active_player
             .field
             .active_cards()
             .map(|c| c.id())
@@ -32,9 +31,11 @@ impl Environment {
                 return None;
             }
 
-            let castable_cards = player.castable_cards(&self.state).collect::<Vec<_>>();
+            let castable_cards = active_player
+                .castable_cards(&self.state)
+                .collect::<Vec<_>>();
             Some(PlayerAvailableActions {
-                player: active_player,
+                player: active_player.id,
                 actions: filter_vec![
                     if castable_cards.is_empty() {
                         None
@@ -56,10 +57,9 @@ impl Environment {
                 message_dialog: None,
             })
         } else if let Phase::Block = &self.state.phase {
-            player.field.attacking_cards().next()?;
+            active_player.field.attacking_cards().next()?;
 
-            let player_in_action = self.state.players.next(active_player);
-            let player_in_action = self.state.players.get(player_in_action);
+            let player_in_action = self.state.players.next_player(active_player.id);
             let blockers = player_in_action
                 .field
                 .active_cards()
@@ -87,12 +87,12 @@ impl Environment {
                 message_dialog: None,
             })
         } else if matches!(self.state.phase, Phase::End)
-            && player.hand.len() > self.state.config.max_hand_size as usize
+            && active_player.hand.len() > self.state.config.max_hand_size as usize
         {
             Some(PlayerAvailableActions {
-                player: active_player,
+                player: active_player.id,
                 actions: vec![AvailableAction::SelectCard {
-                    cards: player.hand.iter().map(|card| card.id()).collect(),
+                    cards: active_player.hand.iter().map(|card| card.id()).collect(),
                     score_factor: -1,
                 }]
                 .into_iter()
