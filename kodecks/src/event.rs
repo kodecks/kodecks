@@ -13,6 +13,7 @@ pub enum CardEvent {
     ReturnedToHand {
         reason: EventReason,
     },
+    ReturnedToDeck,
     DealtDamage {
         player: PlayerId,
         amount: u32,
@@ -30,6 +31,7 @@ impl CardEvent {
             CardEvent::Casted => EventFilter::CASTED,
             CardEvent::Destroyed { .. } => EventFilter::DESTROYED,
             CardEvent::ReturnedToHand { .. } => EventFilter::RETURNED_TO_HAND,
+            CardEvent::ReturnedToDeck => EventFilter::RETURNED_TO_DECK,
             CardEvent::DealtDamage { .. } => EventFilter::DEALT_DAMAGE,
             CardEvent::Attacking => EventFilter::ATTACKING,
             CardEvent::Blocking => EventFilter::BLOCKING,
@@ -45,11 +47,12 @@ bitflags! {
         const CASTED = 1 << 0;
         const DESTROYED = 1 << 1;
         const RETURNED_TO_HAND = 1 << 2;
-        const DEALT_DAMAGE = 1 << 3;
-        const ATTACKING = 1 << 4;
-        const BLOCKING = 1 << 5;
-        const ATTACKED = 1 << 6;
-        const ANY_CASTED = 1 << 7;
+        const RETURNED_TO_DECK = 1 << 3;
+        const DEALT_DAMAGE = 1 << 4;
+        const ATTACKING = 1 << 5;
+        const BLOCKING = 1 << 6;
+        const ATTACKED = 1 << 7;
+        const ANY_CASTED = 1 << 8;
     }
 }
 

@@ -4,6 +4,7 @@ use crate::{
     error::Error,
     event::{CardEvent, EventReason},
     field::FieldState,
+    filter_vec,
     id::{CardId, ObjectId, TimedObjectId},
     opcode::{Opcode, OpcodeList},
     player::PlayerId,
@@ -26,6 +27,10 @@ pub enum ActionCommand {
         source: ObjectId,
         target: TimedObjectId,
         reason: EventReason,
+    },
+    ShuffleCardIntoDeck {
+        source: ObjectId,
+        target: TimedObjectId,
     },
     SetFieldState {
         source: ObjectId,
@@ -79,6 +84,19 @@ impl ActionCommand {
                     return Err(Error::TargetLost { target });
                 }
                 env.apply_event(CardEvent::ReturnedToHand { reason }, source, current_target)
+            }
+            ActionCommand::ShuffleCardIntoDeck { source, target } => {
+                let source = env.state.find_card(source)?;
+                let current_target = env.state.find_card(target.id)?;
+                if current_target.timed_id() != target {
+                    return Err(Error::TargetLost { target });
+                }
+                Ok(filter_vec![
+                    env.apply_event(CardEvent::ReturnedToDeck, source, current_target)?,
+                    Some(OpcodeList::new(vec![Opcode::ShuffleDeck {
+                        player: current_target.owner(),
+                    }])),
+                ])
             }
             ActionCommand::SetFieldState { target, state, .. } => {
                 let current_target = env.state.find_card(target.id)?;

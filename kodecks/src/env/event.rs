@@ -70,6 +70,19 @@ impl Environment {
                     trigger,
                 ],)),])
             }
+            CardEvent::ReturnedToDeck => {
+                let from = *target.zone();
+                let to = PlayerZone::new(target.owner(), Zone::Deck);
+                Ok(filter_vec![Some(OpcodeList::new(filter_vec![
+                    Some(Opcode::MoveCard {
+                        card: target.id(),
+                        from,
+                        to,
+                        reason: MoveReason::Move,
+                    }),
+                    trigger,
+                ],)),])
+            }
             _ => Ok(vec![OpcodeList::new(filter_vec![trigger,])]),
         }
     }
