@@ -176,6 +176,11 @@ impl Environment {
                 }
                 Ok(vec![])
             }
+            Opcode::ShuffleDeck { player } => {
+                let player = self.state.players.get_mut(*player);
+                player.deck.shuffle(&mut self.obj_counter, &mut self.rng);
+                Ok(vec![LogAction::DeckShuffled { player: player.id }])
+            }
             Opcode::TriggerEvent {
                 source,
                 target,

@@ -1,5 +1,3 @@
-use std::fmt;
-
 use crate::{
     color::Color,
     event::CardEvent,
@@ -10,6 +8,7 @@ use crate::{
     target::Target,
     zone::MoveReason,
 };
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum Opcode {
@@ -53,6 +52,9 @@ pub enum Opcode {
         from: PlayerZone,
         to: PlayerZone,
         reason: MoveReason,
+    },
+    ShuffleDeck {
+        player: PlayerId,
     },
     TriggerEvent {
         source: ObjectId,
