@@ -24,3 +24,5 @@ card-flash-bang-jellyfish = Flash-Bang Jellyfish
 card-airborne-eagle-ray = Airborne Eagle Ray
     .text = When <<Airborne Eagle Ray>> enters the field, return target creature to its owner's hand.
     .message = Choose a creature to return to the hand.
+card-deep-sea-wyrm = Deep-Sea Wyrm
+    .text = When <<Deep-Sea Wyrm>> enters the field, shuffle all creatures with power less than its power into their owners' decks.

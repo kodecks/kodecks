@@ -2,6 +2,7 @@ use kodecks::prelude::*;
 
 mod airborne_eagle_ray;
 mod bambooster;
+mod deep_sea_wyrm;
 mod diamond_porcupine;
 mod flash_bang_jellyfish;
 mod leaf_veined_gecko;
@@ -47,4 +48,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "flas" => flash_bang_jellyfish::ARCHETYPE,
     "airborne-eagle-ray" => airborne_eagle_ray::ARCHETYPE,
     "airb" => airborne_eagle_ray::ARCHETYPE,
+    "deep-sea-wyrm" => deep_sea_wyrm::ARCHETYPE,
+    "deep" => deep_sea_wyrm::ARCHETYPE,
 };
