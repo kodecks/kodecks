@@ -20,18 +20,13 @@ impl Effect for CardDef {
     fn trigger(&mut self, id: EffectId, ctx: &mut EffectTriggerContext) -> Result<()> {
         if id == "main" {
             ctx.push_stack("main", |ctx, _| {
-                let power = ctx
-                    .source()
-                    .computed()
-                    .power
-                    .map(|p| p.value())
-                    .unwrap_or(0);
+                let power = ctx.source().computed().current_power();
                 let commands = ctx
                     .state()
                     .players()
                     .iter()
                     .flat_map(|p| p.field.iter())
-                    .filter(|card| card.computed().power.map(|p| p.value()).unwrap_or(0) < power)
+                    .filter(|card| card.computed().current_power() < power)
                     .map(|card| ActionCommand::ShuffleCardIntoDeck {
                         source: ctx.source().id(),
                         target: card.timed_id(),

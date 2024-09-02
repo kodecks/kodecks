@@ -39,6 +39,10 @@ impl ComputedAttribute {
     pub fn is_hex(&self) -> bool {
         matches!(self.card_type, CardType::Hex)
     }
+
+    pub fn current_power(&self) -> u32 {
+        self.power.map(|power| power.value()).unwrap_or(0)
+    }
 }
 
 bitflags! {
