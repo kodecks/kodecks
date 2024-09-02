@@ -24,3 +24,5 @@ card-flash-bang-jellyfish = 閃光クラゲ
 card-airborne-eagle-ray = 飛行トビエイ
     .text = <<飛行トビエイ>>が場に出た時、クリーチャー1体を持ち主の手札に戻す。
     .message = 手札に戻すクリーチャーを選択してください。
+card-deep-sea-wyrm = 深海のワーム
+    .text = <<深海のワーム>>が場に出た時、そのパワーよりも低いパワーを持つ全てのクリーチャーを持ち主のデッキに無作為に戻す。
