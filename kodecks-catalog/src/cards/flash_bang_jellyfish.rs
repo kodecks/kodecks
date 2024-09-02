@@ -37,10 +37,7 @@ impl Effect for CardDef {
     }
 
     fn activate(&mut self, _event: CardEvent, ctx: &mut EffectActivateContext) -> Result<()> {
-        let target = ctx.source().zone().player;
-        if ctx.state().players().get(target).shards.is_empty() {
-            ctx.trigger_stack("main");
-        }
+        ctx.trigger_stack("main");
         Ok(())
     }
 }
