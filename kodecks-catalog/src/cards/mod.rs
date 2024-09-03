@@ -15,6 +15,7 @@ mod scrapyard_raven;
 mod turbofish;
 mod vigilant_lynx;
 mod volcanic_wyrm;
+mod wasteland_cobra;
 mod wind_up_spider;
 
 pub static CARDS: CardMap = phf::phf_map! {
@@ -50,4 +51,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "airb" => airborne_eagle_ray::ARCHETYPE,
     "deep-sea-wyrm" => deep_sea_wyrm::ARCHETYPE,
     "deep" => deep_sea_wyrm::ARCHETYPE,
+    "wasteland-cobra" => wasteland_cobra::ARCHETYPE,
+    "wast" => wasteland_cobra::ARCHETYPE,
 };

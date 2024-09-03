@@ -22,12 +22,13 @@ pub fn default_profile() -> GameProfile {
 
     let deck_list_jade = DeckList::parse(
         "
-    Vigilant Lynx 4
+    Vigilant Lynx 3
     Leaf-Veined Gecko 4
     Scrapyard Raven 3
-    Radio Deer 4
+    Radio Deer 2
     Moss-Grown Mastodon 2
     Mire Alligator 3
+    Wasteland Cobra 3
     ",
         &CATALOG,
     )
