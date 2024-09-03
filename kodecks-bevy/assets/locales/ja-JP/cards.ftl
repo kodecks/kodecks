@@ -26,3 +26,4 @@ card-airborne-eagle-ray = 飛行トビエイ
     .message = 手札に戻すクリーチャーを選択してください。
 card-deep-sea-wyrm = 深海のワーム
     .text = <<深海のワーム>>が場に出た時、そのパワーよりも低いパワーを持つ全てのクリーチャーを持ち主のデッキに無作為に戻す。
+card-wasteland-cobra = 荒野のコブラ
