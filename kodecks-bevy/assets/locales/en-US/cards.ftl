@@ -27,3 +27,4 @@ card-airborne-eagle-ray = Airborne Eagle Ray
 card-deep-sea-wyrm = Deep-Sea Wyrm
     .text = When <<Deep-Sea Wyrm>> enters the field, shuffle all creatures with power less than its power into their owners' decks.
 card-wasteland-cobra = Wasteland Cobra
+card-coppermine-scorpion = Coppermine Scorpion
