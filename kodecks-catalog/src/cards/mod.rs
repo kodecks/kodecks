@@ -2,6 +2,7 @@ use kodecks::prelude::*;
 
 mod airborne_eagle_ray;
 mod bambooster;
+mod coppermine_scorpion;
 mod deep_sea_wyrm;
 mod diamond_porcupine;
 mod flash_bang_jellyfish;
@@ -53,4 +54,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "deep" => deep_sea_wyrm::ARCHETYPE,
     "wasteland-cobra" => wasteland_cobra::ARCHETYPE,
     "wast" => wasteland_cobra::ARCHETYPE,
+    "coppermine-scorpion" => coppermine_scorpion::ARCHETYPE,
+    "copp" => coppermine_scorpion::ARCHETYPE,
 };

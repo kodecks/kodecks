@@ -5,6 +5,7 @@
     "bitflags",
     "castable",
     "consts",
+    "Coppermine",
     "dashmap",
     "Debuff",
     "Deque",
