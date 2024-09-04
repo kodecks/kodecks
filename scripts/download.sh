@@ -7,6 +7,7 @@ for txt_file in "$ASSETS_DIR"/*.txt; do
     mkdir -p "$ASSETS_DIR/$base_name"
 
     while IFS= read -r url; do
+        url=$(echo "$url" | xargs)
         file_name=$(basename "$url")
         curl -L -o "$ASSETS_DIR/$base_name/$file_name" "$url"
     done < "$txt_file"
