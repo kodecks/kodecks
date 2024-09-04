@@ -13,7 +13,10 @@ You need to have Rust toolchain installed. You can install it from [rustup.rs](h
 ```bash
 git clone https://github.com/kodecks/kodecks.git
 cd kodecks
+
 scripts/download.sh # Download assets
+# scripts\download.ps1 # For Windows PowerShell
+
 cargo run
 ```
 
