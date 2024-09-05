@@ -28,3 +28,4 @@ card-deep-sea-wyrm = Deep-Sea Wyrm
     .text = When <<Deep-Sea Wyrm>> enters the field, shuffle all creatures with power less than its power into their owners' decks.
 card-wasteland-cobra = Wasteland Cobra
 card-coppermine-scorpion = Coppermine Scorpion
+card-zigzag-ammonite = Zigzag Ammonite
