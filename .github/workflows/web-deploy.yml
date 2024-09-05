@@ -20,7 +20,7 @@ jobs:
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@v1.10.3
       - name: Install wasm-bindgen-cli
-        run: cargo binstall --version 0.2.92 wasm-bindgen-cli -y
+        run: cargo binstall --version 0.2.92 wasm-bindgen-cli --force -y
       - name: Download assets
         run: ./scripts/download.sh
       - name: Build
