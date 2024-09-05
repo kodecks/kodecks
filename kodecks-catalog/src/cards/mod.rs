@@ -18,6 +18,7 @@ mod vigilant_lynx;
 mod volcanic_wyrm;
 mod wasteland_cobra;
 mod wind_up_spider;
+mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     "vigilant-lynx" => vigilant_lynx::ARCHETYPE,
@@ -56,4 +57,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "wast" => wasteland_cobra::ARCHETYPE,
     "coppermine-scorpion" => coppermine_scorpion::ARCHETYPE,
     "copp" => coppermine_scorpion::ARCHETYPE,
+    "zigzag-ammonite" => zigzag_ammonite::ARCHETYPE,
+    "zigz" => zigzag_ammonite::ARCHETYPE,
 };
