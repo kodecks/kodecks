@@ -4,17 +4,13 @@
   </head>
   <title>Kodecks</title>
   <script type="module">
+    import { wasmSize } from './data.js'
     import init from './kodecks-bevy.js'
 
     function loadWasmWithProgress(url, progressCallback) {
       return fetch(url).then(response => {
-        const contentLength = response.headers.get('content-length');
-        if (!contentLength) {
-          return response.arrayBuffer();
-        }
-
         let loaded = 0;
-        const total = parseInt(contentLength, 10);
+        const total = wasmSize;
         const reader = response.body.getReader();
 
         return new ReadableStream({
