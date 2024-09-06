@@ -6,7 +6,7 @@ pub fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::default().mesh().size(50.0, 50.0)),
+        mesh: meshes.add(Plane3d::default().mesh().size(10000.0, 10000.0)),
         material: materials.add(Color::BLACK),
         ..default()
     });

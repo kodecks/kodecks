@@ -29,6 +29,12 @@ struct UiRoot;
 #[derive(Component)]
 struct TurnOverlay;
 
+#[derive(Component)]
+enum TurnIndicator {
+    YourTurn,
+    OpponentsTurn,
+}
+
 #[derive(Debug, Default, States, Copy, Clone, Eq, PartialEq, Hash)]
 enum FadeState {
     #[default]
@@ -41,11 +47,20 @@ fn trigger(
     env: Res<Environment>,
     translator: Res<Translator>,
     mut event: EventReader<TurnChanged>,
-    mut query: Query<&mut Text, With<TurnOverlay>>,
+    mut overlay_query: Query<&mut Text, With<TurnOverlay>>,
+    mut indicator_query: Query<(&TurnIndicator, &mut Visibility)>,
     mut next_state: ResMut<NextState<FadeState>>,
 ) {
     if let Some(TurnChanged(player)) = event.read().next() {
-        query.single_mut().sections[0].value = if env.player == *player {
+        for (indicator, mut visibility) in indicator_query.iter_mut() {
+            *visibility =
+                if (*player == env.player) ^ matches!(indicator, TurnIndicator::OpponentsTurn) {
+                    Visibility::Visible
+                } else {
+                    Visibility::Hidden
+                };
+        }
+        overlay_query.single_mut().sections[0].value = if env.player == *player {
             translator.get("your-turn")
         } else {
             translator.get("opponents-turn")
@@ -75,7 +90,13 @@ fn fade(
     }
 }
 
-fn init(mut commands: Commands, translator: Res<Translator>) {
+fn init(
+    mut commands: Commands,
+    translator: Res<Translator>,
+    asset_server: Res<AssetServer>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+) {
     commands
         .spawn((
             NodeBundle {
@@ -116,10 +137,51 @@ fn init(mut commands: Commands, translator: Res<Translator>) {
                 TurnOverlay,
             ));
         });
+
+    commands.spawn((
+        PbrBundle {
+            mesh: meshes.add(Plane3d::default().mesh().size(10000.0, 1.0)),
+            transform: Transform::from_translation(Vec3::new(0.0, 0.01, 4.8)),
+            material: materials.add(StandardMaterial {
+                base_color_texture: Some(asset_server.load("ui/gradient.png")),
+                base_color: Color::srgba(0.0, 0.0, 1.0, 1.0),
+                emissive: LinearRgba::rgb(0.0, 0.0, 1.0),
+                alpha_mode: AlphaMode::Blend,
+                ..default()
+            }),
+            visibility: Visibility::Hidden,
+            ..default()
+        },
+        TurnIndicator::YourTurn,
+    ));
+    commands.spawn((
+        PbrBundle {
+            mesh: meshes.add(Plane3d::default().mesh().size(10000.0, 1.0)),
+            transform: Transform::from_rotation(Quat::from_rotation_y(std::f32::consts::PI))
+                .with_translation(Vec3::new(0.0, 0.01, -3.4)),
+            material: materials.add(StandardMaterial {
+                base_color_texture: Some(asset_server.load("ui/gradient.png")),
+                base_color: Color::srgba(1.0, 0.0, 0.0, 1.0),
+                emissive: LinearRgba::rgb(1.0, 0.0, 0.0),
+                alpha_mode: AlphaMode::Blend,
+                ..default()
+            }),
+            visibility: Visibility::Hidden,
+            ..default()
+        },
+        TurnIndicator::OpponentsTurn,
+    ));
 }
 
-fn cleanup(mut commands: Commands, query: Query<Entity, With<UiRoot>>) {
-    query.iter().for_each(|entity| {
-        commands.add(DespawnRecursive { entity });
+fn cleanup(
+    mut commands: Commands,
+    ui_query: Query<Entity, With<UiRoot>>,
+    indicator_query: Query<Entity, With<TurnIndicator>>,
+) {
+    ui_query.iter().for_each(|entity| {
+        commands.entity(entity).despawn_recursive();
+    });
+    indicator_query.iter().for_each(|entity| {
+        commands.entity(entity).despawn_recursive();
     });
 }
