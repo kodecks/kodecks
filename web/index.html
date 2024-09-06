@@ -5,7 +5,102 @@
   <title>Kodecks</title>
   <script type="module">
     import init from './kodecks-bevy.js'
-    init()
+
+    function loadWasmWithProgress(url, progressCallback) {
+      return fetch(url).then(response => {
+        const contentLength = response.headers.get('content-length');
+        if (!contentLength) {
+          return response.arrayBuffer();
+        }
+
+        let loaded = 0;
+        const total = parseInt(contentLength, 10);
+        const reader = response.body.getReader();
+
+        return new ReadableStream({
+          start(controller) {
+            function push() {
+              reader.read().then(({ done, value }) => {
+                if (done) {
+                  controller.close();
+                  return;
+                }
+
+                loaded += value.byteLength;
+                progressCallback(loaded, total);
+
+                controller.enqueue(value);
+                push();
+              });
+            }
+
+            push();
+          }
+        });
+      }).then(stream => new Response(stream).arrayBuffer());
+    }
+
+    document.getElementById('loading-screen').style.display = 'flex';
+    loadWasmWithProgress('kodecks-bevy_bg.wasm', (loaded, total) => {
+      const progress = Math.round((loaded / total) * 100);
+      document.querySelector('#loading-percentage').textContent = `${progress}%`;
+    }).then(wasmBuffer => {
+      document.getElementById('loading-screen').style.display = 'none';
+      init(wasmBuffer);
+    });
+
   </script>
   <canvas id="bevy"></canvas>
+  <div id="loading-screen">
+      <div class="spinner"></div>
+      <span id="loading-percentage">0%</span>
+  </div>
+  <style>
+    @font-face {
+        font-family: 'Jersey 20';
+        src: url('assets/fonts/Jersey20-Regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+    body {
+      background-color: #282c34;
+    }
+    #loading-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 5px solid #282c34;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+      position: relative;
+    }
+
+    #loading-percentage {
+      position: absolute;
+      color: #fff;
+      font-size: 32px;
+      font-weight: bold;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Jersey 20';
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </html>
