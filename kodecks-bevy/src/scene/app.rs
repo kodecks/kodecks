@@ -3,11 +3,16 @@ use super::{
     translator::Translator,
     GlobalState,
 };
-use crate::assets::{
-    card::RenderedCardPlugin,
-    fluent::{FluentAsset, FluentPlugin, DEFAULT_LANG},
+use crate::{
+    assets::{
+        card::RenderedCardPlugin,
+        fluent::{FluentAsset, FluentPlugin, DEFAULT_LANG},
+    },
+    scene::lang::find_language,
 };
 use bevy::prelude::*;
+use std::str::FromStr;
+use unic_langid::LanguageIdentifier;
 
 pub struct AppLoadingPlugin;
 
@@ -29,9 +34,21 @@ fn update(
     assets: ResMut<Assets<FluentAsset>>,
     mut next_state: ResMut<NextState<GlobalState>>,
 ) {
-    let lang = config.lang.clone().unwrap_or(DEFAULT_LANG);
-    let path = format!("locales/{lang}/lang.json");
-    let fluent = fluent.get_or_insert_with(|| asset_server.load::<FluentAsset>(path));
+    let fluent = fluent.get_or_insert_with(|| {
+        let locale =
+            sys_locale::get_locale().and_then(|locale| LanguageIdentifier::from_str(&locale).ok());
+        info!("Detected locale: {:?}", locale);
+
+        let lang = config.lang.clone().or(locale).unwrap_or(DEFAULT_LANG);
+        info!("Selected language: {:?}", lang);
+
+        let lang = find_language(lang);
+        info!("Found language: {} ({})", lang.name, lang.id);
+
+        let path = format!("locales/{}/lang.json", lang.id);
+        asset_server.load::<FluentAsset>(path)
+    });
+
     if let Some(res) = assets.get(fluent) {
         commands.insert_resource(Translator::new(res));
         next_state.set(GlobalState::MenuMain);
