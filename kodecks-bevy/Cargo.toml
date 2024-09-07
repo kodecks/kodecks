@@ -28,6 +28,7 @@ serde_default = "0.2.0"
 serde_json = "1.0.125"
 serde_tuple = "0.5.0"
 strum = "0.26.3"
+sys-locale = "0.3.1"
 thiserror = "1.0.63"
 tinystr = "0.7.6"
 tracing = "0.1.40"
@@ -40,6 +41,7 @@ image = { version = "0.25.2", default-features = false, features = ["rayon"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 gloo-storage = "0.3.0"
+sys-locale = { version = "0.3.1", features = ["js"] }
 
 [features]
 trace_chrome = ["trace", "bevy/trace_chrome"]

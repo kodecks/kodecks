@@ -4,6 +4,7 @@ use bevy_mod_picking::DefaultPickingPlugins;
 pub mod app;
 pub mod config;
 pub mod game;
+pub mod lang;
 pub mod menu;
 pub mod translator;
 
