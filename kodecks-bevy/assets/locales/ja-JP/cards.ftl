@@ -29,3 +29,4 @@ card-deep-sea-wyrm = 深海のワーム
 card-wasteland-cobra = 荒野のコブラ
 card-coppermine-scorpion = 銅鉱山のサソリ
 card-zigzag-ammonite = ジグザグアンモナイト
+card-voracious-anteater = 大食いアリクイ

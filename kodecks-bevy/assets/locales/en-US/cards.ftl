@@ -29,3 +29,4 @@ card-deep-sea-wyrm = Deep-Sea Wyrm
 card-wasteland-cobra = Wasteland Cobra
 card-coppermine-scorpion = Coppermine Scorpion
 card-zigzag-ammonite = Zigzag Ammonite
+card-voracious-anteater = Voracious Anteater

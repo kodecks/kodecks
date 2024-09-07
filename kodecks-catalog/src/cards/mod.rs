@@ -16,6 +16,7 @@ mod scrapyard_raven;
 mod turbofish;
 mod vigilant_lynx;
 mod volcanic_wyrm;
+mod voracious_anteater;
 mod wasteland_cobra;
 mod wind_up_spider;
 mod zigzag_ammonite;
@@ -59,4 +60,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "copp" => coppermine_scorpion::ARCHETYPE,
     "zigzag-ammonite" => zigzag_ammonite::ARCHETYPE,
     "zigz" => zigzag_ammonite::ARCHETYPE,
+    "voracious-anteater" => voracious_anteater::ARCHETYPE,
+    "vora" => voracious_anteater::ARCHETYPE,
 };
