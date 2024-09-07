@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "deep",
     "Deep-Sea Wyrm",
-    color: Color::AZURE,
+    color: Color::BLUE,
     cost: 6,
     card_type: CardType::Creature,
     power: 500,

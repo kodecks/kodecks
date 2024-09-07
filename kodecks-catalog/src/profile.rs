@@ -7,7 +7,7 @@ use kodecks::{
 };
 
 pub fn default_profile() -> GameProfile {
-    let deck_list_ruby = DeckList::parse(
+    let deck_list_red = DeckList::parse(
         "
     Volcanic Wyrm 2
     Wind-Up Spider 3
@@ -21,7 +21,7 @@ pub fn default_profile() -> GameProfile {
     )
     .unwrap();
 
-    let deck_list_jade = DeckList::parse(
+    let deck_list_green = DeckList::parse(
         "
     Vigilant Lynx 3
     Leaf-Veined Gecko 4
@@ -44,11 +44,11 @@ pub fn default_profile() -> GameProfile {
         players: vec![
             PlayerConfig {
                 id: PlayerId::new("player1"),
-                deck: deck_list_jade,
+                deck: deck_list_green,
             },
             PlayerConfig {
                 id: PlayerId::new("player2"),
-                deck: deck_list_ruby,
+                deck: deck_list_red,
             },
         ],
         scenario: None,

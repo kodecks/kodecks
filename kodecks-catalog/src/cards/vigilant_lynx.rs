@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "vigi",
     "Vigilant Lynx",
-    color: Color::JADE,
+    color: Color::GREEN,
     cost: 2,
     card_type: CardType::Creature,
     power: 100,

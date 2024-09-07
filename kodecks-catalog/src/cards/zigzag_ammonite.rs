@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "zigz",
     "Zigzag Ammonite",
-    color: Color::AZURE,
+    color: Color::BLUE,
     cost: 2,
     card_type: CardType::Creature,
     power: 300,

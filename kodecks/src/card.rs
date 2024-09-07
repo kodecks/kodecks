@@ -265,10 +265,10 @@ impl fmt::Display for CardSnapshot {
             return write!(f, "<???>",);
         };
         let color = match computed.color {
-            Color::RUBY => "C",
-            Color::TOPAZ => "A",
-            Color::JADE => "J",
-            Color::AZURE => "Z",
+            Color::RED => "R",
+            Color::YELLOW => "Y",
+            Color::GREEN => "G",
+            Color::BLUE => "B",
             _ => "--",
         };
         let clock = format!(" {}", self.power().map(|p| p.value()).unwrap_or(0));

@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "moss",
     "Moss-Grown Mastodon",
-    color: Color::JADE,
+    color: Color::GREEN,
     cost: 7,
     card_type: CardType::Creature,
     power: 700,

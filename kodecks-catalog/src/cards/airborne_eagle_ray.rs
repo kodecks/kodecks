@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "airb",
     "Airborne Eagle Ray",
-    color: Color::AZURE,
+    color: Color::BLUE,
     cost: 3,
     card_type: CardType::Creature,
     power: 300,
