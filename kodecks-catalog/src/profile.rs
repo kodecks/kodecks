@@ -26,8 +26,9 @@ pub fn default_profile() -> GameProfile {
     Vigilant Lynx 3
     Leaf-Veined Gecko 4
     Scrapyard Raven 3
-    Radio Deer 2
+    Radio Deer 1
     Moss-Grown Mastodon 2
+    Voracious Anteater 1
     Mire Alligator 3
     Wasteland Cobra 3
     ",
