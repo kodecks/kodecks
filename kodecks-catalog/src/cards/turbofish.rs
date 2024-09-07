@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "turb",
     "Turbofish",
-    color: Color::AZURE,
+    color: Color::BLUE,
     cost: 0,
     card_type: CardType::Creature,
     power: 100,

@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "mire",
     "Mire Alligator",
-    color: Color::JADE,
+    color: Color::GREEN,
     cost: 3,
     card_type: CardType::Creature,
     power: 400,

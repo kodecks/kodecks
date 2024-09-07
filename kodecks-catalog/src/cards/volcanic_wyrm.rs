@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "volc",
     "Volcanic Wyrm",
-    color: Color::RUBY,
+    color: Color::RED,
     cost: 7,
     card_type: CardType::Creature,
     power: 500,

@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "bamb",
     "Bambooster",
-    color: Color::RUBY,
+    color: Color::RED,
     cost: 1,
     card_type: CardType::Creature,
     power: 300,

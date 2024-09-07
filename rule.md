@@ -21,7 +21,7 @@ During each player's standby phase, the cost of all cards in that player's hand 
 
 #### Color
 
-Cards are categorized by color: Ruby (red), Jade (green), Azure (blue), Topaz (yellow), or Colorless (gray).
+Cards are categorized by color: Red, Green, Blue, Yellow, or Colorless (gray).
 
 #### Shard
 

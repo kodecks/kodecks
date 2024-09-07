@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "wast",
     "Wasteland Cobra",
-    color: Color::JADE,
+    color: Color::GREEN,
     cost: 1,
     card_type: CardType::Creature,
     power: 200,

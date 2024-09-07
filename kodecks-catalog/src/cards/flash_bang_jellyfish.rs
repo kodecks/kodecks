@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "flas",
     "Flash-Bang Jellyfish",
-    color: Color::AZURE,
+    color: Color::BLUE,
     cost: 3,
     card_type: CardType::Creature,
     power: 300,

@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "diam",
     "Diamond Porcupine",
-    color: Color::RUBY,
+    color: Color::RED,
     cost: 2,
     card_type: CardType::Creature,
     power: 100,

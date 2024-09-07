@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "wind",
     "Wind-Up Spider",
-    color: Color::RUBY,
+    color: Color::RED,
     cost: 0,
     card_type: CardType::Creature,
     power: 100,

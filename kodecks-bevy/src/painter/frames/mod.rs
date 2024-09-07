@@ -62,10 +62,10 @@ impl CardFramePainter {
 }
 
 const FRAME_IMAGES: &[(Color, &[u8])] = &[
-    (Color::RUBY, include_bytes!("frame_ruby.png")),
-    (Color::TOPAZ, include_bytes!("frame_topaz.png")),
-    (Color::JADE, include_bytes!("frame_jade.png")),
-    (Color::AZURE, include_bytes!("frame_azure.png")),
+    (Color::RED, include_bytes!("frame_red.png")),
+    (Color::YELLOW, include_bytes!("frame_yellow.png")),
+    (Color::GREEN, include_bytes!("frame_green.png")),
+    (Color::BLUE, include_bytes!("frame_blue.png")),
     (Color::empty(), include_bytes!("frame_colorless.png")),
 ];
 

@@ -5,7 +5,7 @@ card_def!(
     CardDef,
     "oill",
     "Oil-Leaking Droid",
-    color: Color::RUBY,
+    color: Color::RED,
     cost: 2,
     card_type: CardType::Creature,
     power: 100,

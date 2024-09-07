@@ -27,10 +27,10 @@ impl Plugin for ShardPlugin {
 #[derive(Resource)]
 struct ShardAssets {
     mesh: Handle<Mesh>,
-    ruby: Handle<StandardMaterial>,
-    jade: Handle<StandardMaterial>,
-    azure: Handle<StandardMaterial>,
-    topaz: Handle<StandardMaterial>,
+    red: Handle<StandardMaterial>,
+    green: Handle<StandardMaterial>,
+    blue: Handle<StandardMaterial>,
+    yellow: Handle<StandardMaterial>,
 }
 
 fn setup(
@@ -41,36 +41,36 @@ fn setup(
 ) {
     let mesh = meshes.add(Plane3d::default().mesh().size(0.3, 0.3));
 
-    let ruby = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("shards/ruby.png")),
+    let red = materials.add(StandardMaterial {
+        base_color_texture: Some(asset_server.load("shards/red.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
-    let jade = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("shards/jade.png")),
+    let green = materials.add(StandardMaterial {
+        base_color_texture: Some(asset_server.load("shards/green.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
-    let azure = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("shards/azure.png")),
+    let blue = materials.add(StandardMaterial {
+        base_color_texture: Some(asset_server.load("shards/blue.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
-    let topaz = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("shards/topaz.png")),
+    let yellow = materials.add(StandardMaterial {
+        base_color_texture: Some(asset_server.load("shards/yellow.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
     let assets = ShardAssets {
         mesh,
-        ruby,
-        jade,
-        azure,
-        topaz,
+        red,
+        green,
+        blue,
+        yellow,
     };
     commands.insert_resource(assets);
 }
@@ -156,11 +156,11 @@ fn update(
                     },
                 );
                 *material = match shard.color {
-                    Color::RUBY => assets.ruby.clone(),
-                    Color::JADE => assets.jade.clone(),
-                    Color::AZURE => assets.azure.clone(),
-                    Color::TOPAZ => assets.topaz.clone(),
-                    _ => assets.ruby.clone(),
+                    Color::RED => assets.red.clone(),
+                    Color::GREEN => assets.green.clone(),
+                    Color::BLUE => assets.blue.clone(),
+                    Color::YELLOW => assets.yellow.clone(),
+                    _ => assets.red.clone(),
                 };
                 *transform = Transform::from_translation(position);
                 *visibility = Visibility::Visible;
@@ -180,7 +180,7 @@ fn update(
         commands.spawn((
             PbrBundle {
                 mesh: assets.mesh.clone(),
-                material: assets.ruby.clone(),
+                material: assets.red.clone(),
                 visibility: Visibility::Hidden,
                 ..default()
             },

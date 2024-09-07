@@ -7,16 +7,16 @@ bitflags! {
     #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
     pub struct Color: u8 {
         const COLORLESS = 0b00000000;
-        const RUBY = 0b00000001;
-        const TOPAZ = 0b00000010;
-        const JADE = 0b00000100;
-        const AZURE = 0b00001000;
+        const RED = 0b00000001;
+        const YELLOW = 0b00000010;
+        const GREEN = 0b00000100;
+        const BLUE = 0b00001000;
     }
 }
 
 impl Color {
     pub fn iter_all() -> impl Iterator<Item = Color> {
-        [Color::RUBY, Color::TOPAZ, Color::JADE, Color::AZURE]
+        [Color::RED, Color::YELLOW, Color::GREEN, Color::BLUE]
             .iter()
             .copied()
     }
@@ -28,32 +28,32 @@ impl fmt::Display for Color {
             write!(f, "Colorless")
         } else {
             let mut first = true;
-            if self.contains(Color::RUBY) {
+            if self.contains(Color::RED) {
                 if !first {
                     write!(f, "+")?;
                 }
-                write!(f, "Ruby")?;
+                write!(f, "Red")?;
                 first = false;
             }
-            if self.contains(Color::TOPAZ) {
+            if self.contains(Color::YELLOW) {
                 if !first {
                     write!(f, "+")?;
                 }
-                write!(f, "Topaz")?;
+                write!(f, "Yellow")?;
                 first = false;
             }
-            if self.contains(Color::JADE) {
+            if self.contains(Color::GREEN) {
                 if !first {
                     write!(f, "+")?;
                 }
-                write!(f, "Jade")?;
+                write!(f, "Green")?;
                 first = false;
             }
-            if self.contains(Color::AZURE) {
+            if self.contains(Color::BLUE) {
                 if !first {
                     write!(f, "+")?;
                 }
-                write!(f, "Azure")?;
+                write!(f, "Blue")?;
             }
             Ok(())
         }
@@ -67,10 +67,10 @@ impl FromStr for Color {
         let mut color = Color::empty();
         for part in s.to_ascii_lowercase().split('+') {
             match part.trim() {
-                "ruby" => color |= Color::RUBY,
-                "topaz" => color |= Color::TOPAZ,
-                "jade" => color |= Color::JADE,
-                "azure" => color |= Color::AZURE,
+                "red" => color |= Color::RED,
+                "yellow" => color |= Color::YELLOW,
+                "green" => color |= Color::GREEN,
+                "Blue" => color |= Color::BLUE,
                 "colorless" => color = Color::empty(),
                 _ => return Err("Invalid color"),
             }
