@@ -13,7 +13,7 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocalEnvironment {
     pub player: PlayerId,
     pub turn: u32,

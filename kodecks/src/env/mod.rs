@@ -157,7 +157,7 @@ impl Environment {
                 self.game_condition = GameCondition::Win(loser.id);
                 None
             }
-            Some(Action::DebugCommand(commands))
+            Some(Action::DebugCommand { commands })
                 if self.state.config.debug.contains(DebugFlags::DEBUG_COMMAND) =>
             {
                 for command in commands {
