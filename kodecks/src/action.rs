@@ -5,8 +5,10 @@ use crate::{
     player::PlayerId,
 };
 use serde::{Deserialize, Serialize};
+use serde_tuple::{Deserialize_tuple, Serialize_tuple};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "name", rename_all = "snake_case")]
 pub enum AvailableAction {
     SelectCard {
         cards: Vec<ObjectId>,
@@ -43,7 +45,7 @@ impl Ord for AvailableAction {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize_tuple, Deserialize_tuple)]
 pub struct PlayerAvailableActions {
     pub player: PlayerId,
     pub actions: AvailableActionList,
@@ -70,6 +72,7 @@ impl PlayerAvailableActions {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct AvailableActionList(Vec<AvailableAction>);
 
 impl AvailableActionList {
@@ -223,6 +226,7 @@ impl IntoIterator for AvailableActionList {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "name", rename_all = "snake_case")]
 pub enum Action {
     CastCard { card: ObjectId },
     SelectCard { card: ObjectId },
@@ -230,5 +234,5 @@ pub enum Action {
     Block { pairs: Vec<(ObjectId, ObjectId)> },
     EndTurn,
     Concede,
-    DebugCommand(Vec<ActionCommand>),
+    DebugCommand { commands: Vec<ActionCommand> },
 }
