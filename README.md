@@ -24,6 +24,6 @@ For WASM build, you need to have `wasm32-unknown-unknown` target installed.
 
 ```bash
 rustup target install wasm32-unknown-unknown
-cargo install wasm-server-runner
-cargo run --target wasm32-unknown-unknown
+cargo binstall trunk
+trunk serve
 ```
