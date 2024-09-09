@@ -4,7 +4,6 @@ use super::{
 };
 use crate::scene::{game::board::Environment, GlobalState};
 use bevy::{prelude::*, render::mesh::VertexAttributeValues};
-use bevy_asset_loader::prelude::*;
 use bevy_mod_picking::prelude::*;
 use kodecks_catalog::CATALOG;
 
@@ -12,8 +11,7 @@ pub struct DeckPlugin;
 
 impl Plugin for DeckPlugin {
     fn build(&self, app: &mut App) {
-        app.init_collection::<ImageAssets>()
-            .add_event::<GraveyardHovered>()
+        app.add_event::<GraveyardHovered>()
             .add_systems(OnEnter(GlobalState::GameInit), init)
             .add_systems(OnEnter(GlobalState::GameCleanup), cleanup)
             .add_systems(
@@ -32,15 +30,6 @@ impl Plugin for DeckPlugin {
                 (update_decks, update_graveyards),
             );
     }
-}
-
-#[derive(AssetCollection, Resource)]
-struct ImageAssets {
-    #[asset(path = "frames/back.png")]
-    card_back: Handle<Image>,
-
-    #[asset(path = "frames/graveyard.png")]
-    graveyard: Handle<Image>,
 }
 
 #[derive(Component)]
@@ -62,17 +51,17 @@ fn init(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    assets: Res<ImageAssets>,
+    asset_server: Res<AssetServer>,
 ) {
     let deck_material = materials.add(StandardMaterial {
-        base_color_texture: Some(assets.card_back.clone()),
+        base_color_texture: Some(asset_server.load("frames/back.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
 
     let graveyard_material: Handle<StandardMaterial> = materials.add(StandardMaterial {
-        base_color_texture: Some(assets.graveyard.clone()),
+        base_color_texture: Some(asset_server.load("frames/graveyard.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
