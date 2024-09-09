@@ -1,4 +1,7 @@
-use super::{board, event, server};
+use super::{
+    board, event,
+    server::{self, Server},
+};
 use crate::scene::GlobalState;
 use bevy::prelude::*;
 use kodecks_catalog::profile;
@@ -12,7 +15,6 @@ impl Plugin for GameLoadingPlugin {
             .add_plugins(event::EventPlugin)
             .add_systems(OnEnter(GlobalState::GameInit), init_loading_screen)
             .add_systems(OnExit(GlobalState::GameLoading), cleanup_loading_screen)
-            .add_systems(OnEnter(GlobalState::GameCleanup), cleanup)
             .add_systems(
                 Update,
                 (finish_load.run_if(resource_exists::<board::Environment>))
@@ -43,16 +45,12 @@ fn finish_load(
     }
 }
 
-fn cleanup(mut commands: Commands) {
-    commands.remove_resource::<server::Server>();
-}
-
 fn wait_env(mut next_state: ResMut<NextState<GlobalState>>) {
     next_state.set(GlobalState::GameLoading);
 }
 
-fn init_loading_screen(mut commands: Commands) {
-    commands.insert_resource(server::Server::new(profile::default_profile()));
+fn init_loading_screen(mut commands: Commands, mut conn: ResMut<Server>) {
+    conn.create_session(profile::default_profile());
 
     commands.spawn((
         NodeBundle {

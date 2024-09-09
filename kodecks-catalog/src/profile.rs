@@ -3,7 +3,7 @@ use kodecks::{
     config::{DebugFlags, GameConfig},
     deck::DeckList,
     player::{PlayerConfig, PlayerId},
-    profile::GameProfile,
+    profile::{BotConfig, GameProfile},
 };
 
 pub fn default_profile() -> GameProfile {
@@ -52,6 +52,9 @@ pub fn default_profile() -> GameProfile {
                 deck: deck_list_red,
             },
         ],
+        bots: vec![BotConfig {
+            player: PlayerId::new("player2"),
+        }],
         scenario: None,
     }
 }
