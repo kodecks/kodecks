@@ -1,0 +1,10 @@
+trunk-version = ">=0.19.0"
+
+[build]
+target = "web/index.html"
+
+[serve]
+no_spa = true
+
+[tools]
+wasm_bindgen = "0.2.92"
