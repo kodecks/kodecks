@@ -1,6 +1,12 @@
 [workspace]
 resolver = "2"
-members = ["kodecks", "kodecks-bevy", "kodecks-bot", "kodecks-catalog"]
+members = [
+    "kodecks",
+    "kodecks-bevy",
+    "kodecks-bot",
+    "kodecks-catalog",
+    "kodecks-server",
+]
 
 [profile.dev]
 debug = 0

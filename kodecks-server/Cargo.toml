@@ -1,0 +1,11 @@
+[package]
+name = "kodecks-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+kodecks = { path = "../kodecks" }
+kodecks-bot = { path = "../kodecks-bot" }
+kodecks-catalog = { path = "../kodecks-catalog" }
+serde = { version = "1.0.208", features = ["derive"] }
+tracing = "0.1.40"
