@@ -5,6 +5,10 @@ use super::{
 use crate::scene::GlobalState;
 use bevy::prelude::*;
 use kodecks_catalog::profile;
+use kodecks_server::{
+    message::{Command, Input},
+    Connection,
+};
 
 pub struct GameLoadingPlugin;
 
@@ -50,7 +54,9 @@ fn wait_env(mut next_state: ResMut<NextState<GlobalState>>) {
 }
 
 fn init_loading_screen(mut commands: Commands, mut conn: ResMut<Server>) {
-    conn.create_session(profile::default_profile());
+    conn.send(Input::Command(Command::CreateSession {
+        profile: profile::default_profile(),
+    }));
 
     commands.spawn((
         NodeBundle {
