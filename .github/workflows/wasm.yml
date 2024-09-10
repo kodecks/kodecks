@@ -6,17 +6,21 @@ on:
     paths:
       - "**/*.rs"
       - "**/*.toml"
+      - "**/*.html"
+      - "**/*.mjs"
   pull_request:
     branches: ["main"]
     paths:
       - "**/*.rs"
       - "**/*.toml"
+      - "**/*.html"
+      - "**/*.mjs"
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build_wasm:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,5 +29,9 @@ jobs:
         with:
           target: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@v1.10.3
+      - name: Install trunk
+        run: cargo binstall trunk --force -y
       - name: Build
-        run: cargo build --target wasm32-unknown-unknown
+        run: trunk build
