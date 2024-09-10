@@ -2889,6 +2889,7 @@ dependencies = [
 name = "kodecks-server"
 version = "0.1.0"
 dependencies = [
+ "futures",
  "kodecks",
  "kodecks-bot",
  "kodecks-catalog",

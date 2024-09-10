@@ -1,9 +1,11 @@
 use crate::scene::GlobalState;
 use bevy::{ecs::world::Command, prelude::*};
-use futures::channel::mpsc::Receiver;
-use kodecks::{action::Action, game::LocalGameState, player::PlayerId, profile::GameProfile};
-use kodecks_server::message::{self, Input};
-use std::sync::Mutex;
+use kodecks::{action::Action, game::LocalGameState, player::PlayerId};
+use kodecks_server::{
+    local::LocalServer,
+    message::{self, Input},
+    Connection,
+};
 
 pub struct ServerPlugin;
 
@@ -20,29 +22,8 @@ fn cleanup(mut commands: Commands) {
     commands.remove_resource::<Session>();
 }
 
-#[derive(Resource)]
-pub struct Server {
-    server: kodecks_server::Server,
-    event_recv: Receiver<kodecks_server::message::Output>,
-}
-
-impl Default for Server {
-    fn default() -> Self {
-        let (event_send, event_recv) = futures::channel::mpsc::channel(256);
-        let event_send = Mutex::new(event_send);
-        let server = kodecks_server::Server::new(move |event| {
-            event_send.lock().unwrap().try_send(event).unwrap();
-        });
-        Self { server, event_recv }
-    }
-}
-
-impl Server {
-    pub fn create_session(&mut self, profile: GameProfile) {
-        self.server
-            .handle_input(Input::Command(message::Command::CreateSession { profile }));
-    }
-}
+#[derive(Resource, Default, Deref, DerefMut)]
+pub struct Server(LocalServer);
 
 #[derive(Resource)]
 struct Session {
@@ -55,7 +36,7 @@ fn recv_events(
     mut server: ResMut<Server>,
     mut events: EventWriter<ServerEvent>,
 ) {
-    while let Ok(Some(event)) = server.event_recv.try_next() {
+    while let Some(event) = server.recv() {
         match event {
             message::Output::SessionEvent(event) => match event.event {
                 message::SessionEventKind::Created => {
@@ -80,12 +61,11 @@ impl Command for SendCommand {
             let id = session.id;
             let player = session.player;
             if let Some(mut conn) = world.get_resource_mut::<Server>() {
-                conn.server
-                    .handle_input(Input::SessionCommand(message::SessionCommand {
-                        session: id,
-                        player,
-                        kind: message::SessionCommandKind::NextAction { action: self.0 },
-                    }));
+                conn.send(Input::SessionCommand(message::SessionCommand {
+                    session: id,
+                    player,
+                    kind: message::SessionCommandKind::NextAction { action: self.0 },
+                }));
             }
         }
     }

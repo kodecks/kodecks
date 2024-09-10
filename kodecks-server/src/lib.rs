@@ -3,6 +3,7 @@ use message::{Command, Input};
 use session::Session;
 use std::{collections::HashMap, sync::Arc};
 
+pub mod local;
 pub mod message;
 pub mod session;
 
@@ -52,4 +53,9 @@ impl Server {
         let session = Session::new(session_id, profile, self.callback.clone());
         self.sessions.insert(session_id, session);
     }
+}
+
+pub trait Connection {
+    fn send(&mut self, output: message::Input);
+    fn recv(&mut self) -> Option<message::Output>;
 }
