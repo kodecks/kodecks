@@ -4,8 +4,10 @@ use session::Session;
 use std::{collections::HashMap, sync::Arc};
 
 pub mod local;
+pub mod codec;
 pub mod message;
 pub mod session;
+pub mod worker;
 
 pub type ServerCallback = dyn Fn(message::Output) + Send + Sync + 'static;
 
