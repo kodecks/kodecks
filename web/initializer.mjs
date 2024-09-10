@@ -11,7 +11,10 @@ export default function myInitializer () {
       document.querySelector('#loading-percentage').textContent = `${progress}%`;
     },
     onComplete: () => {
-      document.getElementById('loading-screen').style.display = 'none';
+      document.querySelector('#loading-percentage').textContent = `100%`;
+      setTimeout(() => {
+        document.getElementById('loading-screen').style.display = 'none';
+      }, 100);
     },
     onSuccess: (wasm) => {},
     onFailure: (error) => {}
