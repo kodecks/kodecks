@@ -162,7 +162,9 @@ impl Environment {
             {
                 for command in commands {
                     match command.into_opcodes(self) {
-                        Ok(log) => self.opcodes.extend(log),
+                        Ok(log) => self
+                            .opcodes
+                            .extend(log.into_iter().filter(|item| !item.is_empty())),
                         Err(err) => {
                             error!("Error processing command: {:?}", err);
                         }
@@ -254,12 +256,13 @@ impl Environment {
                     vec![]
                 }
             };
-            self.opcodes.extend(opcodes);
+            self.opcodes
+                .extend(opcodes.into_iter().filter(|item| !item.is_empty()));
             self.state.phase = phase;
         }
 
         let next = self.opcodes.pop_front();
-        let next_empty = next.is_none();
+        let next_empty = self.opcodes.is_empty();
 
         let mut logs = vec![];
         if let Some(log) = next {
