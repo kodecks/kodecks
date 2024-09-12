@@ -14,6 +14,8 @@ use bevy::prelude::*;
 use std::str::FromStr;
 use unic_langid::LanguageIdentifier;
 
+build_info::build_info!(fn build_info);
+
 pub struct AppLoadingPlugin;
 
 impl Plugin for AppLoadingPlugin {
@@ -22,8 +24,13 @@ impl Plugin for AppLoadingPlugin {
             .add_plugins(ConfigPlugin)
             .add_plugins(RenderedCardPlugin)
             .add_plugins(FluentPlugin)
+            .add_systems(Startup, init)
             .add_systems(Update, update.run_if(in_state(GlobalState::AppInit)));
     }
+}
+
+fn init() {
+    info!("{}", build_info::format!("{}", $));
 }
 
 fn update(
