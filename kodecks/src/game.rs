@@ -42,6 +42,7 @@ pub struct Report {
     pub available_actions: Option<PlayerAvailableActions>,
     pub logs: Vec<LogAction>,
     pub condition: GameCondition,
+    pub timestamp: u64,
 }
 
 #[derive(Debug, Clone, Serialize_tuple, Deserialize_tuple)]
@@ -73,6 +74,7 @@ mod tests {
             env: LocalEnvironment {
                 player,
                 turn: 1,
+                timestamp: 0,
                 players: PlayerList::new(
                     player,
                     vec![LocalPlayerState {

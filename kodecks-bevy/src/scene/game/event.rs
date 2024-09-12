@@ -25,7 +25,8 @@ pub struct EventPlugin;
 
 impl Plugin for EventPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<MessageDialogUpdated>()
+        app.insert_resource(AvailableActionList::new(Default::default(), 0))
+            .add_event::<MessageDialogUpdated>()
             .add_event::<InstructionsUpdated>()
             .add_event::<ShardUpdated>()
             .add_event::<LifeUpdated>()
@@ -34,8 +35,9 @@ impl Plugin for EventPlugin {
             .add_systems(
                 Update,
                 (
+                    preload_actions.run_if(resource_exists::<Environment>),
                     queue_events.run_if(resource_exists::<EventQueue>),
-                    (preload_assets,).run_if(resource_exists::<PreloadedAssets>),
+                    preload_assets.run_if(resource_exists::<PreloadedAssets>),
                 )
                     .run_if(on_event::<ServerEvent>()),
             )
@@ -106,6 +108,29 @@ fn queue_events(mut queue: ResMut<EventQueue>, mut events: EventReader<ServerEve
     }
 }
 
+fn preload_actions(
+    mut commands: Commands,
+    mut events: EventReader<ServerEvent>,
+    env: Res<Environment>,
+    list: Res<AvailableActionList>,
+) {
+    for event in events.read() {
+        if event.available_actions.is_some()
+            && list.timestamp() < event.env.timestamp
+            && event.env.turn == env.turn
+        {
+            commands.insert_resource::<AvailableActionList>(AvailableActionList::new(
+                event
+                    .available_actions
+                    .as_ref()
+                    .map(|actions| actions.actions.clone())
+                    .unwrap_or_default(),
+                event.env.timestamp,
+            ));
+        }
+    }
+}
+
 fn preload_assets(
     mut events: EventReader<ServerEvent>,
     asset_server: Res<AssetServer>,
@@ -172,6 +197,7 @@ pub struct ServerEvents<'w> {
     life: EventWriter<'w, LifeUpdated>,
     shard: EventWriter<'w, ShardUpdated>,
     turn: EventWriter<'w, TurnChanged>,
+    list: Res<'w, AvailableActionList>,
 }
 
 fn recv_server_events(
@@ -290,13 +316,16 @@ fn recv_server_events(
             available_actions = env.tick(action).available_actions;
         }
 
-        commands.insert_resource::<AvailableActionList>(
-            available_actions
-                .as_ref()
-                .map(|actions| actions.actions.clone())
-                .unwrap_or_default()
-                .into(),
-        );
+        if events.list.timestamp() < env.timestamp {
+            commands.insert_resource::<AvailableActionList>(AvailableActionList::new(
+                available_actions
+                    .as_ref()
+                    .map(|actions| actions.actions.clone())
+                    .unwrap_or_default(),
+                env.timestamp,
+            ));
+        }
+
         board.update(&env);
         commands.insert_resource::<Environment>(env.into());
     }

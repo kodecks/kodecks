@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 pub struct LocalEnvironment {
     pub player: PlayerId,
     pub turn: u32,
+    pub timestamp: u64,
     pub players: PlayerList<LocalPlayerState>,
     pub phase: Phase,
     pub stack: Stack<LocalStackItem>,
@@ -66,6 +67,7 @@ impl LocalEnvironment {
                     battle: None,
                 });
             }
+            self.timestamp += 1;
         }
         Report {
             available_actions: Some(PlayerAvailableActions {
@@ -76,6 +78,7 @@ impl LocalEnvironment {
             }),
             logs: vec![],
             condition: self.game_condition,
+            timestamp: self.timestamp,
         }
     }
 }
@@ -97,6 +100,7 @@ impl Environment {
             phase: self.state.phase.clone(),
             stack,
             game_condition: self.game_condition,
+            timestamp: self.timestamp,
         }
     }
 }

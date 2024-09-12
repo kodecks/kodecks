@@ -97,16 +97,7 @@ fn handle_player_events(
     if let Some(action) = &action {
         commands.add(SendCommand(action.clone()));
 
-        let mut env = env.clone();
-        let available_actions = env.tick(action.clone()).available_actions;
-
-        commands.insert_resource::<AvailableActionList>(
-            available_actions
-                .as_ref()
-                .map(|actions| actions.actions.clone())
-                .unwrap_or_default()
-                .into(),
-        );
+        let env = env.clone();
         board.update(&env);
         commands.insert_resource::<Environment>(env.into());
     } else {

@@ -9,7 +9,7 @@ use kodecks::{
     player::{PlayerId, PlayerZone},
     zone::Zone,
 };
-use std::f32::consts::PI;
+use std::{f32::consts::PI, ops::Deref};
 
 pub struct BoardPlugin;
 
@@ -37,12 +37,27 @@ impl From<LocalEnvironment> for Environment {
     }
 }
 
-#[derive(Debug, Resource, Deref, Default)]
-pub struct AvailableActionList(action::AvailableActionList);
+#[derive(Debug, Resource, Default)]
+pub struct AvailableActionList {
+    list: action::AvailableActionList,
+    timestamp: u64,
+}
 
-impl From<action::AvailableActionList> for AvailableActionList {
-    fn from(list: action::AvailableActionList) -> Self {
-        Self(list)
+impl AvailableActionList {
+    pub fn new(list: action::AvailableActionList, timestamp: u64) -> Self {
+        Self { list, timestamp }
+    }
+
+    pub fn timestamp(&self) -> u64 {
+        self.timestamp
+    }
+}
+
+impl Deref for AvailableActionList {
+    type Target = action::AvailableActionList;
+
+    fn deref(&self) -> &Self::Target {
+        &self.list
     }
 }
 
