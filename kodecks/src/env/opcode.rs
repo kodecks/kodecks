@@ -14,7 +14,7 @@ use tracing::error;
 
 impl Environment {
     pub fn execute(&mut self, opcode: &Opcode) -> Result<Vec<LogAction>, Error> {
-        self.ts_counter += 1;
+        self.timestamp += 1;
         match opcode {
             Opcode::StartGame => Ok(vec![LogAction::GameStarted]),
             Opcode::ChangeTurn {
@@ -106,7 +106,7 @@ impl Environment {
                     let id = card.id();
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Hand);
-                    card.set_timestamp(self.ts_counter);
+                    card.set_timestamp(self.timestamp);
                     card.set_zone(to);
                     player.hand.push(card);
                     player.counters.draw += 1;
@@ -127,7 +127,7 @@ impl Environment {
                     let id = card.id();
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Field);
-                    card.set_timestamp(self.ts_counter);
+                    card.set_timestamp(self.timestamp);
                     card.set_zone(to);
                     player.field.push(card);
                     player.counters.cast_creatures += 1;
@@ -156,7 +156,7 @@ impl Environment {
                 };
                 if let Some(mut card) = card {
                     let id = card.id();
-                    card.set_timestamp(self.ts_counter);
+                    card.set_timestamp(self.timestamp);
                     card.set_zone(*to);
                     card.reset_computed();
                     let player = self.state.players.get_mut(to.player);

@@ -42,7 +42,7 @@ pub struct Environment {
     stack: Stack<StackItem>,
     continuous: ContinuousEffectList,
     game_condition: GameCondition,
-    ts_counter: u64,
+    timestamp: u64,
     last_available_actions: Option<PlayerAvailableActions>,
     rng: SmallRng,
     obj_counter: ObjectIdCounter,
@@ -91,7 +91,7 @@ impl Environment {
             stack: Stack::new(),
             continuous: Default::default(),
             game_condition: GameCondition::Progress,
-            ts_counter: 0,
+            timestamp: 0,
             last_available_actions: None,
             rng,
             obj_counter,
@@ -142,6 +142,7 @@ impl Environment {
                     available_actions: self.last_available_actions.clone(),
                     logs: vec![],
                     condition: self.game_condition,
+                    timestamp: self.timestamp,
                 }
             }
         };
@@ -180,6 +181,7 @@ impl Environment {
                 available_actions: None,
                 logs: vec![],
                 condition: self.game_condition,
+                timestamp: self.timestamp,
             };
         }
 
@@ -203,7 +205,9 @@ impl Environment {
                     let mut list = vec![];
                     for command in report.commands {
                         match command.into_opcodes(self) {
-                            Ok(codes) => list.extend(codes),
+                            Ok(codes) => {
+                                list.extend(codes.into_iter().filter(|item| !item.is_empty()))
+                            }
                             Err(err) => {
                                 error!("Error processing command: {:?}", err);
                             }
@@ -237,10 +241,12 @@ impl Environment {
                     {
                         self.stack.push(item);
                     }
+
                     return Report {
                         available_actions: report.available_actions,
                         logs,
                         condition: self.game_condition,
+                        timestamp: self.timestamp,
                     };
                 }
                 Err(err) => {
@@ -281,7 +287,7 @@ impl Environment {
             error!("Error computing effects: {:?}", err);
         }
 
-        let available_actions = if next_empty {
+        let available_actions = if next_empty && self.stack.is_empty() {
             self.available_actions()
         } else {
             None
@@ -293,6 +299,7 @@ impl Environment {
             available_actions,
             logs,
             condition: self.game_condition,
+            timestamp: self.timestamp,
         }
     }
 
