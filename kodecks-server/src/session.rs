@@ -5,7 +5,6 @@ use crate::{
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     game::{Game, LocalGameState},
-    player::PlayerId,
     profile::{BotConfig, GameProfile},
 };
 use kodecks_bot::{Bot, DefaultBot};
@@ -16,9 +15,9 @@ pub struct Session {
     id: u32,
     game: Game,
     bots: Vec<BotConfig>,
-    next_actions: HashMap<PlayerId, Action>,
+    next_actions: HashMap<u8, Action>,
     available_actions: Option<PlayerAvailableActions>,
-    player_in_action: PlayerId,
+    player_in_action: u8,
     default_bot: DefaultBot,
     callback: Arc<Box<ServerCallback>>,
 }
@@ -112,7 +111,7 @@ impl Session {
         }
     }
 
-    pub fn players(&self) -> impl Iterator<Item = PlayerId> + '_ {
+    pub fn players(&self) -> impl Iterator<Item = u8> + '_ {
         self.game.env().state.players.iter().map(|p| p.id)
     }
 

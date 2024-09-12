@@ -12,7 +12,6 @@ use kodecks::{
     id::ObjectId,
     log::LogAction,
     message::MessageDialog,
-    player::PlayerId,
     prelude::Message,
     target::Target,
 };
@@ -66,11 +65,11 @@ pub struct InstructionsUpdated(pub Option<Message>);
 pub struct ShardUpdated;
 
 #[derive(Event)]
-pub struct TurnChanged(pub PlayerId);
+pub struct TurnChanged(pub u8);
 
 #[derive(Event)]
 pub struct LifeUpdated {
-    pub player: PlayerId,
+    pub player: u8,
     pub delta: i32,
 }
 

@@ -1,8 +1,8 @@
-use crate::{id::ObjectId, player::PlayerId};
+use crate::id::ObjectId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Target {
-    Player(PlayerId),
+    Player(u8),
     Card(ObjectId),
 }

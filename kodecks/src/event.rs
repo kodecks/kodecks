@@ -1,4 +1,3 @@
-use crate::player::PlayerId;
 use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 use strum::Display;
@@ -15,7 +14,7 @@ pub enum CardEvent {
     },
     ReturnedToDeck,
     DealtDamage {
-        player: PlayerId,
+        player: u8,
         amount: u32,
         reason: EventReason,
     },

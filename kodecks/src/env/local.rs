@@ -7,7 +7,7 @@ use crate::{
     game::Report,
     id::ObjectId,
     phase::Phase,
-    player::{LocalPlayerState, PlayerId, PlayerList, PlayerZone},
+    player::{LocalPlayerState, PlayerList, PlayerZone},
     stack::{LocalStackItem, Stack},
     zone::CardZone,
 };
@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocalEnvironment {
-    pub player: PlayerId,
+    pub player: u8,
     pub turn: u32,
     pub timestamp: u64,
     pub players: PlayerList<LocalPlayerState>,
@@ -49,11 +49,11 @@ impl LocalEnvironment {
         self.players.iter().flat_map(|player| player.cards())
     }
 
-    pub fn next_id(&self, player: PlayerId) -> PlayerId {
+    pub fn next_id(&self, player: u8) -> u8 {
         self.players.next_id(player)
     }
 
-    pub fn next_player(&self, player: PlayerId) -> &LocalPlayerState {
+    pub fn next_player(&self, player: u8) -> &LocalPlayerState {
         self.players.next_player(player)
     }
 
@@ -84,7 +84,7 @@ impl LocalEnvironment {
 }
 
 impl Environment {
-    pub fn local(&self, receiver: PlayerId) -> LocalEnvironment {
+    pub fn local(&self, receiver: u8) -> LocalEnvironment {
         let players = PlayerList::new(
             self.state.players.player_in_turn().id,
             self.state

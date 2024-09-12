@@ -6,7 +6,7 @@ use kodecks::{
     field::{FieldBattleState, FieldState},
     id::ObjectId,
     phase::Phase,
-    player::{PlayerId, PlayerZone},
+    player::PlayerZone,
     zone::Zone,
 };
 use std::{f32::consts::PI, ops::Deref};
@@ -233,7 +233,7 @@ impl Board {
         &self,
         card: ObjectId,
         zone: PlayerZone,
-        viewer: PlayerId,
+        viewer: u8,
         camera_pos: Vec3,
     ) -> Option<Transform> {
         if zone.player == viewer {

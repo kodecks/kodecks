@@ -12,7 +12,7 @@ use crate::{
     log::LogAction,
     opcode::OpcodeList,
     phase::Phase,
-    player::{PlayerCondition, PlayerId, PlayerList, PlayerState},
+    player::{PlayerCondition, PlayerList, PlayerState},
     profile::GameProfile,
     sequence::CardSequence,
     stack::{Stack, StackItem},
@@ -130,7 +130,7 @@ impl Environment {
         Ok(())
     }
 
-    pub fn process(&mut self, player: PlayerId, action: Option<Action>) -> Report {
+    pub fn process(&mut self, player: u8, action: Option<Action>) -> Report {
         let report = match (&self.last_available_actions, action.clone()) {
             (None, _) => self.process_turn(player, None),
             (Some(available), Some(action)) if available.validate(player, &action) => {
@@ -150,7 +150,7 @@ impl Environment {
         report
     }
 
-    fn process_turn(&mut self, player: PlayerId, mut action: Option<Action>) -> Report {
+    fn process_turn(&mut self, player: u8, mut action: Option<Action>) -> Report {
         let action = match action.take() {
             Some(Action::Concede) => {
                 let loser = self.state.players.get_mut(player);
@@ -356,7 +356,7 @@ impl Environment {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum GameCondition {
     Progress,
-    Win(PlayerId),
+    Win(u8),
     Draw,
 }
 

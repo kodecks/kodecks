@@ -4,7 +4,7 @@ use bitflags::bitflags;
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::Environment,
-    player::PlayerId,
+    
 };
 use rand::rngs::SmallRng;
 use score::ComputedScore;
@@ -24,7 +24,7 @@ pub use simple::SimpleBot;
 pub struct BotContext {
     pub rng: SmallRng,
     pub flags: BotFlags,
-    pub player: PlayerId,
+    pub player: u8,
     pub env: Arc<Environment>,
 }
 

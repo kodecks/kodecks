@@ -1,8 +1,4 @@
-use crate::{
-    config::GameConfig,
-    player::{PlayerConfig, PlayerId},
-    scenario::Scenario,
-};
+use crate::{config::GameConfig, player::PlayerConfig, scenario::Scenario};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -28,5 +24,5 @@ impl fmt::Debug for GameProfile {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BotConfig {
-    pub player: PlayerId,
+    pub player: u8,
 }

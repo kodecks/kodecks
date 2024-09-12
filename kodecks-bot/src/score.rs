@@ -1,6 +1,6 @@
 use kodecks::{
     env::{Environment, GameCondition},
-    player::PlayerId,
+    
     score::Score,
 };
 
@@ -36,7 +36,7 @@ impl Ord for ComputedScore {
     }
 }
 
-pub fn get_score(env: &Environment, side: PlayerId) -> i32 {
+pub fn get_score(env: &Environment, side: u8) -> i32 {
     let state = &env.state;
     let player = state.players().get(side);
     let opponent = state.players().next_player(side);

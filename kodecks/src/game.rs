@@ -3,7 +3,6 @@ use crate::{
     card::Catalog,
     env::{Environment, GameCondition, LocalEnvironment},
     log::LogAction,
-    player::PlayerId,
     profile::GameProfile,
     scenario::Scenario,
 };
@@ -23,7 +22,7 @@ impl Game {
         }
     }
 
-    pub fn tick(&mut self, player: PlayerId, action: Option<Action>) -> Report {
+    pub fn tick(&mut self, player: u8, action: Option<Action>) -> Report {
         let mut report = Arc::make_mut(&mut self.env).process(player, action);
         if let Some(scenario) = &mut self.scenario {
             report.available_actions =
@@ -66,7 +65,7 @@ mod tests {
 
     #[test]
     fn test_serialize_local_game_state() {
-        let player = PlayerId::new("player1");
+        let player = 1;
         let mut counter = ObjectIdCounter::default();
         let mut shards = ShardList::new();
         shards.add(Color::RED, 10);

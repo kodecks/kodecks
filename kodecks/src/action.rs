@@ -2,7 +2,6 @@ use crate::{
     command::ActionCommand,
     id::ObjectId,
     message::{Message, MessageDialog},
-    player::PlayerId,
 };
 use serde::{Deserialize, Serialize};
 use serde_tuple::{Deserialize_tuple, Serialize_tuple};
@@ -47,14 +46,14 @@ impl Ord for AvailableAction {
 
 #[derive(Debug, Clone, Serialize_tuple, Deserialize_tuple)]
 pub struct PlayerAvailableActions {
-    pub player: PlayerId,
+    pub player: u8,
     pub actions: AvailableActionList,
     pub instructions: Option<Message>,
     pub message_dialog: Option<MessageDialog>,
 }
 
 impl PlayerAvailableActions {
-    pub fn new(player: PlayerId) -> Self {
+    pub fn new(player: u8) -> Self {
         Self {
             player,
             actions: AvailableActionList::new(),
@@ -63,7 +62,7 @@ impl PlayerAvailableActions {
         }
     }
 
-    pub fn validate(&self, player: PlayerId, action: &Action) -> bool {
+    pub fn validate(&self, player: u8, action: &Action) -> bool {
         if player != self.player {
             return false;
         }

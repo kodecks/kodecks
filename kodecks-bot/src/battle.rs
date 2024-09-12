@@ -3,7 +3,7 @@ use crate::{
     score::{get_score, ComputedScore},
     Bot, SimpleBot,
 };
-use kodecks::{action::Action, env::Environment, id::ObjectId, phase::Phase, player::PlayerId};
+use kodecks::{action::Action, env::Environment, id::ObjectId, phase::Phase};
 use std::sync::Arc;
 
 #[cfg(feature = "rayon")]
@@ -146,7 +146,7 @@ fn backtrack_pair(
     }
 }
 
-fn evaluate_battle(env: &Environment, player: PlayerId, action: Option<Action>) -> i32 {
+fn evaluate_battle(env: &Environment, player: u8, action: Option<Action>) -> i32 {
     let mut next_action = action;
     let mut current_player = player;
 

@@ -1,6 +1,6 @@
 use crate::scene::GlobalState;
 use bevy::{ecs::world::Command, prelude::*};
-use kodecks::{action::Action, game::LocalGameState, player::PlayerId};
+use kodecks::{action::Action, game::LocalGameState};
 use kodecks_server::{
     message::{self, Input},
     Connection,
@@ -32,7 +32,7 @@ pub struct Server(kodecks_server::worker::WebWorkerServer);
 #[derive(Resource)]
 struct Session {
     id: u32,
-    player: PlayerId,
+    player: u8,
 }
 
 fn recv_events(

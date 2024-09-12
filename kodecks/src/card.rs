@@ -7,7 +7,7 @@ use crate::{
     event::EventFilter,
     id::{CardId, ObjectId, ObjectIdCounter, TimedObjectId},
     linear::Linear,
-    player::{PlayerId, PlayerZone},
+    player::PlayerZone,
     score::Score,
     zone::Zone,
 };
@@ -47,9 +47,9 @@ impl Index<TinyAsciiStr<8>> for Catalog {
 
 pub struct Card {
     id: ObjectId,
-    owner: PlayerId,
+    owner: u8,
     zone: PlayerZone,
-    controller: PlayerId,
+    controller: u8,
     archetype: &'static CardArchetype,
     computed: ComputedAttribute,
     flags: ComputedFlags,
@@ -69,7 +69,7 @@ impl Card {
         counter: &mut ObjectIdCounter,
         item: &DeckItem,
         archetype: &'static CardArchetype,
-        owner: PlayerId,
+        owner: u8,
     ) -> Self {
         let effect = (archetype.effect)();
         Self {
@@ -90,11 +90,11 @@ impl Card {
         self.id
     }
 
-    pub fn owner(&self) -> PlayerId {
+    pub fn owner(&self) -> u8 {
         self.owner
     }
 
-    pub fn controller(&self) -> PlayerId {
+    pub fn controller(&self) -> u8 {
         self.controller
     }
 
@@ -213,7 +213,7 @@ pub fn safe_name(name: &str) -> Result<String, idna::Errors> {
 pub struct CardSnapshot {
     pub id: ObjectId,
     pub archetype_id: TinyAsciiStr<8>,
-    pub owner: PlayerId,
+    pub owner: u8,
     pub computed: Option<ComputedAttribute>,
     pub timestamp: u64,
 }

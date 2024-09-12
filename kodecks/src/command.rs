@@ -7,7 +7,7 @@ use crate::{
     filter_vec,
     id::{CardId, ObjectId, TimedObjectId},
     opcode::{Opcode, OpcodeList},
-    player::PlayerId,
+    
 };
 use serde::{Deserialize, Serialize};
 use strum::Display;
@@ -15,7 +15,7 @@ use strum::Display;
 #[derive(Debug, Clone, Serialize, Deserialize, Display)]
 pub enum ActionCommand {
     InflictDamage {
-        target: PlayerId,
+        target: u8,
         damage: u32,
     },
     DestroyCard {
@@ -39,13 +39,13 @@ pub enum ActionCommand {
         reason: EventReason,
     },
     GenerateShards {
-        player: PlayerId,
+        player: u8,
         source: ObjectId,
         color: Color,
         amount: u32,
     },
     ConsumeShards {
-        player: PlayerId,
+        player: u8,
         source: ObjectId,
         color: Color,
         amount: u32,

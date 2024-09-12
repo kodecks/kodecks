@@ -5,7 +5,7 @@ use crate::{
     condition::Condition,
     env::GameState,
     id::ObjectId,
-    player::PlayerId,
+    
 };
 use core::fmt;
 use dyn_clone::DynClone;
@@ -43,7 +43,7 @@ pub trait ContinuousEffect: Send + Sync + DynClone {
     fn apply_player(
         &mut self,
         _state: &GameState,
-        _player: PlayerId,
+        _player: u8,
         _abilities: &mut AbilityList<PlayerAbility>,
     ) -> anyhow::Result<()> {
         Ok(())
@@ -112,7 +112,7 @@ impl ContinuousEffectList {
     pub fn apply_player(
         &mut self,
         state: &GameState,
-        player: PlayerId,
+        player: u8,
     ) -> AbilityList<PlayerAbility> {
         let mut abilities = AbilityList::new();
         for effect in self.effects.iter_mut().rev() {

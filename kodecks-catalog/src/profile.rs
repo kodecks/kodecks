@@ -2,7 +2,7 @@ use crate::CATALOG;
 use kodecks::{
     config::{DebugFlags, GameConfig},
     deck::DeckList,
-    player::{PlayerConfig, PlayerId},
+    player::PlayerConfig,
     profile::{BotConfig, GameProfile},
 };
 
@@ -44,17 +44,15 @@ pub fn default_profile() -> GameProfile {
         },
         players: vec![
             PlayerConfig {
-                id: PlayerId::new("player1"),
+                id: 1,
                 deck: deck_list_green,
             },
             PlayerConfig {
-                id: PlayerId::new("player2"),
+                id: 2,
                 deck: deck_list_red,
             },
         ],
-        bots: vec![BotConfig {
-            player: PlayerId::new("player2"),
-        }],
+        bots: vec![BotConfig { player: 2 }],
         scenario: None,
     }
 }

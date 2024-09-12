@@ -1,4 +1,4 @@
-use kodecks::{action::Action, game::LocalGameState, player::PlayerId, profile::GameProfile};
+use kodecks::{action::Action, game::LocalGameState,  profile::GameProfile};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -17,7 +17,7 @@ pub enum Command {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SessionCommand {
     pub session: u32,
-    pub player: PlayerId,
+    pub player: u8,
     #[serde(flatten)]
     pub kind: SessionCommandKind,
 }
@@ -37,7 +37,7 @@ pub enum Output {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SessionEvent {
     pub session: u32,
-    pub player: PlayerId,
+    pub player: u8,
     #[serde(flatten)]
     pub event: SessionEventKind,
 }

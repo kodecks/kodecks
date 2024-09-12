@@ -4,7 +4,7 @@ use crate::{
     field::{FieldBattleState, FieldState},
     id::ObjectId,
     phase::Phase,
-    player::{PlayerId, PlayerZone},
+    player::PlayerZone,
     target::Target,
     zone::MoveReason,
 };
@@ -15,36 +15,36 @@ pub enum Opcode {
     StartGame,
     ChangeTurn {
         turn: u32,
-        player: PlayerId,
+        player: u8,
         phase: Phase,
     },
     ChangePhase {
         phase: Phase,
     },
     SetLife {
-        player: PlayerId,
+        player: u8,
         life: u32,
     },
     ReduceCost {
-        player: PlayerId,
+        player: u8,
     },
     GenerateShards {
-        player: PlayerId,
+        player: u8,
         source: ObjectId,
         color: Color,
         amount: u32,
     },
     ConsumeShards {
-        player: PlayerId,
+        player: u8,
         source: ObjectId,
         color: Color,
         amount: u32,
     },
     DrawCard {
-        player: PlayerId,
+        player: u8,
     },
     CastCard {
-        player: PlayerId,
+        player: u8,
         card: ObjectId,
     },
     MoveCard {
@@ -54,7 +54,7 @@ pub enum Opcode {
         reason: MoveReason,
     },
     ShuffleDeck {
-        player: PlayerId,
+        player: u8,
     },
     TriggerEvent {
         source: ObjectId,
@@ -75,7 +75,7 @@ pub enum Opcode {
     },
     ResetBattleState,
     InflictDamage {
-        player: PlayerId,
+        player: u8,
         damage: u32,
     },
 }

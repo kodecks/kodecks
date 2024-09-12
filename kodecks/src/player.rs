@@ -12,39 +12,22 @@ use crate::{
     zone::{CardZone, Zone},
 };
 use serde::{Deserialize, Serialize};
-use std::{collections::VecDeque, fmt};
-use tinystr::TinyAsciiStr;
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct PlayerId(TinyAsciiStr<16>);
-
-impl fmt::Display for PlayerId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-impl PlayerId {
-    pub fn new(id: &str) -> Self {
-        Self(TinyAsciiStr::from_bytes_lossy(id.as_bytes()))
-    }
-}
+use std::collections::VecDeque;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerConfig {
-    pub id: PlayerId,
+    pub id: u8,
     pub deck: DeckList,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerList<T> {
-    player_in_turn: PlayerId,
+    player_in_turn: u8,
     players: Vec<T>,
 }
 
 impl<T> PlayerList<T> {
-    pub fn new<I>(player_in_turn: PlayerId, iter: I) -> Self
+    pub fn new<I>(player_in_turn: u8, iter: I) -> Self
     where
         I: IntoIterator<Item = T>,
     {
@@ -54,7 +37,7 @@ impl<T> PlayerList<T> {
         }
     }
 
-    pub fn set_player_in_turn(&mut self, player: PlayerId) {
+    pub fn set_player_in_turn(&mut self, player: u8) {
         self.player_in_turn = player;
     }
 }
@@ -67,7 +50,7 @@ impl<'a, T> PlayerListIter<'a, T>
 where
     T: PlayerItem,
 {
-    pub fn new(player_in_turn: PlayerId, players: &'a [T]) -> Self {
+    pub fn new(player_in_turn: u8, players: &'a [T]) -> Self {
         let pos = players
             .iter()
             .position(|player| player.id() == player_in_turn)
@@ -94,7 +77,7 @@ impl<'a, T> PlayerListMutIter<'a, T>
 where
     T: PlayerItem,
 {
-    pub fn new(player_in_turn: PlayerId, players: &'a mut [T]) -> Self {
+    pub fn new(player_in_turn: u8, players: &'a mut [T]) -> Self {
         let pos = players
             .iter()
             .position(|player| player.id() == player_in_turn)
@@ -117,14 +100,14 @@ impl<T> PlayerList<T>
 where
     T: PlayerItem,
 {
-    pub fn get(&self, player: PlayerId) -> &T {
+    pub fn get(&self, player: u8) -> &T {
         self.players
             .iter()
             .find(|item| item.id() == player)
             .unwrap()
     }
 
-    pub fn get_mut(&mut self, player: PlayerId) -> &mut T {
+    pub fn get_mut(&mut self, player: u8) -> &mut T {
         let index = self
             .players
             .iter()
@@ -141,7 +124,7 @@ where
         PlayerListMutIter::new(self.player_in_turn, &mut self.players)
     }
 
-    pub fn next_id(&self, id: PlayerId) -> PlayerId {
+    pub fn next_id(&self, id: u8) -> u8 {
         let pos = self
             .players
             .iter()
@@ -151,7 +134,7 @@ where
         self.players[next].id()
     }
 
-    pub fn next_player(&self, id: PlayerId) -> &T {
+    pub fn next_player(&self, id: u8) -> &T {
         let next = self.next_id(id);
         self.get(next)
     }
@@ -166,12 +149,12 @@ where
 }
 
 pub trait PlayerItem {
-    fn id(&self) -> PlayerId;
+    fn id(&self) -> u8;
 }
 
 #[derive(Debug)]
 pub struct PlayerState {
-    pub id: PlayerId,
+    pub id: u8,
     pub deck: Deck,
     pub hand: Hand,
     pub graveyard: Graveyard,
@@ -184,7 +167,7 @@ pub struct PlayerState {
 }
 
 impl PlayerItem for PlayerState {
-    fn id(&self) -> PlayerId {
+    fn id(&self) -> u8 {
         self.id
     }
 }
@@ -207,7 +190,7 @@ impl Clone for PlayerState {
 }
 
 impl PlayerState {
-    pub fn new(id: PlayerId) -> Self {
+    pub fn new(id: u8) -> Self {
         PlayerState {
             id,
             deck: Deck::default(),
@@ -300,19 +283,19 @@ pub struct PlayerCounters {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PlayerZone {
-    pub player: PlayerId,
+    pub player: u8,
     pub zone: Zone,
 }
 
 impl PlayerZone {
-    pub fn new(player: PlayerId, zone: Zone) -> Self {
+    pub fn new(player: u8, zone: Zone) -> Self {
         Self { player, zone }
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocalPlayerState {
-    pub id: PlayerId,
+    pub id: u8,
     pub deck: usize,
     pub hand: Vec<HandItem<CardSnapshot>>,
     pub graveyard: Vec<CardSnapshot>,
@@ -322,7 +305,7 @@ pub struct LocalPlayerState {
 }
 
 impl PlayerItem for LocalPlayerState {
-    fn id(&self) -> PlayerId {
+    fn id(&self) -> u8 {
         self.id
     }
 }
