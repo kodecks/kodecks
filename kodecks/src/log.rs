@@ -41,6 +41,10 @@ pub enum LogAction {
         to: PlayerZone,
         reason: MoveReason,
     },
+    #[strum(to_string = "Card Token {card} generated")]
+    CardTokenGenerated { card: ObjectId },
+    #[strum(to_string = "Card Token {card} removed")]
+    CardTokenRemoved { card: ObjectId },
     #[strum(to_string = "Deck shuffled for {player}")]
     DeckShuffled { player: u8 },
     #[strum(to_string = "Effect {id} triggered by {source}")]

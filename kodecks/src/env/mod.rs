@@ -45,6 +45,7 @@ pub struct Environment {
     timestamp: u64,
     last_available_actions: Option<PlayerAvailableActions>,
     rng: SmallRng,
+    catalog: &'static Catalog,
     obj_counter: ObjectIdCounter,
 }
 
@@ -64,7 +65,7 @@ impl Environment {
                 let mut state = PlayerState::new(player.id);
                 for item in &player.deck.cards {
                     let archetype = &catalog[item.archetype_id];
-                    let card = Card::new(&mut obj_counter, item, archetype, player.id);
+                    let card = Card::new(&mut obj_counter, item, archetype, player.id, false);
                     state.deck.add_top(card);
                 }
                 if !profile.config.no_deck_shuffle {
@@ -94,6 +95,7 @@ impl Environment {
             timestamp: 0,
             last_available_actions: None,
             rng,
+            catalog,
             obj_counter,
         }
     }
@@ -187,7 +189,7 @@ impl Environment {
 
         if let Some(item) = self.stack.pop() {
             let card = self.state.find_card(item.source).unwrap();
-            let mut ctx = EffectTriggerContext::new(&self.state, card);
+            let mut ctx = EffectTriggerContext::new(&self.state, &mut self.obj_counter, card);
 
             let targeted = match &action {
                 Some(Action::SelectCard { card }) => Some(LogAction::CardsTargeted {

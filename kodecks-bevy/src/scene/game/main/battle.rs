@@ -61,8 +61,16 @@ fn update_battle(
 
     let camera_pos = camera.single().translation;
     for (attacker, blocker) in board.blocking_pairs() {
-        let attacker_zone = env.find_zone(*attacker).unwrap();
-        let defender_zone = env.find_zone(*blocker).unwrap();
+        let attacker_zone = if let Ok(zone) = env.find_zone(*attacker) {
+            zone
+        } else {
+            continue;
+        };
+        let defender_zone = if let Ok(zone) = env.find_zone(*blocker) {
+            zone
+        } else {
+            continue;
+        };
         if attacker_zone.zone == Zone::Field && defender_zone.zone == Zone::Field {
             let mut attacker_pos = board
                 .get_zone_transform(*attacker, attacker_zone, env.player, camera_pos)

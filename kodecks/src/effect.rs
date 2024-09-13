@@ -6,6 +6,7 @@ use crate::{
     continuous::{ContinuousEffect, ContinuousItem},
     env::GameState,
     event::{CardEvent, EventFilter},
+    id::{ObjectId, ObjectIdCounter},
     stack::StackItem,
 };
 use dyn_clone::DynClone;
@@ -90,15 +91,21 @@ pub struct EffectTriggerContext<'a> {
     source: &'a Card,
     continuous: Vec<ContinuousItem>,
     stack: Vec<StackItem>,
+    obj_counter: &'a mut ObjectIdCounter,
 }
 
 impl<'a> EffectTriggerContext<'a> {
-    pub fn new(state: &'a GameState, source: &'a Card) -> Self {
+    pub fn new(
+        state: &'a GameState,
+        obj_counter: &'a mut ObjectIdCounter,
+        source: &'a Card,
+    ) -> Self {
         Self {
             state,
             source,
             continuous: Vec::new(),
             stack: Vec::new(),
+            obj_counter,
         }
     }
 
@@ -131,6 +138,10 @@ impl<'a> EffectTriggerContext<'a> {
             id: id.to_string(),
             handler: Arc::new(Box::new(handler)),
         });
+    }
+
+    pub fn new_id(&mut self) -> ObjectId {
+        self.obj_counter.allocate(None)
     }
 
     pub fn into_inner(self) -> (Vec<ContinuousItem>, Vec<StackItem>) {

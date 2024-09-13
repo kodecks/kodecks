@@ -140,18 +140,20 @@ impl AssetLoader for RenderedCardLoader {
             });
 
             let background = self.painter.get_color(Default::default());
-            self.number.draw(
-                &archetype.attribute.cost.to_string(),
-                &DrawOptions {
-                    x: 2,
-                    y: 2,
-                    h_align: Alignment::Start,
-                    v_align: Alignment::Start,
-                    background,
-                    foreground: [255, 255, 255, 255].into(),
-                },
-                &mut frame_image,
-            );
+            if !archetype.attribute.is_token {
+                self.number.draw(
+                    &archetype.attribute.cost.to_string(),
+                    &DrawOptions {
+                        x: 2,
+                        y: 2,
+                        h_align: Alignment::Start,
+                        v_align: Alignment::Start,
+                        background,
+                        foreground: [255, 255, 255, 255].into(),
+                    },
+                    &mut frame_image,
+                );
+            }
 
             let image = Image::new(
                 Extent3d {
