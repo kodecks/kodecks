@@ -30,3 +30,5 @@ card-wasteland-cobra = Wasteland Cobra
 card-coppermine-scorpion = Coppermine Scorpion
 card-zigzag-ammonite = Zigzag Ammonite
 card-voracious-anteater = Voracious Anteater
+    .text = When <<Voracious Anteater>> dies, create an <<Ant>> token.
+card-ant = Ant
