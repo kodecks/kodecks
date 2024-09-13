@@ -37,10 +37,10 @@ impl Index<&str> for Catalog {
     }
 }
 
-impl Index<TinyAsciiStr<8>> for Catalog {
+impl Index<ArchetypeId> for Catalog {
     type Output = CardArchetype;
 
-    fn index(&self, short_id: TinyAsciiStr<8>) -> &Self::Output {
+    fn index(&self, short_id: ArchetypeId) -> &Self::Output {
         self.index(short_id.as_str())
     }
 }
@@ -212,7 +212,7 @@ pub fn safe_name(name: &str) -> Result<String, idna::Errors> {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CardSnapshot {
     pub id: ObjectId,
-    pub archetype_id: TinyAsciiStr<8>,
+    pub archetype_id: ArchetypeId,
     pub owner: u8,
     pub computed: Option<ComputedAttribute>,
     pub timestamp: u64,
@@ -234,7 +234,7 @@ impl CardId for CardSnapshot {
 impl CardSnapshot {
     pub fn redacted(self) -> Self {
         Self {
-            archetype_id: TinyAsciiStr::from_bytes_lossy(b""),
+            archetype_id: ArchetypeId::new(""),
             computed: None,
             timestamp: 0,
             ..self
@@ -275,10 +275,33 @@ impl fmt::Display for CardSnapshot {
         write!(f, "<({color}{}){clock} {}>", computed.cost.value(), self.id)
     }
 }
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct ArchetypeId(TinyAsciiStr<8>);
+
+impl fmt::Display for ArchetypeId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl ArchetypeId {
+    pub fn new(id: &str) -> Self {
+        Self(TinyAsciiStr::from_bytes_lossy(id.as_bytes()))
+    }
+
+    pub fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CardArchetype {
-    pub id: TinyAsciiStr<8>,
+    pub id: ArchetypeId,
     pub name: &'static str,
     pub safe_name: &'static str,
     pub attribute: CardAttribute,
@@ -295,7 +318,7 @@ impl CardArchetype {
 impl Default for CardArchetype {
     fn default() -> Self {
         Self {
-            id: TinyAsciiStr::from_bytes_lossy(b""),
+            id: ArchetypeId::new(""),
             name: "",
             safe_name: "",
             attribute: CardAttribute::default(),

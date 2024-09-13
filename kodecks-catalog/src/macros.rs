@@ -7,7 +7,7 @@ macro_rules! card_def {
         pub const ARCHETYPE: fn() -> &'static CardArchetype = || {
             static SAFE_NAME: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| kodecks::card::safe_name($name).unwrap());
             static CACHE: std::sync::LazyLock<CardArchetype> = std::sync::LazyLock::new(|| CardArchetype {
-                id: tinystr::TinyAsciiStr::from_bytes_lossy($id.as_bytes()),
+                id: ArchetypeId::new($id),
                 name: $name,
                 safe_name: &SAFE_NAME,
                 attribute: CardAttribute {

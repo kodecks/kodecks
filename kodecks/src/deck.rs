@@ -1,5 +1,5 @@
 use crate::{
-    card::{safe_name, Card, Catalog},
+    card::{safe_name, ArchetypeId, Card, Catalog},
     id::{ObjectId, ObjectIdCounter},
     sequence::CardSequence,
     zone::CardZone,
@@ -8,7 +8,6 @@ use rand::seq::SliceRandom;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::iter;
-use tinystr::TinyAsciiStr;
 
 #[derive(Debug, Default)]
 pub struct Deck {
@@ -100,7 +99,7 @@ impl DeckList {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DeckItem {
-    pub archetype_id: TinyAsciiStr<8>,
+    pub archetype_id: ArchetypeId,
     pub base_id: Option<ObjectId>,
 }
 

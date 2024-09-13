@@ -9,6 +9,7 @@ use bevy::{
 };
 use kodecks::{
     action::{Action, AvailableAction},
+    card::ArchetypeId,
     id::ObjectId,
     log::LogAction,
     message::MessageDialog,
@@ -17,7 +18,6 @@ use kodecks::{
 };
 use kodecks_catalog::CATALOG;
 use std::collections::VecDeque;
-use tinystr::TinyAsciiStr;
 use web_time::Duration;
 
 pub struct EventPlugin;
@@ -97,8 +97,8 @@ pub enum AssetState {
 
 #[derive(Resource, Default)]
 struct PreloadedAssets {
-    loaded: HashMap<TinyAsciiStr<8>, Vec<Handle<Image>>>,
-    loading: HashMap<TinyAsciiStr<8>, Vec<Handle<Image>>>,
+    loaded: HashMap<ArchetypeId, Vec<Handle<Image>>>,
+    loading: HashMap<ArchetypeId, Vec<Handle<Image>>>,
 }
 
 fn queue_events(mut queue: ResMut<EventQueue>, mut events: EventReader<ServerEvent>) {

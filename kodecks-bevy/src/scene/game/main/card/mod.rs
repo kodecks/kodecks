@@ -19,14 +19,13 @@ use bevy::utils::{HashMap, HashSet};
 use bevy_mod_picking::prelude::*;
 use frame::CardFrame;
 use image::{DynamicImage, RgbaImage};
-use kodecks::card::{CardArchetype, CardSnapshot};
+use kodecks::card::{ArchetypeId, CardArchetype, CardSnapshot};
 use kodecks::id::ObjectId;
 use kodecks::zone::Zone;
 use kodecks_catalog::CATALOG;
 use number::{NumberOverlay, NumberOverlayKey};
 use std::cmp::Ordering;
 use std::f32::consts::PI;
-use tinystr::TinyAsciiStr;
 use web_time::Instant;
 
 pub const CARD_WIDTH: f32 = 36.0;
@@ -129,7 +128,7 @@ struct CardAssets {
 
 struct CardAssetEntry {
     entity: Entity,
-    archetype_id: Option<TinyAsciiStr<8>>,
+    archetype_id: Option<ArchetypeId>,
     time: Instant,
 }
 
