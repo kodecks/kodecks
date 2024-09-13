@@ -1,6 +1,8 @@
 use super::Environment;
 use crate::{
     ability::PlayerAbility,
+    card::Card,
+    deck::DeckItem,
     effect::{EffectActivateContext, EffectTriggerContext},
     error::Error,
     field::FieldState,
@@ -100,6 +102,28 @@ impl Environment {
                     amount: *amount,
                 }])
             }
+            Opcode::GenerateCardToken {
+                token,
+                archetype,
+                player,
+            } => {
+                let player = self.state.players.get_mut(*player);
+                let archetype = &self.catalog[*archetype];
+                let mut card = Card::new(
+                    &mut self.obj_counter,
+                    &DeckItem {
+                        archetype_id: archetype.id,
+                        base_id: Some(*token),
+                    },
+                    archetype,
+                    player.id,
+                    true,
+                );
+                card.set_timestamp(self.timestamp);
+                card.set_zone(PlayerZone::new(player.id, Zone::Field));
+                player.field.push(card);
+                Ok(vec![LogAction::CardTokenGenerated { card: *token }])
+            }
             Opcode::DrawCard { player } => {
                 let player = self.state.players.get_mut(*player);
                 if let Some(mut card) = player.deck.remove_top() {
@@ -156,6 +180,9 @@ impl Environment {
                 };
                 if let Some(mut card) = card {
                     let id = card.id();
+                    if card.is_token() && to.zone != Zone::Field {
+                        return Ok(vec![LogAction::CardTokenRemoved { card: id }]);
+                    }
                     card.set_timestamp(self.timestamp);
                     card.set_zone(*to);
                     card.reset_computed();
@@ -203,7 +230,7 @@ impl Environment {
                     })
                     .collect::<Vec<_>>();
 
-                let mut ctx = EffectTriggerContext::new(&self.state, target);
+                let mut ctx = EffectTriggerContext::new(&self.state, &mut self.obj_counter, target);
                 let mut effect = target.effect();
                 for id in stack.into_iter().chain(continuous) {
                     if let Err(err) = effect.trigger(id, &mut ctx) {

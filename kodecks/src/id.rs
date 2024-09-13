@@ -31,7 +31,7 @@ impl Default for ObjectIdCounter {
 impl ObjectIdCounter {
     pub fn allocate(&mut self, base_id: Option<ObjectId>) -> ObjectId {
         match base_id {
-            Some(id) if id.0 > 0 && id.0 <= MAX_RESERVED_ID => id,
+            Some(id) => id,
             _ => {
                 self.0 += 1;
                 ObjectId(self.0)

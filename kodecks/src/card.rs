@@ -56,6 +56,7 @@ pub struct Card {
     event_filter: EventFilter,
     effect: Box<dyn Effect>,
     timestamp: u64,
+    is_token: bool,
 }
 
 impl fmt::Debug for Card {
@@ -70,6 +71,7 @@ impl Card {
         item: &DeckItem,
         archetype: &'static CardArchetype,
         owner: u8,
+        is_token: bool,
     ) -> Self {
         let effect = (archetype.effect)();
         Self {
@@ -83,6 +85,7 @@ impl Card {
             event_filter: effect.event_filter(),
             effect,
             timestamp: 0,
+            is_token,
         }
     }
 
@@ -153,6 +156,10 @@ impl Card {
         self.timestamp = timestamp;
     }
 
+    pub fn is_token(&self) -> bool {
+        self.is_token
+    }
+
     pub fn snapshot(&self) -> CardSnapshot {
         CardSnapshot {
             id: self.id,
@@ -160,6 +167,7 @@ impl Card {
             owner: self.owner,
             computed: Some(self.computed.clone()),
             timestamp: self.timestamp,
+            is_token: self.is_token,
         }
     }
 
@@ -175,6 +183,7 @@ impl Card {
             event_filter: self.event_filter,
             effect: (self.archetype.effect)(),
             timestamp: self.timestamp,
+            is_token: self.is_token,
         }
     }
 
@@ -216,6 +225,7 @@ pub struct CardSnapshot {
     pub owner: u8,
     pub computed: Option<ComputedAttribute>,
     pub timestamp: u64,
+    pub is_token: bool,
 }
 
 impl CardId for CardSnapshot {
@@ -275,6 +285,7 @@ impl fmt::Display for CardSnapshot {
         write!(f, "<({color}{}){clock} {}>", computed.cost.value(), self.id)
     }
 }
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ArchetypeId(TinyAsciiStr<8>);
@@ -339,6 +350,7 @@ pub struct CardAttribute {
     pub abilities: &'static [KeywordAbility],
     pub anon_abilities: &'static [AnonymousAbility],
     pub power: Option<u32>,
+    pub is_token: bool,
 }
 
 impl Default for CardAttribute {
@@ -350,6 +362,7 @@ impl Default for CardAttribute {
             abilities: &[],
             anon_abilities: &[],
             power: None,
+            is_token: false,
         }
     }
 }

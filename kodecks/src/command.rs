@@ -1,4 +1,5 @@
 use crate::{
+    card::ArchetypeId,
     color::Color,
     env::Environment,
     error::Error,
@@ -7,7 +8,6 @@ use crate::{
     filter_vec,
     id::{CardId, ObjectId, TimedObjectId},
     opcode::{Opcode, OpcodeList},
-    
 };
 use serde::{Deserialize, Serialize};
 use strum::Display;
@@ -37,6 +37,11 @@ pub enum ActionCommand {
         target: TimedObjectId,
         state: FieldState,
         reason: EventReason,
+    },
+    GenerateCardToken {
+        token: ObjectId,
+        archetype: ArchetypeId,
+        player: u8,
     },
     GenerateShards {
         player: u8,
@@ -108,6 +113,15 @@ impl ActionCommand {
                     state,
                 }])])
             }
+            ActionCommand::GenerateCardToken {
+                token,
+                archetype,
+                player,
+            } => Ok(vec![OpcodeList::new(vec![Opcode::GenerateCardToken {
+                token,
+                archetype,
+                player,
+            }])]),
             ActionCommand::GenerateShards {
                 player,
                 source,
