@@ -30,3 +30,5 @@ card-wasteland-cobra = 荒野のコブラ
 card-coppermine-scorpion = 銅鉱山のサソリ
 card-zigzag-ammonite = ジグザグアンモナイト
 card-voracious-anteater = 大食いアリクイ
+    .text = <<大食いアリクイ>>が死亡した時、<<アリ>>トークンを生成する。
+card-ant = アリ

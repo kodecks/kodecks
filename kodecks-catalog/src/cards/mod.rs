@@ -1,6 +1,7 @@
 use kodecks::prelude::*;
 
 mod airborne_eagle_ray;
+mod ant;
 mod bambooster;
 mod coppermine_scorpion;
 mod deep_sea_wyrm;
@@ -62,4 +63,5 @@ pub static CARDS: CardMap = phf::phf_map! {
     "zigz" => zigzag_ammonite::ARCHETYPE,
     "voracious-anteater" => voracious_anteater::ARCHETYPE,
     "vora" => voracious_anteater::ARCHETYPE,
+    "ant" => ant::ARCHETYPE,
 };

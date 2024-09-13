@@ -11,4 +11,28 @@ card_def!(
     power: 400,
 );
 
-impl Effect for CardDef {}
+impl Effect for CardDef {
+    fn event_filter(&self) -> EventFilter {
+        EventFilter::DESTROYED
+    }
+
+    fn trigger(&mut self, id: EffectId, ctx: &mut EffectTriggerContext) -> Result<()> {
+        if id == "main" {
+            ctx.push_stack("main", |ctx, _| {
+                let token = ctx.new_id();
+                let commands = vec![ActionCommand::GenerateCardToken {
+                    token,
+                    archetype: ArchetypeId::new("ant"),
+                    player: ctx.source().controller(),
+                }];
+                Ok(EffectReport::default().with_commands(commands))
+            });
+        }
+        Ok(())
+    }
+
+    fn activate(&mut self, _event: CardEvent, ctx: &mut EffectActivateContext) -> Result<()> {
+        ctx.trigger_stack("main");
+        Ok(())
+    }
+}
