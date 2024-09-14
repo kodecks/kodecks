@@ -23,10 +23,6 @@ opt-level = 2
 opt-level = 3
 panic = 'abort'
 debug = 0
-strip = "debuginfo"
-
-[profile.distribution]
-inherits = "release"
 strip = true
-lto = "thin"
+lto = true
 codegen-units = 1
