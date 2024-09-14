@@ -7,8 +7,8 @@ mod coppermine_scorpion;
 mod deep_sea_wyrm;
 mod diamond_porcupine;
 mod flash_bang_jellyfish;
-mod leaf_veined_gecko;
 mod mire_alligator;
+mod moonlit_gecko;
 mod moss_grown_mastodon;
 mod oil_leaking_droid;
 mod pyrosnail;
@@ -37,8 +37,8 @@ pub static CARDS: CardMap = phf::phf_map! {
     "moss" => moss_grown_mastodon::ARCHETYPE,
     "radio-deer" => radio_deer::ARCHETYPE,
     "radi" => radio_deer::ARCHETYPE,
-    "leaf-veined-gecko" => leaf_veined_gecko::ARCHETYPE,
-    "leaf" => leaf_veined_gecko::ARCHETYPE,
+    "moonlit-gecko" => moonlit_gecko::ARCHETYPE,
+    "moon" => moonlit_gecko::ARCHETYPE,
     "diamond-porcupine" => diamond_porcupine::ARCHETYPE,
     "diam" => diamond_porcupine::ARCHETYPE,
     "pyrosnail" => pyrosnail::ARCHETYPE,

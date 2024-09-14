@@ -3097,7 +3097,6 @@ dependencies = [
  "strum",
  "sys-locale",
  "thiserror",
- "tinystr",
  "tracing",
  "unic-langid",
  "web-time",

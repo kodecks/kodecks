@@ -1,5 +1,5 @@
 card-wind-up-spider = Wind-Up Spider
-card-leaf-veined-gecko = Leaf-Veined Gecko
+card-moonlit-gecko = Moonlit Gecko
 card-scrapyard-raven = Scrapyard Raven
     .text = When <<Scrapyard Raven>> enters the field, generate a shard if you have no shards.
 card-oil-leaking-droid = Oil-Leaking Droid

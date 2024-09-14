@@ -3,8 +3,8 @@ use kodecks::prelude::*;
 
 card_def!(
     CardDef,
-    "leaf",
-    "Leaf-Veined Gecko",
+    "moon",
+    "Moonlit Gecko",
     color: Color::GREEN,
     cost: 0,
     card_type: CardType::Creature,
