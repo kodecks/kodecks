@@ -30,7 +30,6 @@ serde_tuple = "0.5.0"
 strum = "0.26.3"
 sys-locale = "0.3.1"
 thiserror = "1.0.63"
-tinystr = "0.7.6"
 tracing = "0.1.40"
 unic-langid = { version = "0.9.5", features = ["macros"] }
 web-time = "1.1.0"

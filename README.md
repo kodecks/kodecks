@@ -1,8 +1,11 @@
 # Kodecks
 
-Open-source Digital Card Game
+[![Test Status](https://github.com/kodecks/kodecks/actions/workflows/test.yml/badge.svg)](https://github.com/kodecks/kodecks/actions/workflows/test.yml)
 
-- Streamlined gameplay
+Open-source Non-rogue-lite Digital Card Game
+
+- Inspired by traditional TCGs such as Mt:G but featuring more streamlined gameplay
+- Play in the browser or on desktop
 - Battle against CPU
 - Localization support
 
