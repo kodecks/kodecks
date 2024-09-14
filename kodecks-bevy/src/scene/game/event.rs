@@ -3,7 +3,7 @@ use super::{
     main::AnimationState,
     server::{SendCommand, ServerEvent},
 };
-use crate::scene::GlobalState;
+use crate::scene::{translator::Translator, GlobalState};
 use bevy::{
     asset::LoadState, ecs::system::SystemParam, prelude::*, time::Stopwatch, utils::HashMap,
 };
@@ -134,35 +134,46 @@ fn preload_assets(
     mut events: EventReader<ServerEvent>,
     asset_server: Res<AssetServer>,
     mut assets: ResMut<PreloadedAssets>,
+    translator: Res<Translator>,
     mut next_state: ResMut<NextState<AssetState>>,
 ) {
+    let mut cards = vec![];
     for event in events.read() {
         for card in event.env.cards() {
             let archetype = &CATALOG[card.archetype_id];
-            if !archetype.safe_name.is_empty()
-                && !assets.loaded.contains_key(&card.archetype_id)
-                && !assets.loading.contains_key(&card.archetype_id)
-            {
-                let handles = vec![
-                    asset_server.load(format!("cards/{}/image.main.png", archetype.safe_name)),
-                    asset_server.load(format!("cards/{}/image.main.png#hand", archetype.safe_name)),
-                    asset_server.load(format!(
-                        "cards/{}/image.main.png#image",
-                        archetype.safe_name
-                    )),
-                    asset_server.load(format!(
-                        "cards/{}/image.main.png#stack",
-                        archetype.safe_name
-                    )),
-                ];
-                assets.loading.insert(card.archetype_id, handles);
+            cards.push(archetype);
+
+            for safe_name in translator.get_related_items(archetype.safe_name).cards {
+                cards.push(&CATALOG[safe_name.as_str()]);
             }
         }
-        if assets.loading.is_empty() {
-            next_state.set(AssetState::Ready);
-        } else {
-            next_state.set(AssetState::Loading);
+    }
+
+    for archetype in cards {
+        if !archetype.safe_name.is_empty()
+            && !assets.loaded.contains_key(&archetype.id)
+            && !assets.loading.contains_key(&archetype.id)
+        {
+            let handles = vec![
+                asset_server.load(format!("cards/{}/image.main.png", archetype.safe_name)),
+                asset_server.load(format!("cards/{}/image.main.png#hand", archetype.safe_name)),
+                asset_server.load(format!(
+                    "cards/{}/image.main.png#image",
+                    archetype.safe_name
+                )),
+                asset_server.load(format!(
+                    "cards/{}/image.main.png#stack",
+                    archetype.safe_name
+                )),
+            ];
+            assets.loading.insert(archetype.id, handles);
         }
+    }
+
+    if assets.loading.is_empty() {
+        next_state.set(AssetState::Ready);
+    } else {
+        next_state.set(AssetState::Loading);
     }
 }
 

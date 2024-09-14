@@ -761,19 +761,10 @@ impl UICardInfo {
             .to_vec();
 
         let safe_name = CATALOG[self.snapshot.archetype_id].safe_name;
-        let id = format!("card-{safe_name}.text");
-        let text = translator.get_default_lang(&id);
-
-        abilities.extend(parse_text(&text).into_iter().filter_map(|section| {
-            if let Section::Keyword(ability) = section {
-                ability.parse::<KeywordAbility>().ok()
-            } else {
-                None
-            }
-        }));
-
+        abilities.extend(translator.get_related_items(safe_name).abilities);
         abilities.sort();
         abilities.dedup();
+
         abilities
     }
 

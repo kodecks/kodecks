@@ -2,6 +2,11 @@ use crate::assets::fluent::{FluentAsset, DEFAULT_LANG};
 use bevy::{prelude::*, utils::HashMap};
 use fluent_bundle::{concurrent::FluentBundle, FluentArgs, FluentResource};
 use fluent_content::{Content, Request};
+use kodecks::{
+    card,
+    prelude::KeywordAbility,
+    text::{parse_text, Section},
+};
 use serde::Deserialize;
 use std::{
     borrow::{Borrow, Cow},
@@ -71,6 +76,34 @@ impl Translator {
                 Cow::Borrowed(req.id)
             })
     }
+
+    pub fn get_related_items(&self, safe_name: &str) -> RelatedItems {
+        let id = format!("card-{safe_name}.text");
+        let text = self.get_default_lang(&id);
+        let mut items = RelatedItems::default();
+
+        for section in parse_text(&text) {
+            match section {
+                Section::Keyword(ability) => {
+                    if let Ok(ability) = ability.parse::<KeywordAbility>() {
+                        items.abilities.push(ability);
+                    }
+                }
+                Section::Card(name) => {
+                    if let Ok(name) = card::safe_name(name) {
+                        items.cards.push(name);
+                    }
+                }
+                _ => (),
+            }
+        }
+
+        items.abilities.sort();
+        items.abilities.dedup();
+        items.cards.sort();
+        items.cards.dedup();
+        items
+    }
 }
 
 impl<'a, T, U> Content<'a, T, U> for Translator
@@ -95,4 +128,10 @@ pub enum TextPurpose {
     Dialog,
     Button,
     Result,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct RelatedItems {
+    pub abilities: Vec<KeywordAbility>,
+    pub cards: Vec<String>,
 }
