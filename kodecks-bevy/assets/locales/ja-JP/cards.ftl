@@ -1,5 +1,5 @@
 card-wind-up-spider = ゼンマイ蜘蛛
-card-leaf-veined-gecko = 葉脈トカゲ
+card-moonlit-gecko = 月光ヤモリ
 card-scrapyard-raven = スクラップ置き場のカラス
     .text = <<スクラップ置き場のカラス>>が場に出た時、あなたがカケラを持っていないなら、カケラを1つ生成する。
 card-oil-leaking-droid = オイル漏れドロイド
