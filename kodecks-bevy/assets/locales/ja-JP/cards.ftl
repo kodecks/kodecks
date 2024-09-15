@@ -32,3 +32,5 @@ card-zigzag-ammonite = ジグザグアンモナイト
 card-voracious-anteater = 大食いアリクイ
     .text = <<大食いアリクイ>>が死亡した時、<<アリ>>トークンを生成する。
 card-ant = アリ
+card-binary-starfish = 双子ヒトデ
+    .text = <<双子ヒトデ>>が手札から場に出た時、それを複製する。
