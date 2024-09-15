@@ -8,7 +8,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Field {
     cards: Vec<FieldItem<Card>>,
 }
@@ -107,23 +107,6 @@ impl CardZone for Field {
             .iter()
             .position(|field_card| field_card.card.id() == id)?;
         Some(self.cards.remove(index).card)
-    }
-
-    fn duplicate(&self) -> Self
-    where
-        Self: Sized,
-    {
-        Self {
-            cards: self
-                .cards
-                .iter()
-                .map(|field_card| FieldItem {
-                    card: field_card.card.duplicate(),
-                    state: field_card.state,
-                    battle: field_card.battle,
-                })
-                .collect(),
-        }
     }
 }
 

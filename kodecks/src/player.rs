@@ -152,7 +152,7 @@ pub trait PlayerItem {
     fn id(&self) -> u8;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PlayerState {
     pub id: u8,
     pub deck: Deck,
@@ -169,23 +169,6 @@ pub struct PlayerState {
 impl PlayerItem for PlayerState {
     fn id(&self) -> u8 {
         self.id
-    }
-}
-
-impl Clone for PlayerState {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            deck: self.deck.duplicate(),
-            hand: self.hand.duplicate(),
-            graveyard: self.graveyard.duplicate(),
-            field: self.field.duplicate(),
-            shards: self.shards.clone(),
-            stats: self.stats,
-            counters: self.counters,
-            condition: self.condition,
-            abilities: self.abilities.clone(),
-        }
     }
 }
 
@@ -389,13 +372,6 @@ impl CardZone for Vec<CardSnapshot> {
         Some(self.remove(index))
     }
 
-    fn duplicate(&self) -> Self
-    where
-        Self: Sized,
-    {
-        self.clone()
-    }
-
     fn get(&self, id: ObjectId) -> Option<&Self::Item> {
         self.iter().find(|card| card.id == id)
     }
@@ -431,13 +407,6 @@ impl CardZone for Vec<FieldItem<CardSnapshot>> {
     fn remove(&mut self, id: ObjectId) -> Option<Self::Item> {
         let index = self.iter().position(|card| card.id == id)?;
         Some(self.remove(index).card)
-    }
-
-    fn duplicate(&self) -> Self
-    where
-        Self: Sized,
-    {
-        self.clone()
     }
 
     fn get(&self, id: ObjectId) -> Option<&Self::Item> {
@@ -478,13 +447,6 @@ impl CardZone for Vec<HandItem<CardSnapshot>> {
     fn remove(&mut self, id: ObjectId) -> Option<Self::Item> {
         let index = self.iter().position(|item| item.id == id)?;
         Some(self.remove(index).card)
-    }
-
-    fn duplicate(&self) -> Self
-    where
-        Self: Sized,
-    {
-        self.clone()
     }
 
     fn get(&self, id: ObjectId) -> Option<&Self::Item> {

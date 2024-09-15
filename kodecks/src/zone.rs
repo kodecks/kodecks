@@ -45,8 +45,4 @@ pub trait CardZone {
 
     fn push(&mut self, card: Self::Item);
     fn remove(&mut self, id: ObjectId) -> Option<Self::Item>;
-
-    fn duplicate(&self) -> Self
-    where
-        Self: Sized;
 }

@@ -171,7 +171,13 @@ impl Card {
         }
     }
 
-    pub fn duplicate(&self) -> Self {
+    pub fn renew_id(&mut self, counter: &mut ObjectIdCounter) {
+        self.id = counter.allocate(Some(self.id));
+    }
+}
+
+impl Clone for Card {
+    fn clone(&self) -> Self {
         Self {
             id: self.id,
             owner: self.owner,
@@ -181,14 +187,10 @@ impl Card {
             computed: self.computed.clone(),
             flags: self.flags,
             event_filter: self.event_filter,
-            effect: (self.archetype.effect)(),
+            effect: self.effect(),
             timestamp: self.timestamp,
             is_token: self.is_token,
         }
-    }
-
-    pub fn renew_id(&mut self, counter: &mut ObjectIdCounter) {
-        self.id = counter.allocate(Some(self.id));
     }
 }
 

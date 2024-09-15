@@ -7,7 +7,7 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Hand {
     cards: Vec<HandItem<Card>>,
 }
@@ -58,22 +58,6 @@ impl CardZone for Hand {
     fn remove(&mut self, id: ObjectId) -> Option<Card> {
         let index = self.cards.iter().position(|item| item.id() == id)?;
         Some(self.cards.remove(index).card)
-    }
-
-    fn duplicate(&self) -> Self
-    where
-        Self: Sized,
-    {
-        Self {
-            cards: self
-                .cards
-                .iter()
-                .map(|item| HandItem {
-                    card: item.card.duplicate(),
-                    cost_delta: item.cost_delta,
-                })
-                .collect(),
-        }
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::{card::Card, id::ObjectId, sequence::CardSequence, zone::CardZone};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Graveyard {
     cards: Vec<Card>,
 }
@@ -31,15 +31,6 @@ impl CardZone for Graveyard {
     fn remove(&mut self, id: ObjectId) -> Option<Card> {
         let index = self.cards.iter().position(|card| card.id() == id)?;
         Some(self.cards.remove(index))
-    }
-
-    fn duplicate(&self) -> Self
-    where
-        Self: Sized,
-    {
-        Self {
-            cards: self.cards.iter().map(|card| card.duplicate()).collect(),
-        }
     }
 }
 
