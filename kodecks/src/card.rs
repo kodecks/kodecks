@@ -207,6 +207,18 @@ impl CardId for Card {
     }
 }
 
+impl AsRef<Card> for Card {
+    fn as_ref(&self) -> &Card {
+        self
+    }
+}
+
+impl AsMut<Card> for Card {
+    fn as_mut(&mut self) -> &mut Card {
+        self
+    }
+}
+
 impl Score for Card {
     fn score(&self) -> i32 {
         self.computed.abilities.score()
