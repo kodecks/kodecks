@@ -6,7 +6,7 @@ default-run = "kodecks-bevy"
 
 [dependencies]
 async-channel = "2.3.1"
-bevy = "0.14.1"
+bevy = "0.14.2"
 bevy_mod_picking = { version = "0.20.1", features = [
     "backend_raycast",
     "backend_bevy_ui",
