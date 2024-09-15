@@ -63,6 +63,15 @@ impl Session {
         self.progress();
     }
 
+    fn send_player_thinking(&self, player: u8) {
+        let event = SessionEvent {
+            session: self.id,
+            player,
+            event: SessionEventKind::PlayerThinking { player },
+        };
+        (self.callback)(Output::SessionEvent(event));
+    }
+
     fn progress(&mut self) {
         while !self.game.env().game_condition().is_ended() {
             let mut next_action = None;
@@ -72,11 +81,13 @@ impl Session {
                     .iter()
                     .any(|bot| bot.player == self.player_in_action);
                 if is_bot {
+                    self.send_player_thinking(self.player_in_action);
                     let env = self.game.env().clone();
                     next_action = self.default_bot.compute_best_action(env, available_actions);
                 } else if let Some(action) = self.next_actions.remove(&self.player_in_action) {
                     next_action = Some(action);
                 } else {
+                    self.send_player_thinking(self.player_in_action);
                     return;
                 }
             }

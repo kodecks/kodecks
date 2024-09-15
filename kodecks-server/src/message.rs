@@ -1,4 +1,4 @@
-use kodecks::{action::Action, game::LocalGameState,  profile::GameProfile};
+use kodecks::{action::Action, game::LocalGameState, profile::GameProfile};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -47,4 +47,5 @@ pub struct SessionEvent {
 pub enum SessionEventKind {
     Created,
     GameUpdated { state: LocalGameState },
+    PlayerThinking { player: u8 },
 }
