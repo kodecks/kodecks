@@ -1,5 +1,5 @@
 use crate::{
-    card::ArchetypeId,
+    card::Card,
     color::Color,
     event::CardEvent,
     field::{FieldBattleState, FieldState},
@@ -42,9 +42,7 @@ pub enum Opcode {
         amount: u32,
     },
     GenerateCardToken {
-        token: ObjectId,
-        archetype: ArchetypeId,
-        player: u8,
+        card: Card,
     },
     DrawCard {
         player: u8,

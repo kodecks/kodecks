@@ -71,7 +71,6 @@ impl Card {
         item: &DeckItem,
         archetype: &'static CardArchetype,
         owner: u8,
-        is_token: bool,
     ) -> Self {
         let effect = (archetype.effect)();
         Self {
@@ -85,7 +84,24 @@ impl Card {
             event_filter: effect.event_filter(),
             effect,
             timestamp: 0,
-            is_token,
+            is_token: false,
+        }
+    }
+
+    pub fn new_token(id: ObjectId, archetype: &'static CardArchetype, owner: u8) -> Self {
+        let effect = (archetype.effect)();
+        Self {
+            id,
+            owner,
+            zone: PlayerZone::new(owner, Zone::Deck),
+            controller: owner,
+            archetype,
+            computed: archetype.into(),
+            flags: ComputedFlags::empty(),
+            event_filter: effect.event_filter(),
+            effect,
+            timestamp: 0,
+            is_token: true,
         }
     }
 

@@ -117,11 +117,24 @@ impl ActionCommand {
                 token,
                 archetype,
                 player,
-            } => Ok(vec![OpcodeList::new(vec![Opcode::GenerateCardToken {
-                token,
-                archetype,
-                player,
-            }])]),
+            } => {
+                let card = env.generate_card_token(player, token, archetype);
+                let casted = env
+                    .apply_event(CardEvent::Casted, &card, &card)
+                    .ok()
+                    .into_iter()
+                    .flatten();
+                let casted_any = env
+                    .apply_event_any(CardEvent::AnyCasted, &card)
+                    .ok()
+                    .into_iter()
+                    .flatten();
+                Ok(filter_vec![
+                    Some(OpcodeList::new(vec![Opcode::GenerateCardToken { card }])),
+                    casted,
+                    casted_any,
+                ])
+            }
             ActionCommand::GenerateShards {
                 player,
                 source,

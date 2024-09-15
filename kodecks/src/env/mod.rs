@@ -1,6 +1,6 @@
 use crate::{
     action::{Action, PlayerAvailableActions},
-    card::{Card, Catalog},
+    card::{ArchetypeId, Card, Catalog},
     computed::ComputedSequence,
     config::DebugFlags,
     continuous::ContinuousEffectList,
@@ -8,15 +8,15 @@ use crate::{
     error::Error,
     filter_vec,
     game::Report,
-    id::ObjectIdCounter,
+    id::{ObjectId, ObjectIdCounter},
     log::LogAction,
     opcode::OpcodeList,
     phase::Phase,
-    player::{PlayerCondition, PlayerList, PlayerState},
+    player::{PlayerCondition, PlayerList, PlayerState, PlayerZone},
     profile::GameProfile,
     sequence::CardSequence,
     stack::{Stack, StackItem},
-    zone::CardZone,
+    zone::{CardZone, Zone},
 };
 use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
@@ -65,7 +65,7 @@ impl Environment {
                 let mut state = PlayerState::new(player.id);
                 for item in &player.deck.cards {
                     let archetype = &catalog[item.archetype_id];
-                    let card = Card::new(&mut obj_counter, item, archetype, player.id, false);
+                    let card = Card::new(&mut obj_counter, item, archetype, player.id);
                     state.deck.add_top(card);
                 }
                 if !profile.config.no_deck_shuffle {
@@ -220,7 +220,7 @@ impl Environment {
 
                     for item in list {
                         for opcode in item {
-                            match self.execute(&opcode) {
+                            match self.execute(opcode) {
                                 Ok(log) => logs.extend(log),
                                 Err(err) => {
                                     error!("Error executing opcode: {:?}", err);
@@ -275,7 +275,7 @@ impl Environment {
         let mut logs = vec![];
         if let Some(log) = next {
             for opcode in log {
-                match self.execute(&opcode) {
+                match self.execute(opcode) {
                     Ok(log) => logs.extend(log),
                     Err(err) => {
                         error!("Error executing opcode: {:?}", err);
@@ -352,6 +352,14 @@ impl Environment {
         } else {
             GameCondition::Draw
         };
+    }
+
+    pub fn generate_card_token(&self, player: u8, token: ObjectId, archetype: ArchetypeId) -> Card {
+        let archetype = &self.catalog[archetype];
+        let mut card = Card::new_token(token, archetype, player);
+        card.set_timestamp(self.timestamp);
+        card.set_zone(PlayerZone::new(player, Zone::Field));
+        card
     }
 }
 
