@@ -32,3 +32,5 @@ card-zigzag-ammonite = Zigzag Ammonite
 card-voracious-anteater = Voracious Anteater
     .text = When <<Voracious Anteater>> dies, create an <<Ant>> token.
 card-ant = Ant
+card-binary-starfish = Binary Starfish
+    .text = When <<Binary Starfish>> enters the field from your hand, clone it.

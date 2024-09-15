@@ -3,6 +3,7 @@ use kodecks::prelude::*;
 mod airborne_eagle_ray;
 mod ant;
 mod bambooster;
+mod binary_starfish;
 mod coppermine_scorpion;
 mod deep_sea_wyrm;
 mod diamond_porcupine;
@@ -64,4 +65,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "voracious-anteater" => voracious_anteater::ARCHETYPE,
     "vora" => voracious_anteater::ARCHETYPE,
     "ant" => ant::ARCHETYPE,
+    "binary-starfish" => binary_starfish::ARCHETYPE,
+    "bina" => binary_starfish::ARCHETYPE,
 };
