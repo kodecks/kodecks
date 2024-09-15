@@ -137,6 +137,7 @@ impl Environment {
                         {
                             return Err(Error::CreatureAlreadyCasted);
                         }
+                        let from = PlayerZone::new(player_in_turn.id, Zone::Hand);
                         filter_vec![
                             Some(OpcodeList::new(filter_vec![
                                 if amount > 0 {
@@ -154,7 +155,7 @@ impl Environment {
                                     card: item.card.id(),
                                 }),
                             ],)),
-                            self.apply_event(CardEvent::Casted, &item.card, &item.card)
+                            self.apply_event(CardEvent::Casted { from }, &item.card, &item.card)
                                 .ok()
                                 .into_iter()
                                 .flatten(),
@@ -237,6 +238,7 @@ impl Environment {
                     {
                         return Err(Error::CreatureAlreadyCasted);
                     }
+                    let from = PlayerZone::new(active_player.id, Zone::Hand);
                     Ok(filter_vec![
                         Some(OpcodeList::new(filter_vec![
                             if amount > 0 {
@@ -254,7 +256,7 @@ impl Environment {
                                 card: item.card.id(),
                             }),
                         ],)),
-                        self.apply_event(CardEvent::Casted, &item.card, &item.card)
+                        self.apply_event(CardEvent::Casted { from }, &item.card, &item.card)
                             .ok()
                             .into_iter()
                             .flatten(),

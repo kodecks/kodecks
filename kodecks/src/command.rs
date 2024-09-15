@@ -76,7 +76,12 @@ impl ActionCommand {
                 if current_target.timed_id() != target {
                     return Err(Error::TargetLost { target });
                 }
-                env.apply_event(CardEvent::Destroyed { reason }, source, current_target)
+                let from = *current_target.zone();
+                env.apply_event(
+                    CardEvent::Destroyed { from, reason },
+                    source,
+                    current_target,
+                )
             }
             ActionCommand::ReturnCardToHand {
                 source,
@@ -119,8 +124,9 @@ impl ActionCommand {
                 player,
             } => {
                 let card = env.generate_card_token(player, token, archetype);
+                let from = *card.zone();
                 let casted = env
-                    .apply_event(CardEvent::Casted, &card, &card)
+                    .apply_event(CardEvent::Casted { from }, &card, &card)
                     .ok()
                     .into_iter()
                     .flatten();

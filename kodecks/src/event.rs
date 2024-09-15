@@ -2,11 +2,16 @@ use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
+use crate::player::PlayerZone;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize)]
 #[non_exhaustive]
 pub enum CardEvent {
-    Casted,
+    Casted {
+        from: PlayerZone,
+    },
     Destroyed {
+        from: PlayerZone,
         reason: EventReason,
     },
     ReturnedToHand {
@@ -27,7 +32,7 @@ pub enum CardEvent {
 impl CardEvent {
     pub fn filter(&self) -> EventFilter {
         match self {
-            CardEvent::Casted => EventFilter::CASTED,
+            CardEvent::Casted { .. } => EventFilter::CASTED,
             CardEvent::Destroyed { .. } => EventFilter::DESTROYED,
             CardEvent::ReturnedToHand { .. } => EventFilter::RETURNED_TO_HAND,
             CardEvent::ReturnedToDeck => EventFilter::RETURNED_TO_DECK,
