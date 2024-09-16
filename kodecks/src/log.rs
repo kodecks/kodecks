@@ -54,4 +54,6 @@ pub enum LogAction {
         source: ObjectId,
         targets: Vec<ObjectId>,
     },
+    #[strum(to_string = "Shield broken for {card}")]
+    ShieldBroken { card: ObjectId },
 }

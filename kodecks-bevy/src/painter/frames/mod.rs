@@ -1,4 +1,7 @@
-use super::numbers::{Alignment, DrawOptions, NumberPainter};
+use super::{
+    numbers::{Alignment, DrawOptions, NumberPainter},
+    shield::draw_shield,
+};
 use bevy::{ecs::system::Resource, utils::HashMap};
 use dashmap::DashMap;
 use image::{DynamicImage, GenericImageView, ImageReader, Rgba};
@@ -40,6 +43,9 @@ impl CardFramePainter {
                 &mut frame_base,
             );
         }
+        if let Some(shields) = frame.shields {
+            draw_shield(&mut frame_base, 35, 47, shields);
+        }
         frame_base
     }
 
@@ -74,6 +80,7 @@ pub struct CardFrame {
     pub color: Color,
     pub cost: u8,
     pub power: Option<u32>,
+    pub shields: Option<u8>,
 }
 
 impl CardFrame {
@@ -82,6 +89,7 @@ impl CardFrame {
             color: attr.color,
             cost: attr.cost.value(),
             power: attr.power.map(|p| p.value()),
+            shields: attr.shields.map(|p| p.value()),
         }
     }
 }

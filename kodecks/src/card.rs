@@ -240,6 +240,12 @@ impl Score for Card {
         self.computed.abilities.score()
             + self.computed.anon_abilities.score()
             + self.computed.power.map(|power| power.value()).unwrap_or(0) as i32 / 100
+            + self
+                .computed
+                .shields
+                .map(|shields| shields.value())
+                .unwrap_or(0) as i32
+                * 2
             + if self.computed.is_creature() { 1 } else { 0 }
     }
 }
@@ -294,6 +300,10 @@ impl CardSnapshot {
 
     pub fn power(&self) -> Option<Linear<u32>> {
         self.computed.as_ref().and_then(|c| c.power)
+    }
+
+    pub fn shields(&self) -> Option<Linear<u8>> {
+        self.computed.as_ref().and_then(|c| c.shields)
     }
 }
 
@@ -380,6 +390,7 @@ pub struct CardAttribute {
     pub abilities: &'static [KeywordAbility],
     pub anon_abilities: &'static [AnonymousAbility],
     pub power: Option<u32>,
+    pub shields: Option<u8>,
     pub is_token: bool,
 }
 
@@ -392,6 +403,7 @@ impl Default for CardAttribute {
             abilities: &[],
             anon_abilities: &[],
             power: None,
+            shields: None,
             is_token: false,
         }
     }
