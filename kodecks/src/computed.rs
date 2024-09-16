@@ -16,6 +16,7 @@ pub struct ComputedAttribute {
     pub abilities: AbilityList<KeywordAbility>,
     pub anon_abilities: AbilityList<AnonymousAbility>,
     pub power: Option<Linear<u32>>,
+    pub shields: Option<Linear<u8>>,
 }
 
 impl From<&CardArchetype> for ComputedAttribute {
@@ -27,6 +28,7 @@ impl From<&CardArchetype> for ComputedAttribute {
             abilities: archetype.attribute.abilities.iter().copied().collect(),
             anon_abilities: archetype.attribute.anon_abilities.iter().copied().collect(),
             power: archetype.attribute.power.map(Linear::from),
+            shields: archetype.attribute.shields.map(Linear::from),
         }
     }
 }

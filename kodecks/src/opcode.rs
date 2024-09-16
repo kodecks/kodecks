@@ -41,6 +41,9 @@ pub enum Opcode {
         color: Color,
         amount: u32,
     },
+    BreakShield {
+        card: ObjectId,
+    },
     GenerateCardToken {
         card: Card,
     },

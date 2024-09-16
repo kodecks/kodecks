@@ -1,12 +1,15 @@
-use super::Environment;
+use super::{Environment, GameState};
 use crate::{
     ability::PlayerAbility,
+    card::Card,
+    condition,
     effect::{EffectActivateContext, EffectTriggerContext},
     error::Error,
     field::FieldState,
     log::LogAction,
     opcode::Opcode,
     player::{PlayerCondition, PlayerZone},
+    prelude::{ComputedAttribute, ContinuousEffect, ContinuousItem},
     sequence::CardSequence,
     zone::{CardZone, MoveReason, Zone},
 };
@@ -96,6 +99,15 @@ impl Environment {
                     color,
                     amount,
                 }])
+            }
+            Opcode::BreakShield { card } => {
+                let card = self.state.find_card_mut(card)?;
+                self.continuous.add(ContinuousItem::new(
+                    card,
+                    ShieldBroken,
+                    condition::OnField(card.id()),
+                ));
+                Ok(vec![LogAction::ShieldBroken { card: card.id() }])
             }
             Opcode::GenerateCardToken { card } => {
                 let id = card.id();
@@ -258,5 +270,25 @@ impl Environment {
                 }])
             }
         }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct ShieldBroken;
+
+impl ContinuousEffect for ShieldBroken {
+    fn apply_card(
+        &mut self,
+        _state: &GameState,
+        source: &Card,
+        target: &Card,
+        computed: &mut ComputedAttribute,
+    ) -> anyhow::Result<()> {
+        if target.id() == source.id() {
+            if let Some(shields) = &mut computed.shields {
+                shields.add(-1);
+            }
+        }
+        Ok(())
     }
 }

@@ -6,9 +6,10 @@ card_def!(
     "radi",
     "Radio Deer",
     color: Color::GREEN,
-    cost: 2,
+    cost: 3,
     card_type: CardType::Creature,
     power: 200,
+    shields: 1,
 );
 
 impl Effect for CardDef {}

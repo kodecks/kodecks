@@ -9,6 +9,7 @@ card_def!(
     cost: 2,
     card_type: CardType::Creature,
     power: 100,
+    shields: 1,
 );
 
 impl Effect for CardDef {

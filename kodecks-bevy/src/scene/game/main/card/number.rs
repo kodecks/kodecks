@@ -15,6 +15,7 @@ pub enum NumberOverlayKey {
     Field {
         color: Rgba<u8>,
         power: Option<u32>,
+        shields: Option<u8>,
         diff: Ordering,
     },
 }
