@@ -63,13 +63,15 @@ impl Session {
         self.progress();
     }
 
-    fn send_player_thinking(&self, player: u8) {
-        let event = SessionEvent {
-            session: self.id,
-            player,
-            event: SessionEventKind::PlayerThinking { player },
-        };
-        (self.callback)(Output::SessionEvent(event));
+    fn send_player_thinking(&self, thinking: u8) {
+        for player in self.players().filter(|&p| p != thinking) {
+            let event = SessionEvent {
+                session: self.id,
+                player,
+                event: SessionEventKind::PlayerThinking { thinking },
+            };
+            (self.callback)(Output::SessionEvent(event));
+        }
     }
 
     fn progress(&mut self) {

@@ -47,5 +47,5 @@ pub struct SessionEvent {
 pub enum SessionEventKind {
     Created,
     GameUpdated { state: LocalGameState },
-    PlayerThinking { player: u8 },
+    PlayerThinking { thinking: u8 },
 }

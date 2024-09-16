@@ -52,8 +52,8 @@ fn recv_events(
                 message::SessionEventKind::GameUpdated { state } => {
                     events.send(ServerEvent(state));
                 }
-                message::SessionEventKind::PlayerThinking { player } => {
-                    info!("Player {} is thinking", player);
+                message::SessionEventKind::PlayerThinking { thinking } => {
+                    info!("Player {} is thinking", thinking);
                 }
             },
         }
