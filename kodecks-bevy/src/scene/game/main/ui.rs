@@ -374,6 +374,7 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                             width: Val::Percent(100.0),
                             height: Val::Percent(100.0),
                             justify_content: JustifyContent::SpaceBetween,
+                            align_items: AlignItems::Center,
                             ..default()
                         },
                         ..default()
@@ -383,17 +384,18 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                 .with_children(|parent| {
                     parent
                         .spawn((
-                            NodeBundle {
+                            ImageBundle {
                                 style: Style {
-                                    width: Val::Auto,
-                                    height: Val::Percent(100.0),
-                                    margin: UiRect::all(Val::Px(10.)),
-                                    justify_content: JustifyContent::Center,
+                                    width: Val::Px(260.),
+                                    height: Val::Percent(60.0),
+                                    justify_content: JustifyContent::Start,
                                     flex_direction: FlexDirection::Column,
                                     ..default()
                                 },
+                                image: button.clone().into(),
                                 ..default()
                             },
+                            ImageScaleMode::Sliced(slicer.clone()),
                             Pickable::IGNORE,
                         ))
                         .with_children(|parent| {
@@ -401,8 +403,8 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                 .spawn((
                                     NodeBundle {
                                         style: Style {
-                                            width: Val::Percent(100.),
-                                            height: Val::Px(120.),
+                                            width: Val::Auto,
+                                            padding: UiRect::all(Val::Px(10.)),
                                             justify_content: JustifyContent::Start,
                                             align_items: AlignItems::End,
                                             flex_direction: FlexDirection::Row,
@@ -434,7 +436,6 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                         .with_style(
                                             Style {
                                                 margin: UiRect::all(Val::Px(5.)),
-                                                width: Val::Px(240.),
                                                 ..default()
                                             },
                                         ),
@@ -447,8 +448,7 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                 .spawn((
                                     NodeBundle {
                                         style: Style {
-                                            width: Val::Px(240.),
-                                            height: Val::Px(240.),
+                                            padding: UiRect::all(Val::Px(10.)),
                                             justify_content: JustifyContent::Start,
                                             flex_direction: FlexDirection::Column,
                                             row_gap: Val::Px(20.),
@@ -462,7 +462,6 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                     parent
                                         .spawn((NodeBundle {
                                             style: Style {
-                                                width: Val::Percent(100.),
                                                 padding: UiRect::all(Val::Px(5.)),
                                                 ..default()
                                             },
@@ -482,7 +481,6 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                     parent.spawn((
                                         NodeBundle {
                                             style: Style {
-                                                width: Val::Percent(100.),
                                                 padding: UiRect::all(Val::Px(5.)),
                                                 justify_content: JustifyContent::Start,
                                                 flex_direction: FlexDirection::Column,
@@ -494,20 +492,6 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                         KeywordList,
                                     ));
                                 });
-
-                            parent.spawn((
-                                NodeBundle {
-                                    style: Style {
-                                        width: Val::Percent(100.),
-                                        height: Val::Px(120.),
-                                        justify_content: JustifyContent::End,
-                                        flex_direction: FlexDirection::Column,
-                                        ..default()
-                                    },
-                                    ..default()
-                                },
-                                Pickable::IGNORE,
-                            ));
                         });
 
                     parent
