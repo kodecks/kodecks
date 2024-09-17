@@ -9,6 +9,13 @@ mod scene;
 fn main() {
     let mut app = App::new();
 
+    #[cfg(feature = "embed_assets")]
+    let app = app.add_plugins(bevy_embedded_assets::EmbeddedAssetPlugin {
+        mode: bevy_embedded_assets::PluginMode::ReplaceAndFallback {
+            path: "assets".to_string(),
+        },
+    });
+
     let default_plugins = DefaultPlugins
         .set(ImagePlugin::default_nearest())
         .set(WindowPlugin {
