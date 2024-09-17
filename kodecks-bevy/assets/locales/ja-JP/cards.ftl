@@ -34,3 +34,6 @@ card-voracious-anteater = 大食いアリクイ
 card-ant = アリ
 card-binary-starfish = 双子ヒトデ
     .text = <<双子ヒトデ>>が手札から場に出た時、それを複製する。
+card-laser-frog = レーザーガエル
+    .text = <<レーザーガエル>>が場に出た時、クリーチャー1体を対象とし、そのシールドを1つ破壊する。
+    .message = シールドを破壊するクリーチャーを選択してください。

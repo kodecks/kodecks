@@ -45,6 +45,10 @@ impl ComputedAttribute {
     pub fn current_power(&self) -> u32 {
         self.power.map(|power| power.value()).unwrap_or(0)
     }
+
+    pub fn current_shields(&self) -> u8 {
+        self.shields.map(|shields| shields.value()).unwrap_or(0)
+    }
 }
 
 bitflags! {

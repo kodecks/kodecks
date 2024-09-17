@@ -55,6 +55,9 @@ pub enum ActionCommand {
         color: Color,
         amount: u32,
     },
+    BreakShield {
+        target: TimedObjectId,
+    },
 }
 
 impl ActionCommand {
@@ -173,6 +176,15 @@ impl ActionCommand {
                 color,
                 amount,
             }])]),
+            ActionCommand::BreakShield { target } => {
+                let current_target = env.state.find_card(target.id)?;
+                if current_target.timed_id() != target {
+                    return Err(Error::TargetLost { target });
+                }
+                Ok(vec![OpcodeList::new(vec![Opcode::BreakShield {
+                    card: current_target.id(),
+                }])])
+            }
         }
     }
 }
