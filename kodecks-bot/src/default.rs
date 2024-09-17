@@ -82,6 +82,15 @@ impl Bot for DefaultBot {
 
         let cast_candidates = actions.actions.castable_cards();
         let cast = cast::find_cast_combination(ctx.clone(), cast_candidates);
+        for (card, score) in &cast {
+            let name = env
+                .state
+                .find_card(*card)
+                .ok()
+                .map(|card| card.archetype().name)
+                .unwrap_or_default();
+            info!("Cast: {} score: {:?}", name, score);
+        }
         let cast = cast
             .into_iter()
             .map(|(card, score)| (Action::CastCard { card }, score))
