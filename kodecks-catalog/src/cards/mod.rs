@@ -8,6 +8,7 @@ mod coppermine_scorpion;
 mod deep_sea_wyrm;
 mod diamond_porcupine;
 mod flash_bang_jellyfish;
+mod laser_frog;
 mod mire_alligator;
 mod moonlit_gecko;
 mod moss_grown_mastodon;
@@ -67,4 +68,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "ant" => ant::ARCHETYPE,
     "binary-starfish" => binary_starfish::ARCHETYPE,
     "bina" => binary_starfish::ARCHETYPE,
+    "laser-frog" => laser_frog::ARCHETYPE,
+    "lase" => laser_frog::ARCHETYPE,
 };

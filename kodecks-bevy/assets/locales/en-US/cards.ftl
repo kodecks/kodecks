@@ -34,3 +34,6 @@ card-voracious-anteater = Voracious Anteater
 card-ant = Ant
 card-binary-starfish = Binary Starfish
     .text = When <<Binary Starfish>> enters the field from your hand, clone it.
+card-laser-frog = Laser Frog
+    .text = When <<Laser Frog>> enters the field, break a shield on target creature.
+    .message = Choose a creature to break a shield on.
