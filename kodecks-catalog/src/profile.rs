@@ -11,11 +11,12 @@ pub fn default_profile() -> GameProfile {
         "
     Volcanic Wyrm 2
     Wind-Up Spider 3
-    Pyrosnail 3
+    Pyrosnail 2
     Oil-Leaking Droid 3
     Diamond Porcupine 3
-    Bambooster 3
-    Coppermine Scorpion 3
+    Bambooster 2
+    Coppermine Scorpion 2
+    Laser Frog 3
     ",
         &CATALOG,
     )
