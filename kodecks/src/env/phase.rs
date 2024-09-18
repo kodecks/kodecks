@@ -349,7 +349,7 @@ impl Environment {
                             .abilities
                             .contains(&KeywordAbility::Toxic);
                         let blocker_power = blocker.computed().power.unwrap_or_default().value();
-                        if (blocker_power > 0 && attacker_power < blocker_power)
+                        if (blocker_power > 0 && attacker_power <= blocker_power)
                             || blocker_has_toxic
                         {
                             if let Ok(log) = (ActionCommand::DestroyCard {

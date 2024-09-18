@@ -70,12 +70,5 @@ Each player's turn follows this sequence:
   Compare the power of the attacking and blocking creatures:
 
   - The creature with the higher power wins the battle. The losing creature is destroyed and sent to the graveyard.
-  - If both creatures have the same non-zero power, the attacking creature wins, and only the blocking creature is destroyed.
+  - If both creatures have the same non-zero power, the both are destroyed and sent to the graveyard.
   - If both creatures have zero power, neither is destroyed, and both remain on the field.
-
-| Attacking Power | Blocking Power | Result        |
-| --------------- | -------------- | ------------- |
-| 300             | 100            | Attacker wins |
-| 100             | 300            | Blocker wins  |
-| 100             | 100            | Attacker wins |
-| 0               | 0              | Both remain   |
