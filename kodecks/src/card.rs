@@ -22,6 +22,12 @@ pub struct Catalog {
     pub str_index: &'static CardMap,
 }
 
+impl Catalog {
+    pub fn iter(&self) -> impl Iterator<Item = &'static CardArchetype> {
+        self.str_index.values().map(|entry| entry())
+    }
+}
+
 impl Index<&str> for Catalog {
     type Output = CardArchetype;
 
