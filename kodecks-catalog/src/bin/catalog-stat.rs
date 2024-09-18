@@ -1,14 +1,20 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 
 use kodecks::color::Color;
 use kodecks_catalog::CATALOG;
 
 fn main() {
+    let mut archetypes = HashSet::new();
     let mut colors = vec![(0, "Blue"), (0, "Green"), (0, "Yellow"), (0, "Red")];
     let mut costs = vec![];
     let mut powers = BTreeMap::new();
 
     CATALOG.iter().for_each(|card| {
+        if archetypes.contains(&card.id) {
+            return;
+        }
+        archetypes.insert(card.id);
+
         let color = card.attribute.color;
         colors[0].0 += color.contains(Color::BLUE) as i32;
         colors[1].0 += color.contains(Color::GREEN) as i32;
