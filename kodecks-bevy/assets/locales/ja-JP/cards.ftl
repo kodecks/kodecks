@@ -37,3 +37,4 @@ card-binary-starfish = 双子ヒトデ
 card-laser-frog = レーザーガエル
     .text = <<レーザーガエル>>が場に出た時、クリーチャー1体を対象とし、そのシールドを1つ破壊する。
     .message = シールドを破壊するクリーチャーを選択してください。
+card-helium-puffer = ヘリウム・パファー
