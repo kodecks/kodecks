@@ -103,6 +103,12 @@ impl Board {
         self.update_battle_layout();
     }
 
+    pub fn clear_battle(&mut self) {
+        self.temp_attackers.clear();
+        self.temp_blocking_pairs.clear();
+        self.update_battle_layout();
+    }
+
     pub fn blocking_pairs(&self) -> impl Iterator<Item = &(ObjectId, ObjectId)> {
         self.temp_blocking_pairs.iter().chain(
             self.blocking_pairs

@@ -464,6 +464,7 @@ dependencies = [
  "bevy_reflect",
  "bevy_tasks",
  "bevy_utils",
+ "serde",
  "uuid",
 ]
 
@@ -705,6 +706,7 @@ dependencies = [
  "bevy_math",
  "bevy_reflect",
  "bevy_utils",
+ "serde",
  "smol_str",
  "thiserror",
 ]
@@ -1199,6 +1201,7 @@ dependencies = [
  "bevy_reflect",
  "bevy_utils",
  "crossbeam-channel",
+ "serde",
  "thiserror",
 ]
 
@@ -1213,6 +1216,7 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_math",
  "bevy_reflect",
+ "serde",
  "thiserror",
 ]
 
@@ -1241,6 +1245,7 @@ dependencies = [
  "bevy_window",
  "bytemuck",
  "nonmax",
+ "serde",
  "smallvec",
  "taffy",
  "thiserror",
@@ -1285,6 +1290,7 @@ dependencies = [
  "bevy_reflect",
  "bevy_utils",
  "raw-window-handle",
+ "serde",
  "smol_str",
 ]
 
@@ -1311,6 +1317,7 @@ dependencies = [
  "cfg-if",
  "crossbeam-channel",
  "raw-window-handle",
+ "serde",
  "wasm-bindgen",
  "web-sys",
  "winit",
@@ -1334,7 +1341,7 @@ dependencies = [
  "bitflags 2.6.0",
  "cexpr",
  "clang-sys",
- "itertools",
+ "itertools 0.12.1",
  "lazy_static",
  "lazycell",
  "proc-macro2",
@@ -1455,7 +1462,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c88e36f2531db6136c2d42810698ced69af85872f4559c7b6dccb8e7c30485d2"
 dependencies = [
  "chrono",
- "derive_more",
+ "derive_more 1.0.0",
  "semver",
  "serde",
 ]
@@ -1951,6 +1958,17 @@ name = "data-encoding"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8566979429cf69b49a5c740c60791108e86440e8be149bbea4fe54d2c32d6e2"
+
+[[package]]
+name = "derive_more"
+version = "0.99.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f33878137e4dafd7fa914ad4e259e18a4e8e532b9617a2d0150262bf53abfce"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.60",
+]
 
 [[package]]
 name = "derive_more"
@@ -3005,6 +3023,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3109,6 +3136,7 @@ dependencies = [
  "kodecks-bot",
  "kodecks-catalog",
  "kodecks-server",
+ "leafwing-input-manager",
  "rand",
  "serde",
  "serde_default",
@@ -3119,7 +3147,6 @@ dependencies = [
  "thiserror",
  "tracing",
  "unic-langid",
- "web-time",
 ]
 
 [[package]]
@@ -3179,6 +3206,31 @@ name = "lazycell"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
+
+[[package]]
+name = "leafwing-input-manager"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bebb7f3227809906ca7ccc981aedf7805b5edb422b4265290cc749316c0faba4"
+dependencies = [
+ "bevy",
+ "derive_more 0.99.18",
+ "itertools 0.13.0",
+ "leafwing_input_manager_macros",
+ "serde",
+]
+
+[[package]]
+name = "leafwing_input_manager_macros"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d065e4f0771d9cc597e76d648da18476ad01fd50cd60ee585ee500f9cd8d696"
+dependencies = [
+ "proc-macro-crate 3.1.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.60",
+]
 
 [[package]]
 name = "lewton"
@@ -4563,6 +4615,9 @@ name = "smallvec"
 version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "smol_str"

@@ -3,6 +3,7 @@
 use bevy::{prelude::*, window::WindowTheme};
 
 mod assets;
+mod input;
 mod painter;
 mod scene;
 
@@ -34,6 +35,6 @@ fn main() {
         });
 
     app.add_plugins(default_plugins)
-        .add_plugins(scene::ScenePlugin)
+        .add_plugins((input::InputPlugin, scene::ScenePlugin))
         .run();
 }
