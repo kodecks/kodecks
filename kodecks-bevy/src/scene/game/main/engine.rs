@@ -28,7 +28,6 @@ pub struct PlayerEventFinished;
 
 #[derive(Debug, Event, Clone)]
 pub enum PlayerEvent {
-    _Action(Action),
     ButtonPressed(ActionButton),
     CardDroppedOnField(ObjectId),
     CardDropped(ObjectId, ObjectId),
@@ -44,7 +43,6 @@ fn handle_player_events(
     mut finished: EventWriter<PlayerEventFinished>,
 ) {
     let action = events.read().find_map(|event| match event {
-        PlayerEvent::_Action(action) => Some(action.clone()),
         PlayerEvent::ButtonPressed(button) => match button {
             ActionButton::EndTurn => Some(Action::EndTurn),
             ActionButton::Block(_) | ActionButton::Continue => Some(Action::Block {
@@ -53,19 +51,12 @@ fn handle_player_events(
             ActionButton::Attack(_) => Some(Action::Attack {
                 attackers: board.attackers().copied().collect(),
             }),
-            ActionButton::AllAttack => list
-                .iter()
-                .find_map(|action| match action {
-                    AvailableAction::Attack { attackers } => Some(Action::Attack {
-                        attackers: attackers.clone(),
-                    }),
-                    _ => None,
-                })
-                .or_else(|| {
-                    Some(Action::Attack {
-                        attackers: board.attackers().copied().collect(),
-                    })
+            ActionButton::AllAttack => list.iter().find_map(|action| match action {
+                AvailableAction::Attack { attackers } => Some(Action::Attack {
+                    attackers: attackers.clone(),
                 }),
+                _ => None,
+            }),
         },
         PlayerEvent::CardDroppedOnField(dropped) => {
             if list.castable_cards().iter().any(|card| *card == *dropped) {
