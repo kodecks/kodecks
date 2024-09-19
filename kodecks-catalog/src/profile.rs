@@ -10,13 +10,14 @@ pub fn default_profile() -> GameProfile {
     let deck_list_red = DeckList::parse(
         "
     Volcanic Wyrm 2
-    Wind-Up Spider 3
+    Wind-Up Spider 2
     Pyrosnail 2
-    Oil-Leaking Droid 3
-    Diamond Porcupine 3
+    Oil-Leaking Droid 2
+    Diamond Porcupine 2
     Bambooster 2
     Coppermine Scorpion 2
     Laser Frog 3
+    Graphite Armadillo 3
     ",
         &CATALOG,
     )

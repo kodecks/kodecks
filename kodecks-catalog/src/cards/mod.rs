@@ -8,6 +8,7 @@ mod coppermine_scorpion;
 mod deep_sea_wyrm;
 mod diamond_porcupine;
 mod flash_bang_jellyfish;
+mod graphite_armadillo;
 mod helium_puffer;
 mod laser_frog;
 mod mire_alligator;
@@ -73,4 +74,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "lase" => laser_frog::ARCHETYPE,
     "helium-puffer" => helium_puffer::ARCHETYPE,
     "heli" => helium_puffer::ARCHETYPE,
+    "graphite-armadillo" => graphite_armadillo::ARCHETYPE,
+    "grap" => graphite_armadillo::ARCHETYPE,
 };
