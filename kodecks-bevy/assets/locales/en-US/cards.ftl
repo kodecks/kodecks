@@ -38,3 +38,4 @@ card-laser-frog = Laser Frog
     .text = When <<Laser Frog>> enters the field, break a shield on target creature.
     .message = Choose a creature to break a shield on.
 card-helium-puffer = Helium Puffer
+card-graphite-armadillo = Graphite Armadillo
