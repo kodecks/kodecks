@@ -18,7 +18,7 @@ use kodecks::{
 };
 use kodecks_catalog::CATALOG;
 use std::collections::VecDeque;
-use web_time::Duration;
+use bevy::utils::Duration;
 
 pub struct EventPlugin;
 
