@@ -8,6 +8,7 @@ card_def!(
     color: Color::GREEN,
     cost: 7,
     card_type: CardType::Creature,
+    creature_type: CreatureType::Mutant,
     power: 700,
     shields: 1,
 );

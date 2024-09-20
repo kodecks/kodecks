@@ -8,6 +8,7 @@ card_def!(
     color: Color::RED,
     cost: 0,
     card_type: CardType::Creature,
+    creature_type: CreatureType::Robot,
     power: 100,
 );
 

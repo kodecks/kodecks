@@ -8,6 +8,7 @@ card_def!(
     color: Color::BLUE,
     cost: 6,
     card_type: CardType::Creature,
+    creature_type: CreatureType::Mutant,
     power: 500,
     abilities: &[KeywordAbility::Stealth][..],
 );
