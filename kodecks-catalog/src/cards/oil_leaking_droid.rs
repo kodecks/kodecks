@@ -8,6 +8,7 @@ card_def!(
     color: Color::RED,
     cost: 2,
     card_type: CardType::Creature,
+    creature_type: CreatureType::Robot,
     power: 100,
     abilities: &[KeywordAbility::Toxic][..],
 );

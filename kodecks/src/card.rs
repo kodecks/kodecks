@@ -393,6 +393,7 @@ pub struct CardAttribute {
     pub color: Color,
     pub cost: u8,
     pub card_type: CardType,
+    pub creature_type: Option<CreatureType>,
     pub abilities: &'static [KeywordAbility],
     pub anon_abilities: &'static [AnonymousAbility],
     pub power: Option<u32>,
@@ -406,6 +407,7 @@ impl Default for CardAttribute {
             color: Color::COLORLESS,
             cost: 0,
             card_type: CardType::Hex,
+            creature_type: None,
             abilities: &[],
             anon_abilities: &[],
             power: None,
@@ -420,4 +422,14 @@ impl Default for CardAttribute {
 pub enum CardType {
     Creature,
     Hex,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CreatureType {
+    Mutant,
+    Cyborg,
+    Robot,
+    Ghost,
+    Program,
 }

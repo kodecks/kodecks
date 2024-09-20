@@ -1,6 +1,6 @@
 use crate::{
     ability::{AbilityList, AnonymousAbility, KeywordAbility},
-    card::{Card, CardArchetype, CardType},
+    card::{Card, CardArchetype, CardType, CreatureType},
     color::Color,
     linear::Linear,
     zone::CardZone,
@@ -13,6 +13,7 @@ pub struct ComputedAttribute {
     pub color: Color,
     pub cost: Linear<u8>,
     pub card_type: CardType,
+    pub creature_type: Option<CreatureType>,
     pub abilities: AbilityList<KeywordAbility>,
     pub anon_abilities: AbilityList<AnonymousAbility>,
     pub power: Option<Linear<u32>>,
@@ -25,6 +26,7 @@ impl From<&CardArchetype> for ComputedAttribute {
             color: archetype.attribute.color,
             cost: archetype.attribute.cost.into(),
             card_type: archetype.attribute.card_type,
+            creature_type: archetype.attribute.creature_type,
             abilities: archetype.attribute.abilities.iter().copied().collect(),
             anon_abilities: archetype.attribute.anon_abilities.iter().copied().collect(),
             power: archetype.attribute.power.map(Linear::from),

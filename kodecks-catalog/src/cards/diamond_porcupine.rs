@@ -8,6 +8,7 @@ card_def!(
     color: Color::RED,
     cost: 2,
     card_type: CardType::Creature,
+    creature_type: CreatureType::Cyborg,
     power: 100,
     shields: 1,
 );

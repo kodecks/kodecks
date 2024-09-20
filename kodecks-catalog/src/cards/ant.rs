@@ -7,6 +7,7 @@ card_def!(
     "Ant",
     color: Color::GREEN,
     card_type: CardType::Creature,
+    creature_type: CreatureType::Mutant,
     power: 100,
     is_token: true,
 );
