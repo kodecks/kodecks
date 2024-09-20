@@ -39,3 +39,4 @@ card-laser-frog = レーザーガエル
     .message = シールドを破壊するクリーチャーを選択してください。
 card-helium-puffer = ヘリウム・パファー
 card-graphite-armadillo = 黒鉛アルマジロ
+card-demilune-nighthawk = 半月の夜鷹
