@@ -39,3 +39,4 @@ card-laser-frog = Laser Frog
     .message = Choose a creature to break a shield on.
 card-helium-puffer = Helium Puffer
 card-graphite-armadillo = Graphite Armadillo
+card-demilune-nighthawk = Demilune Nighthawk

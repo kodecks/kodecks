@@ -6,6 +6,7 @@ mod bambooster;
 mod binary_starfish;
 mod coppermine_scorpion;
 mod deep_sea_wyrm;
+mod demilune_nighthawk;
 mod diamond_porcupine;
 mod flash_bang_jellyfish;
 mod graphite_armadillo;
@@ -76,4 +77,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "heli" => helium_puffer::ARCHETYPE,
     "graphite-armadillo" => graphite_armadillo::ARCHETYPE,
     "grap" => graphite_armadillo::ARCHETYPE,
+    "demilune-nighthawk" => demilune_nighthawk::ARCHETYPE,
+    "demi" => demilune_nighthawk::ARCHETYPE,
 };
