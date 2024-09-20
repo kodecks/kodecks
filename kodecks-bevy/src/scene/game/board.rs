@@ -246,7 +246,7 @@ impl Board {
             if zone.zone == Zone::Hand {
                 if let Some(index) = self.player_hand.iter().position(|&y| y == card) {
                     let x_offset = index as f32 - (self.player_hand.len() - 1) as f32 / 2.0;
-                    let x = 0.8 * x_offset;
+                    let x = 1.1 * x_offset;
                     let y = 2.0 + 0.01 * index as f32;
                     let z = 3.6;
 
