@@ -1,13 +1,13 @@
 use crate::{
     ability::{AbilityList, PlayerAbility},
     card::{Card, CardSnapshot},
-    config::DebugFlags,
     deck::DeckList,
     env::GameState,
     field::{FieldItem, FieldState},
     hand::HandItem,
     id::ObjectId,
     list::CardList,
+    profile::DebugFlags,
     shard::ShardList,
     zone::{CardZone, Zone},
 };
@@ -229,7 +229,7 @@ impl PlayerState {
         self.hand
             .items()
             .filter(|item| {
-                state.config.debug.contains(DebugFlags::IGNORE_COST)
+                state.debug.flags.contains(DebugFlags::IGNORE_COST)
                     || item.card.computed().cost.value() == 0
                     || self.shards.get(item.card.computed().color)
                         >= item.card.computed().cost.value() as u32

@@ -7,7 +7,6 @@ pub mod color;
 pub mod command;
 pub mod computed;
 pub mod condition;
-pub mod config;
 pub mod continuous;
 pub mod deck;
 pub mod effect;

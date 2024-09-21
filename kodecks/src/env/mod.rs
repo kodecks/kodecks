@@ -2,7 +2,6 @@ use crate::{
     action::{Action, PlayerAvailableActions},
     card::{ArchetypeId, Card, Catalog},
     computed::ComputedSequence,
-    config::DebugFlags,
     continuous::ContinuousEffectList,
     effect::EffectTriggerContext,
     error::Error,
@@ -13,6 +12,7 @@ use crate::{
     opcode::OpcodeList,
     phase::Phase,
     player::{PlayerCondition, PlayerList, PlayerState, PlayerZone},
+    profile::DebugFlags,
     profile::GameProfile,
     sequence::CardSequence,
     stack::{Stack, StackItem},
@@ -52,7 +52,7 @@ pub struct Environment {
 impl Environment {
     pub fn new(profile: GameProfile, catalog: &'static Catalog) -> Self {
         let mut rng: SmallRng = profile
-            .config
+            .debug
             .rng_seed
             .map(SmallRng::seed_from_u64)
             .unwrap_or_else(SmallRng::from_entropy);
@@ -68,14 +68,14 @@ impl Environment {
                     let card = Card::new(&mut obj_counter, item, archetype, player.id);
                     state.deck.add_top(card);
                 }
-                if !profile.config.no_deck_shuffle {
+                if !profile.debug.no_deck_shuffle {
                     state.deck.shuffle(&mut obj_counter, &mut rng);
                 }
                 state
             })
             .collect::<Vec<_>>();
 
-        if !profile.config.no_player_shuffle {
+        if !profile.debug.no_player_shuffle {
             players.shuffle(&mut rng);
         }
 
@@ -83,7 +83,8 @@ impl Environment {
 
         Environment {
             state: GameState {
-                config: profile.config,
+                regulation: profile.regulation,
+                debug: profile.debug,
                 turn: 0,
                 phase: Phase::Standby,
                 players: PlayerList::new(current_player, players),
@@ -161,7 +162,7 @@ impl Environment {
                 None
             }
             Some(Action::DebugCommand { commands })
-                if self.state.config.debug.contains(DebugFlags::DEBUG_COMMAND) =>
+                if self.state.debug.flags.contains(DebugFlags::DEBUG_COMMAND) =>
             {
                 for command in commands {
                     match command.into_opcodes(self) {

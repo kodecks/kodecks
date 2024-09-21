@@ -1,15 +1,17 @@
 use crate::{
     card::Card,
-    config::GameConfig,
     error::Error,
     id::ObjectId,
     phase::Phase,
     player::{PlayerList, PlayerState, PlayerZone},
+    profile::DebugConfig,
+    regulation::Regulation,
 };
 
 #[derive(Clone)]
 pub struct GameState {
-    pub config: GameConfig,
+    pub regulation: Regulation,
+    pub debug: DebugConfig,
     pub turn: u32,
     pub phase: Phase,
     pub players: PlayerList<PlayerState>,

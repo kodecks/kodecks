@@ -3,7 +3,6 @@ use crate::{
     ability::KeywordAbility,
     action::Action,
     command::ActionCommand,
-    config::DebugFlags,
     error::Error,
     event::{CardEvent, EventReason},
     field::{FieldBattleState, FieldState},
@@ -12,6 +11,7 @@ use crate::{
     opcode::{Opcode, OpcodeList},
     phase::Phase,
     player::PlayerZone,
+    profile::DebugFlags,
     target::Target,
     zone::{CardZone, MoveReason, Zone},
 };
@@ -19,7 +19,7 @@ use std::{iter, vec};
 
 impl Environment {
     fn initialize(&self) -> Result<Vec<OpcodeList>, Error> {
-        let initial_life = self.state.config.initial_life;
+        let initial_life = self.state.regulation.initial_life;
 
         Ok(filter_vec![
             Some(OpcodeList::new(vec![Opcode::StartGame],)),
@@ -33,7 +33,7 @@ impl Environment {
                 let opcodes = iter::repeat(OpcodeList::new(vec![Opcode::DrawCard {
                     player: player.id,
                 }]))
-                .take(self.state.config.initial_hand_size as usize);
+                .take(self.state.regulation.initial_hand_size as usize);
                 filter_vec![opcodes,]
             }),
             Some(OpcodeList::new(vec![Opcode::ChangeTurn {
@@ -124,7 +124,7 @@ impl Environment {
                     Some(Action::CastCard { card }) => {
                         let item = player_in_turn.hand.get_item(card)?;
                         let color = item.card.computed().color;
-                        let amount = if self.state.config.debug.contains(DebugFlags::IGNORE_COST) {
+                        let amount = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                             0
                         } else {
                             item.card.computed().cost.value() as u32
@@ -225,7 +225,7 @@ impl Environment {
                 } else if let Some(Action::CastCard { card }) = action {
                     let item = active_player.hand.get_item(card)?;
                     let color = item.card.computed().color;
-                    let amount = if self.state.config.debug.contains(DebugFlags::IGNORE_COST) {
+                    let amount = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                         0
                     } else {
                         item.card.computed().cost.value() as u32
@@ -408,7 +408,7 @@ impl Environment {
                         ),
                         reason: MoveReason::Discarded,
                     }])]);
-                } else if player_in_turn.hand.len() > self.state.config.max_hand_size as usize {
+                } else if player_in_turn.hand.len() > self.state.regulation.max_hand_size as usize {
                     return Ok(vec![]);
                 }
                 let active_player = self
