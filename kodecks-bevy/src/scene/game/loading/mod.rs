@@ -5,7 +5,7 @@ use super::{
 use crate::scene::GlobalState;
 use bevy::prelude::*;
 use kodecks_catalog::profile;
-use kodecks_server::{
+use kodecks_engine::{
     message::{Command, Input},
     Connection,
 };

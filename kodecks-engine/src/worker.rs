@@ -17,16 +17,16 @@ use gloo_worker::{
 use std::borrow::BorrowMut;
 use wasm_bindgen_futures::spawn_local;
 
-pub struct WebWorkerServer {
+pub struct WebWorkerEngine {
     command_send: Sender<Input>,
     event_recv: Receiver<Output>,
 }
 
-impl WebWorkerServer {
+impl WebWorkerEngine {
     pub fn new() -> Self {
         let (mut event_send, event_recv) = mpsc::channel(256);
         let (command_send, mut command_recv) = mpsc::channel(256);
-        let (mut bridge_sink, mut bridge_stream) = ServerReactor::spawner()
+        let (mut bridge_sink, mut bridge_stream) = EngineReactor::spawner()
             .encoding::<Json>()
             .spawn_with_loader("/worker_loader.js")
             .split();
@@ -53,13 +53,13 @@ impl WebWorkerServer {
     }
 }
 
-impl Default for WebWorkerServer {
+impl Default for WebWorkerEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl Connection for WebWorkerServer {
+impl Connection for WebWorkerEngine {
     fn send(&mut self, input: Input) {
         self.command_send.try_send(input).unwrap();
     }
@@ -70,9 +70,9 @@ impl Connection for WebWorkerServer {
 }
 
 #[reactor]
-pub async fn ServerReactor(mut scope: ReactorScope<Input, Output>) {
+pub async fn EngineReactor(mut scope: ReactorScope<Input, Output>) {
     let (event_send, mut event_recv) = futures::channel::mpsc::unbounded();
-    let mut server = crate::Server::new(move |event| {
+    let mut engine = crate::Engine::new(move |event| {
         event_send.unbounded_send(event).unwrap();
     });
     loop {
@@ -86,7 +86,7 @@ pub async fn ServerReactor(mut scope: ReactorScope<Input, Output>) {
             }
             input = scope.next() => {
                 if let Some(input) = input {
-                    server.handle_input(input);
+                    engine.handle_input(input);
                 } else {
                     break;
                 }

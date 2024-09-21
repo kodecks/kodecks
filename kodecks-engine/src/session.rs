@@ -1,6 +1,6 @@
 use crate::{
     message::{Output, SessionCommand, SessionCommandKind, SessionEvent, SessionEventKind},
-    ServerCallback,
+    EngineCallback,
 };
 use kodecks::{
     action::{Action, PlayerAvailableActions},
@@ -19,11 +19,11 @@ pub struct Session {
     available_actions: Option<PlayerAvailableActions>,
     player_in_action: u8,
     default_bot: DefaultBot,
-    callback: Arc<Box<ServerCallback>>,
+    callback: Arc<Box<EngineCallback>>,
 }
 
 impl Session {
-    pub fn new(id: u32, profile: GameProfile, callback: Arc<Box<ServerCallback>>) -> Self {
+    pub fn new(id: u32, profile: GameProfile, callback: Arc<Box<EngineCallback>>) -> Self {
         let bots = profile.bots.clone();
         let game = Game::new(profile, &CATALOG);
         let player_in_action = game.env().state.players.player_in_turn().id;

@@ -22,7 +22,7 @@ image = { version = "0.25.2", default-features = false, features = ["png"] }
 kodecks = { path = "../kodecks" }
 kodecks-bot = { path = "../kodecks-bot" }
 kodecks-catalog = { path = "../kodecks-catalog" }
-kodecks-server = { path = "../kodecks-server" }
+kodecks-engine = { path = "../kodecks-engine" }
 leafwing-input-manager = "0.14.0"
 rand = "0.8.5"
 serde = { version = "1.0.208", features = ["derive"] }

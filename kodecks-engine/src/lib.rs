@@ -9,15 +9,15 @@ pub mod message;
 pub mod session;
 pub mod worker;
 
-pub type ServerCallback = dyn Fn(message::Output) + Send + Sync + 'static;
+pub type EngineCallback = dyn Fn(message::Output) + Send + Sync + 'static;
 
-pub struct Server {
+pub struct Engine {
     session_counter: u32,
     sessions: HashMap<u32, Session>,
-    callback: Arc<Box<ServerCallback>>,
+    callback: Arc<Box<EngineCallback>>,
 }
 
-impl Server {
+impl Engine {
     pub fn new<F>(callback: F) -> Self
     where
         F: Fn(message::Output) + Send + Sync + 'static,
