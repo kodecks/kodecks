@@ -24,6 +24,7 @@ fn main() {
                 title: "Kodecks".into(),
                 window_theme: Some(WindowTheme::Dark),
                 fit_canvas_to_parent: true,
+                prevent_default_event_handling: true,
                 resize_constraints: WindowResizeConstraints {
                     min_width: 1100.0,
                     min_height: 700.0,
