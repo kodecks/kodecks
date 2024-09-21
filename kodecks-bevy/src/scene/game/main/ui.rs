@@ -1,4 +1,4 @@
-use super::engine::PlayerEvent;
+use super::event::PlayerEvent;
 use crate::scene::{
     game::{
         board::{self, AvailableActionList, Board},

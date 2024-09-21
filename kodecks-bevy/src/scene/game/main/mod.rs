@@ -5,7 +5,7 @@ mod battle;
 mod card;
 mod deck;
 mod dialog;
-mod engine;
+mod event;
 mod life;
 mod pointer;
 mod setup;
@@ -25,7 +25,7 @@ impl Plugin for GameMainPlugin {
             .add_plugins(life::LifePlugin)
             .add_plugins(shard::ShardPlugin)
             .add_plugins(animation::AnimationPlugin)
-            .add_plugins(engine::EnginePlugin)
+            .add_plugins(event::EventPlugin)
             .add_plugins(card::CardPlugin)
             .add_plugins(ui::UiPlugin)
             .add_plugins(stack::StackPlugin)

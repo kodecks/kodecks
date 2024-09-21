@@ -8,9 +8,9 @@ use kodecks::action::{Action, AvailableAction};
 use kodecks::id::ObjectId;
 use leafwing_input_manager::prelude::*;
 
-pub struct EnginePlugin;
+pub struct EventPlugin;
 
-impl Plugin for EnginePlugin {
+impl Plugin for EventPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<PlayerEventFinished>()
             .add_event::<PlayerEvent>()
