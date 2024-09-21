@@ -11,6 +11,7 @@ mod diamond_porcupine;
 mod flash_bang_jellyfish;
 mod graphite_armadillo;
 mod helium_puffer;
+mod icefall_weasel;
 mod laser_frog;
 mod mire_alligator;
 mod moonlit_gecko;
@@ -79,4 +80,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "grap" => graphite_armadillo::ARCHETYPE,
     "demilune-nighthawk" => demilune_nighthawk::ARCHETYPE,
     "demi" => demilune_nighthawk::ARCHETYPE,
+    "icefall-weasel" => icefall_weasel::ARCHETYPE,
+    "icef" => icefall_weasel::ARCHETYPE,
 };
