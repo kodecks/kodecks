@@ -1,6 +1,5 @@
 use kodecks::{
     env::{Environment, GameCondition},
-    
     score::Score,
 };
 
@@ -66,7 +65,7 @@ pub fn get_score(env: &Environment, side: u8) -> i32 {
     score -= opponent.field.items().map(|item| item.score()).sum::<i32>();
     score -= opponent.abilities.score();
 
-    if (player.stats.life as f32) < (state.config.initial_life as f32 * 0.2) {
+    if (player.stats.life as f32) < (state.regulation.initial_life as f32 * 0.2) {
         score -= 100;
     }
 

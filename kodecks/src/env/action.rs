@@ -87,7 +87,7 @@ impl Environment {
                 message_dialog: None,
             })
         } else if matches!(self.state.phase, Phase::End)
-            && active_player.hand.len() > self.state.config.max_hand_size as usize
+            && active_player.hand.len() > self.state.regulation.max_hand_size as usize
         {
             Some(PlayerAvailableActions {
                 player: active_player.id,
@@ -100,7 +100,7 @@ impl Environment {
                 instructions: Some(Message {
                     id: "message-discard-excess-cards".to_string(),
                     variables: VariableList::new()
-                        .set("maxHandSize", self.state.config.max_hand_size as i32),
+                        .set("maxHandSize", self.state.regulation.max_hand_size as i32),
                 }),
                 message_dialog: None,
             })

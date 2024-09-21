@@ -3,8 +3,8 @@ use message::{Command, Input};
 use session::Session;
 use std::{collections::HashMap, sync::Arc};
 
-pub mod local;
 pub mod codec;
+pub mod local;
 pub mod message;
 pub mod session;
 pub mod worker;

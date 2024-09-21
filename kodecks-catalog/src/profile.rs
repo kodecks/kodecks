@@ -1,9 +1,9 @@
 use crate::CATALOG;
 use kodecks::{
-    config::{DebugFlags, GameConfig},
     deck::DeckList,
     player::PlayerConfig,
-    profile::{BotConfig, GameProfile},
+    profile::{BotConfig, DebugConfig, DebugFlags, GameProfile},
+    regulation::Regulation,
 };
 
 pub fn default_profile() -> GameProfile {
@@ -39,12 +39,14 @@ pub fn default_profile() -> GameProfile {
     .unwrap();
 
     GameProfile {
-        config: GameConfig {
-            debug: DebugFlags::DEBUG_COMMAND,
+        regulation: Regulation {
             initial_life: 1000,
             ..Default::default()
         },
-        regulation: Default::default(),
+        debug: DebugConfig {
+            flags: DebugFlags::DEBUG_COMMAND,
+            ..Default::default()
+        },
         players: vec![
             PlayerConfig {
                 id: 1,
@@ -56,6 +58,5 @@ pub fn default_profile() -> GameProfile {
             },
         ],
         bots: vec![BotConfig { player: 2 }],
-        scenario: None,
     }
 }
