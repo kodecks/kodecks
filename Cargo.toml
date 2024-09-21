@@ -5,7 +5,7 @@ members = [
     "kodecks-bevy",
     "kodecks-bot",
     "kodecks-catalog",
-    "kodecks-server",
+    "kodecks-engine",
 ]
 
 [profile.dev]

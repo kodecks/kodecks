@@ -1,7 +1,7 @@
 use crate::scene::GlobalState;
 use bevy::{ecs::world::Command, prelude::*};
 use kodecks::{action::Action, game::LocalGameState};
-use kodecks_server::{
+use kodecks_engine::{
     message::{self, Input},
     Connection,
 };
@@ -23,11 +23,11 @@ fn cleanup(mut commands: Commands) {
 
 #[cfg(not(target_arch = "wasm32"))]
 #[derive(Resource, Default, Deref, DerefMut)]
-pub struct Server(kodecks_server::local::LocalServer);
+pub struct Server(kodecks_engine::local::LocalEngine);
 
 #[cfg(target_arch = "wasm32")]
 #[derive(Resource, Default, Deref, DerefMut)]
-pub struct Server(kodecks_server::worker::WebWorkerServer);
+pub struct Server(kodecks_engine::worker::WebWorkerEngine);
 
 #[derive(Resource)]
 struct Session {
