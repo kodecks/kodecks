@@ -44,6 +44,7 @@ pub fn default_profile() -> GameProfile {
             initial_life: 1000,
             ..Default::default()
         },
+        regulation: Default::default(),
         players: vec![
             PlayerConfig {
                 id: 1,

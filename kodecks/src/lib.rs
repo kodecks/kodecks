@@ -27,6 +27,7 @@ pub mod phase;
 pub mod player;
 pub mod prelude;
 pub mod profile;
+pub mod regulation;
 pub mod scenario;
 pub mod score;
 pub mod sequence;
