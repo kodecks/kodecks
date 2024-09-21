@@ -40,3 +40,4 @@ card-laser-frog = Laser Frog
 card-helium-puffer = Helium Puffer
 card-graphite-armadillo = Graphite Armadillo
 card-demilune-nighthawk = Demilune Nighthawk
+card-icefall-weasel = Icefall Weasel

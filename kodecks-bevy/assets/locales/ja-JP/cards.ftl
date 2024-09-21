@@ -40,3 +40,4 @@ card-laser-frog = レーザーガエル
 card-helium-puffer = ヘリウム・パファー
 card-graphite-armadillo = 黒鉛アルマジロ
 card-demilune-nighthawk = 半月の夜鷹
+card-icefall-weasel = 氷瀑のイタチ
