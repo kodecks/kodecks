@@ -4,7 +4,7 @@ use crate::{
 };
 use kodecks::{
     action::{Action, PlayerAvailableActions},
-    game::{Game, LocalGameState},
+    env::{Environment, LocalGameState},
     profile::{BotConfig, GameProfile},
 };
 use kodecks_bot::{Bot, DefaultBot};
@@ -13,7 +13,7 @@ use std::{collections::HashMap, sync::Arc};
 
 pub struct Session {
     id: u32,
-    game: Game,
+    env: Arc<Environment>,
     bots: Vec<BotConfig>,
     next_actions: HashMap<u8, Action>,
     available_actions: Option<PlayerAvailableActions>,
@@ -25,12 +25,12 @@ pub struct Session {
 impl Session {
     pub fn new(id: u32, profile: GameProfile, callback: Arc<Box<EngineCallback>>) -> Self {
         let bots = profile.bots.clone();
-        let game = Game::new(profile, &CATALOG);
-        let player_in_action = game.env().state.players.player_in_turn().id;
+        let env = Arc::new(Environment::new(profile, &CATALOG));
+        let player_in_action = env.state.players.player_in_turn().id;
 
         let mut session = Self {
             id,
-            game,
+            env,
             bots,
             next_actions: HashMap::new(),
             available_actions: None,
@@ -75,7 +75,7 @@ impl Session {
     }
 
     fn progress(&mut self) {
-        while !self.game.env().game_condition().is_ended() {
+        while !self.env.game_condition().is_ended() {
             let mut next_action = None;
             if let Some(available_actions) = &self.available_actions {
                 let is_bot = self
@@ -84,7 +84,7 @@ impl Session {
                     .any(|bot| bot.player == self.player_in_action);
                 if is_bot {
                     self.send_player_thinking(self.player_in_action);
-                    let env = self.game.env().clone();
+                    let env = self.env.clone();
                     next_action = self.default_bot.compute_best_action(env, available_actions);
                 } else if let Some(action) = self.next_actions.remove(&self.player_in_action) {
                     next_action = Some(action);
@@ -95,7 +95,7 @@ impl Session {
             }
 
             let player = self.player_in_action;
-            let report = self.game.tick(player, next_action);
+            let report = Arc::make_mut(&mut self.env).process(player, next_action);
             self.available_actions.clone_from(&report.available_actions);
 
             if let Some(available_actions) = &report.available_actions {
@@ -106,7 +106,7 @@ impl Session {
                 let is_bot = self.bots.iter().any(|bot| bot.player == player);
                 if !is_bot {
                     let state = LocalGameState {
-                        env: self.game.env().local(player),
+                        env: self.env.local(player),
                         logs: report.logs.clone(),
                         available_actions: report
                             .available_actions
@@ -125,10 +125,10 @@ impl Session {
     }
 
     pub fn players(&self) -> impl Iterator<Item = u8> + '_ {
-        self.game.env().state.players.iter().map(|p| p.id)
+        self.env.state.players.iter().map(|p| p.id)
     }
 
     pub fn is_ended(&self) -> bool {
-        self.game.env().game_condition().is_ended()
+        self.env.game_condition().is_ended()
     }
 }
