@@ -1,6 +1,7 @@
 use crate::app::AppState;
 use axum::{extract::State, http::StatusCode, Json};
-use http::HeaderMap;
+use axum_extra::TypedHeader;
+use headers::{authorization::Bearer, Authorization};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -23,9 +24,10 @@ pub struct Session {
     token: String,
 }
 
-pub async fn logout(State(state): State<Arc<AppState>>, headers: HeaderMap) -> StatusCode {
-    if let Some(token) = crate::auth::get_token(&headers) {
-        state.logout(token);
-    }
+pub async fn logout(
+    State(state): State<Arc<AppState>>,
+    TypedHeader(authorization): TypedHeader<Authorization<Bearer>>,
+) -> StatusCode {
+    state.logout(authorization.token());
     StatusCode::OK
 }

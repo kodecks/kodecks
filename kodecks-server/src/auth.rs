@@ -1,37 +1,25 @@
 use crate::app::AppState;
 use axum::{
     extract::{Request, State},
-    http::{HeaderMap, StatusCode},
+    http::StatusCode,
     middleware::Next,
     response::Response,
 };
+use axum_extra::TypedHeader;
+use headers::{authorization::Bearer, Authorization};
 use std::sync::Arc;
 
 pub async fn auth(
     State(state): State<Arc<AppState>>,
-    headers: HeaderMap,
+    TypedHeader(authorization): TypedHeader<Authorization<Bearer>>,
     request: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
-    if let Some(token) = get_token(&headers) {
-        if let Some(mut session) = state.session_mut(token) {
-            session.update();
-            let response = next.run(request).await;
-            return Ok(response);
-        }
+    if let Some(mut session) = state.session_mut(authorization.token()) {
+        session.update();
+        std::mem::drop(session);
+        Ok(next.run(request).await)
+    } else {
+        Err(StatusCode::UNAUTHORIZED)
     }
-    Err(StatusCode::UNAUTHORIZED)
-}
-
-pub fn get_token(headers: &HeaderMap) -> Option<&str> {
-    headers.get("Authorization").and_then(|value| {
-        value.to_str().ok().and_then(|value| {
-            let mut parts = value.splitn(2, ' ');
-            if parts.next()? == "Bearer" {
-                parts.next()
-            } else {
-                None
-            }
-        })
-    })
 }
