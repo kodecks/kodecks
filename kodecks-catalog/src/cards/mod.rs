@@ -13,6 +13,7 @@ mod graphite_armadillo;
 mod helium_puffer;
 mod icefall_weasel;
 mod laser_frog;
+mod marshland_moose;
 mod mire_alligator;
 mod moonlit_gecko;
 mod moss_grown_mastodon;
@@ -82,4 +83,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "demi" => demilune_nighthawk::ARCHETYPE,
     "icefall-weasel" => icefall_weasel::ARCHETYPE,
     "icef" => icefall_weasel::ARCHETYPE,
+    "marshland-moose" => marshland_moose::ARCHETYPE,
+    "mars" => marshland_moose::ARCHETYPE,
 };

@@ -41,3 +41,4 @@ card-helium-puffer = Helium Puffer
 card-graphite-armadillo = Graphite Armadillo
 card-demilune-nighthawk = Demilune Nighthawk
 card-icefall-weasel = Icefall Weasel
+card-marshland-moose = Marshland Moose
