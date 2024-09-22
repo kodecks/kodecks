@@ -1,0 +1,18 @@
+[package]
+name = "kodecks-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.89"
+axum = "0.7.6"
+dashmap = "6.1.0"
+http = "1.1.0"
+kodecks = { path = "../kodecks" }
+kodecks-engine = { path = "../kodecks-engine" }
+nanoid = "0.4.0"
+serde = { version = "1.0.210", features = ["derive"] }
+tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
+tower-http = { version = "0.6.0", features = ["full"] }
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
