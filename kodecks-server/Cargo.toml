@@ -6,7 +6,9 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.89"
 axum = "0.7.6"
+axum-extra = { version = "0.9.4", features = ["typed-header"] }
 dashmap = "6.1.0"
+headers = "0.4.0"
 http = "1.1.0"
 kodecks = { path = "../kodecks" }
 kodecks-engine = { path = "../kodecks-engine" }
