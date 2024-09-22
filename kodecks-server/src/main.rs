@@ -5,23 +5,31 @@ use axum::{
     Router,
 };
 use http::Method;
-use std::sync::Arc;
+use std::{net::SocketAddr, sync::Arc};
 use tokio::try_join;
 use tower_http::{
     compression::CompressionLayer,
     cors::{Any, CorsLayer},
+    trace::{DefaultMakeSpan, TraceLayer},
 };
 use tracing::info;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 mod app;
 mod auth;
 mod background;
 mod login;
 mod session;
+mod socket;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::registry()
+        .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+            format!("{}=debug,tower_http=debug", env!("CARGO_CRATE_NAME")).into()
+        }))
+        .with(tracing_subscriber::fmt::layer())
+        .init();
 
     let port = std::env::var("PORT")
         .ok()
@@ -47,11 +55,22 @@ async fn main() -> anyhow::Result<()> {
             get(|| async { Redirect::permanent("https://github.com/kodecks/kodecks") }),
         )
         .route("/login", post(login::login))
+        .route("/ws", get(socket::ws_handler))
         .merge(authorized)
         .layer(cors)
         .layer(CompressionLayer::new())
+        .layer(
+            TraceLayer::new_for_http()
+                .make_span_with(DefaultMakeSpan::default().include_headers(true)),
+        )
         .with_state(state.clone());
 
-    try_join!(axum::serve(listener, app), background::task(state))?;
+    try_join!(
+        axum::serve(
+            listener,
+            app.into_make_service_with_connect_info::<SocketAddr>()
+        ),
+        background::task(state)
+    )?;
     Ok(())
 }
