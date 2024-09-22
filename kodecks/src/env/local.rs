@@ -2,9 +2,9 @@ use super::{Environment, GameCondition};
 use crate::{
     action::{Action, AvailableActionList, PlayerAvailableActions},
     card::CardSnapshot,
+    env::Report,
     error::Error,
     field::{FieldItem, FieldState},
-    game::Report,
     id::ObjectId,
     phase::Phase,
     player::{LocalPlayerState, PlayerList, PlayerZone},

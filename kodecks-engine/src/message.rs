@@ -1,4 +1,4 @@
-use kodecks::{action::Action, game::LocalGameState, profile::GameProfile};
+use kodecks::{action::Action, env::LocalGameState, profile::GameProfile};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]

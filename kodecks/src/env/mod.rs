@@ -6,7 +6,6 @@ use crate::{
     effect::EffectTriggerContext,
     error::Error,
     filter_vec,
-    game::Report,
     id::{ObjectId, ObjectIdCounter},
     log::LogAction,
     opcode::OpcodeList,
@@ -385,4 +384,12 @@ impl fmt::Display for GameCondition {
             GameCondition::Draw => write!(f, "Draw"),
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct Report {
+    pub available_actions: Option<PlayerAvailableActions>,
+    pub logs: Vec<LogAction>,
+    pub condition: GameCondition,
+    pub timestamp: u64,
 }

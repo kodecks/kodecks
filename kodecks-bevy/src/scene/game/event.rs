@@ -4,6 +4,7 @@ use super::{
     server::{SendCommand, ServerEvent},
 };
 use crate::scene::{translator::Translator, GlobalState};
+use bevy::utils::Duration;
 use bevy::{
     asset::LoadState, ecs::system::SystemParam, prelude::*, time::Stopwatch, utils::HashMap,
 };
@@ -18,7 +19,6 @@ use kodecks::{
 };
 use kodecks_catalog::CATALOG;
 use std::collections::VecDeque;
-use bevy::utils::Duration;
 
 pub struct EventPlugin;
 

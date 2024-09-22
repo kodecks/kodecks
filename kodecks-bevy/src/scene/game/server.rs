@@ -1,6 +1,6 @@
 use crate::scene::GlobalState;
 use bevy::{ecs::world::Command, prelude::*};
-use kodecks::{action::Action, game::LocalGameState};
+use kodecks::{action::Action, env::LocalGameState};
 use kodecks_engine::{
     message::{self, Input},
     Connection,
