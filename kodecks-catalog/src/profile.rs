@@ -26,13 +26,14 @@ pub fn default_profile() -> GameProfile {
     let deck_list_green = DeckList::parse(
         "
     Vigilant Lynx 3
-    Moonlit Gecko 4
+    Moonlit Gecko 3
     Scrapyard Raven 3
     Radio Deer 1
     Moss-Grown Mastodon 2
     Voracious Anteater 1
     Mire Alligator 3
-    Wasteland Cobra 3
+    Wasteland Cobra 2
+    Marshland Moose 2
     ",
         &CATALOG,
     )
