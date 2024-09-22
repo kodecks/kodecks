@@ -1,4 +1,4 @@
-const estimatedSize = 28400000;
+const estimatedSize = 15800000;
 
 export default function myInitializer () {
   return {
