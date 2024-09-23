@@ -6,6 +6,7 @@ pub mod config;
 pub mod game;
 pub mod lang;
 pub mod menu;
+pub mod spinner;
 pub mod translator;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Default, States)]
@@ -27,6 +28,7 @@ impl Plugin for ScenePlugin {
         app.add_plugins(DefaultPickingPlugins)
             .add_plugins(app::AppLoadingPlugin)
             .add_plugins(menu::MenuPlugin)
+            .add_plugins(spinner::SpinnerPlugin)
             .add_plugins(game::loading::GameLoadingPlugin)
             .add_plugins(game::main::GameMainPlugin)
             .add_plugins(game::result::GameResultPlugin)
