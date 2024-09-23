@@ -14,7 +14,7 @@ COPY kodecks-engine kodecks-engine
 COPY kodecks-server kodecks-server
 
 # Build the Rust project
-RUN cargo build --release --bin kodecks-server
+RUN cargo build --distribution --bin kodecks-server
 
 # Prepare the final image
 FROM debian:bookworm-slim AS runtime
@@ -23,7 +23,7 @@ FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 
 # Copy the Rust binary from the builder stage
-COPY --from=builder /usr/src/app/target/release/kodecks-server /usr/bin
+COPY --from=builder /usr/src/app/target/distribution/kodecks-server /usr/bin
 
 # Set the entrypoint to run the Rust binary
 ENTRYPOINT ["kodecks-server"]
