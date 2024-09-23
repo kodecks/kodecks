@@ -227,7 +227,7 @@ fn start_attack_animation(
                     animation.add_curve_to_target(
                         AnimationTargetId::from_names([root_name.clone()].iter()),
                         VariableCurve {
-                            keyframe_timestamps: vec![0.0, 0.07, 0.1, 0.13, 0.2],
+                            keyframe_timestamps: vec![0.0, 0.07, 0.1, 0.2, 0.25],
                             keyframes: Keyframes::Translation(vec![
                                 transform.translation,
                                 transform.translation,
