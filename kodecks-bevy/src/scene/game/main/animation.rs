@@ -145,6 +145,8 @@ fn start_attack_animation(
     if matches!(res.log_events.front(), Some(LogEvent::Attack { .. })) {
         let camera_pos = camera.single().translation;
         if let Some(LogEvent::Attack { attacker, target }) = res.log_events.pop_front() {
+            let mut blocker_translation = Vec3::INFINITY;
+
             query
                 .iter_mut()
                 .filter(|(card, _, _, _, _, _)| card.id == attacker)
@@ -166,6 +168,8 @@ fn start_attack_animation(
                             Transform::from_xyz(0.0, 2.0, -2.2)
                         };
 
+                        blocker_translation =
+                            (target_transform.translation - transform.translation) / 4.0;
                         target_transform.translation.y = 0.3;
 
                         let mut target =
@@ -211,6 +215,37 @@ fn start_attack_animation(
                         commands.add(RegisterAnimation::Sync(entity));
                     },
                 );
+
+            query
+                .iter_mut()
+                .filter(|(card, _, _, _, _, _)| Target::Card(card.id) == target)
+                .for_each(|(_, entity, root_name, mut anim, mut graph, transform)| {
+                    let mut animation = AnimationClip::default();
+                    let target_transform =
+                        transform.with_translation(transform.translation + blocker_translation);
+
+                    animation.add_curve_to_target(
+                        AnimationTargetId::from_names([root_name.clone()].iter()),
+                        VariableCurve {
+                            keyframe_timestamps: vec![0.0, 0.07, 0.1, 0.13, 0.2],
+                            keyframes: Keyframes::Translation(vec![
+                                transform.translation,
+                                transform.translation,
+                                target_transform.translation,
+                                transform.translation,
+                                transform.translation,
+                            ]),
+                            interpolation: Interpolation::Linear,
+                        },
+                    );
+
+                    let (anim_graph, animation_index) =
+                        AnimationGraph::from_clip(res.animations.add(animation));
+                    *graph = res.graphs.add(anim_graph);
+                    *anim = AnimationPlayer::default();
+                    anim.play(animation_index);
+                    commands.add(RegisterAnimation::Sync(entity));
+                });
         }
         return true;
     }

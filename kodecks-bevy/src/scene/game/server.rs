@@ -53,7 +53,6 @@ fn recv_events(
                 }
                 message::SessionEventKind::GameUpdated { state } => {
                     events.send(ServerEvent(state));
-                    next_spinner_state.set(SpinnerState::Off);
                 }
                 message::SessionEventKind::PlayerThinking { thinking } => {
                     info!("Player {} is thinking", thinking);
