@@ -19,6 +19,7 @@ mod moonlit_gecko;
 mod moss_grown_mastodon;
 mod oil_leaking_droid;
 mod pyrosnail;
+mod quartz_moth;
 mod radio_deer;
 mod scrapyard_raven;
 mod turbofish;
@@ -85,4 +86,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "icef" => icefall_weasel::ARCHETYPE,
     "marshland-moose" => marshland_moose::ARCHETYPE,
     "mars" => marshland_moose::ARCHETYPE,
+    "quartz-moth" => quartz_moth::ARCHETYPE,
+    "quar" => quartz_moth::ARCHETYPE,
 };
