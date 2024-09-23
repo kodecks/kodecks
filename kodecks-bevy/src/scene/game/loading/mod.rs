@@ -2,7 +2,7 @@ use super::{
     board, event,
     server::{self, Server},
 };
-use crate::scene::GlobalState;
+use crate::scene::{spinner::SpinnerState, GlobalState};
 use bevy::prelude::*;
 use kodecks_catalog::profile;
 use kodecks_engine::{
@@ -53,7 +53,13 @@ fn wait_env(mut next_state: ResMut<NextState<GlobalState>>) {
     next_state.set(GlobalState::GameLoading);
 }
 
-fn init_loading_screen(mut commands: Commands, mut conn: ResMut<Server>) {
+fn init_loading_screen(
+    mut commands: Commands,
+    mut conn: ResMut<Server>,
+    mut next_spinner_state: ResMut<NextState<SpinnerState>>,
+) {
+    next_spinner_state.set(SpinnerState::On);
+
     conn.send(Input::Command(Command::CreateSession {
         profile: profile::default_profile(),
     }));
@@ -76,7 +82,13 @@ fn init_loading_screen(mut commands: Commands, mut conn: ResMut<Server>) {
     ));
 }
 
-fn cleanup_loading_screen(mut commands: Commands, query: Query<Entity, With<UiRoot>>) {
+fn cleanup_loading_screen(
+    mut commands: Commands,
+    query: Query<Entity, With<UiRoot>>,
+    mut next_spinner_state: ResMut<NextState<SpinnerState>>,
+) {
+    next_spinner_state.set(SpinnerState::Off);
+
     query.iter().for_each(|entity| {
         commands.add(DespawnRecursive { entity });
     });
