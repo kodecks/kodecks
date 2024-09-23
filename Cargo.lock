@@ -3137,6 +3137,7 @@ dependencies = [
  "kodecks-catalog",
  "kodecks-engine",
  "leafwing-input-manager",
+ "log",
  "rand",
  "serde",
  "serde_default",

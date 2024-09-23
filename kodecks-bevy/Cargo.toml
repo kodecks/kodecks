@@ -24,6 +24,10 @@ kodecks-bot = { path = "../kodecks-bot" }
 kodecks-catalog = { path = "../kodecks-catalog" }
 kodecks-engine = { path = "../kodecks-engine" }
 leafwing-input-manager = "0.14.0"
+log = { version = "0.4", features = [
+    "max_level_debug",
+    "release_max_level_warn",
+] }
 rand = "0.8.5"
 serde = { version = "1.0.208", features = ["derive"] }
 serde_default = "0.2.0"
