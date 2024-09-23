@@ -6,11 +6,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export BEVY_ASSET_PATH="$SCRIPT_DIR/../kodecks-bevy/assets"
 
 if [ -n "$TARGET" ]; then
-    cross build --release --features embed_assets --target "$TARGET"
-    EXE_PATH="$SCRIPT_DIR/../target/$TARGET/release/kodecks-bevy"
+    cross build --profile distribution --features embed_assets --target "$TARGET"
+    EXE_PATH="$SCRIPT_DIR/../target/$TARGET/distribution/kodecks-bevy"
 else
-    cargo build --release --features embed_assets
-    EXE_PATH="$SCRIPT_DIR/../target/release/kodecks-bevy"
+    cargo build --profile distribution --features embed_assets
+    EXE_PATH="$SCRIPT_DIR/../target/distribution/kodecks-bevy"
 fi
 
 COPIED_EXE_PATH="$SCRIPT_DIR/../target/kodecks"
