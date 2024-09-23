@@ -52,6 +52,9 @@ fn recv_events(
                     });
                 }
                 message::SessionEventKind::GameUpdated { state } => {
+                    if state.available_actions.is_some() {
+                        next_spinner_state.set(SpinnerState::Off);
+                    }
                     events.send(ServerEvent(state));
                 }
                 message::SessionEventKind::PlayerThinking { thinking } => {
