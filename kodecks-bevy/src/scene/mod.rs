@@ -6,6 +6,7 @@ pub mod config;
 pub mod game;
 pub mod lang;
 pub mod menu;
+pub mod preloader;
 pub mod spinner;
 pub mod translator;
 
@@ -29,6 +30,7 @@ impl Plugin for ScenePlugin {
             .add_plugins(app::AppLoadingPlugin)
             .add_plugins(menu::MenuPlugin)
             .add_plugins(spinner::SpinnerPlugin)
+            .add_plugins(preloader::PreloaderPlugin)
             .add_plugins(game::loading::GameLoadingPlugin)
             .add_plugins(game::main::GameMainPlugin)
             .add_plugins(game::result::GameResultPlugin)
