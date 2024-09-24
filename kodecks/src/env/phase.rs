@@ -344,6 +344,7 @@ impl Environment {
                             logs.extend(log);
                         }
 
+                        let mut destroyed_logs = vec![];
                         let blocker_has_toxic = blocker
                             .computed()
                             .abilities
@@ -359,7 +360,7 @@ impl Environment {
                             })
                             .into_opcodes(self)
                             {
-                                logs.extend(log);
+                                destroyed_logs.extend(log.into_iter().flatten());
                             }
                         }
 
@@ -377,8 +378,12 @@ impl Environment {
                             })
                             .into_opcodes(self)
                             {
-                                logs.extend(log);
+                                destroyed_logs.extend(log.into_iter().flatten());
                             }
+                        }
+
+                        if !destroyed_logs.is_empty() {
+                            logs.push(OpcodeList::new(destroyed_logs));
                         }
                     }
 
