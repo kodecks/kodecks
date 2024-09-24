@@ -53,6 +53,7 @@ pub enum Opcode {
     CastCard {
         player: u8,
         card: ObjectId,
+        cost: u32,
     },
     MoveCard {
         card: ObjectId,

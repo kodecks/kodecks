@@ -8,8 +8,8 @@ use thiserror::Error;
 pub enum Error {
     #[error("Insufficient shards: {color} {amount}")]
     InsufficientShards { color: Color, amount: u32 },
-    #[error("Creature already casted")]
-    CreatureAlreadyCasted,
+    #[error("Creature already free-casted")]
+    CreatureAlreadyFreeCasted,
     #[error("Card not found: {id}")]
     CardNotFound { id: ObjectId },
     #[error("Key not found: {key}")]

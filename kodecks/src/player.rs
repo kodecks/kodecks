@@ -234,7 +234,11 @@ impl PlayerState {
                     || self.shards.get(item.card.computed().color)
                         >= item.card.computed().cost.value() as u32
             })
-            .filter(|item| !item.card.computed().is_creature() || self.counters.cast_creatures == 0)
+            .filter(|item| {
+                !item.card.computed().is_creature()
+                    || item.card.computed().cost.value() > 0
+                    || self.counters.free_casted == 0
+            })
             .filter(|item| item.card.effect().is_castable(state, &item.card))
             .map(|item| item.card.id())
     }
@@ -261,7 +265,7 @@ pub enum PlayerCondition {
 #[derive(Debug, Default, Clone, Copy)]
 pub struct PlayerCounters {
     pub draw: u32,
-    pub cast_creatures: u32,
+    pub free_casted: u32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

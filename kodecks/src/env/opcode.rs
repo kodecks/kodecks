@@ -136,7 +136,7 @@ impl Environment {
                 }
                 Ok(vec![])
             }
-            Opcode::CastCard { player, card } => {
+            Opcode::CastCard { player, card, cost } => {
                 let player = self.state.players.get_mut(player);
                 if let Some(mut card) = player.hand.remove(card) {
                     let id = card.id();
@@ -145,7 +145,9 @@ impl Environment {
                     card.set_timestamp(self.timestamp);
                     card.set_zone(to);
                     player.field.push(card);
-                    player.counters.cast_creatures += 1;
+                    if cost == 0 {
+                        player.counters.free_casted += 1;
+                    }
                     return Ok(vec![LogAction::CardMoved {
                         card: id,
                         from,

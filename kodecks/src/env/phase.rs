@@ -124,28 +124,32 @@ impl Environment {
                     Some(Action::CastCard { card }) => {
                         let item = player_in_turn.hand.get_item(card)?;
                         let color = item.card.computed().color;
-                        let amount = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
+                        let cost = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                             0
                         } else {
                             item.card.computed().cost.value() as u32
                         };
-                        if player_in_turn.shards.get(color) < amount {
-                            return Err(Error::InsufficientShards { color, amount });
+                        if player_in_turn.shards.get(color) < cost {
+                            return Err(Error::InsufficientShards {
+                                color,
+                                amount: cost,
+                            });
                         }
                         if item.card.computed().is_creature()
-                            && player_in_turn.counters.cast_creatures > 0
+                            && cost == 0
+                            && player_in_turn.counters.free_casted > 0
                         {
-                            return Err(Error::CreatureAlreadyCasted);
+                            return Err(Error::CreatureAlreadyFreeCasted);
                         }
                         let from = PlayerZone::new(player_in_turn.id, Zone::Hand);
                         filter_vec![
                             Some(OpcodeList::new(filter_vec![
-                                if amount > 0 {
+                                if cost > 0 {
                                     Some(Opcode::ConsumeShards {
                                         player: self.state.players.player_in_turn().id,
                                         source: item.card.id(),
                                         color: item.card.computed().color,
-                                        amount,
+                                        amount: cost,
                                     })
                                 } else {
                                     None
@@ -153,6 +157,7 @@ impl Environment {
                                 Some(Opcode::CastCard {
                                     player: self.state.players.player_in_turn().id,
                                     card: item.card.id(),
+                                    cost
                                 }),
                             ],)),
                             self.apply_event(CardEvent::Casted { from }, &item.card, &item.card)
@@ -225,28 +230,32 @@ impl Environment {
                 } else if let Some(Action::CastCard { card }) = action {
                     let item = active_player.hand.get_item(card)?;
                     let color = item.card.computed().color;
-                    let amount = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
+                    let cost = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                         0
                     } else {
                         item.card.computed().cost.value() as u32
                     };
-                    if active_player.shards.get(color) < amount {
-                        return Err(Error::InsufficientShards { color, amount });
+                    if active_player.shards.get(color) < cost {
+                        return Err(Error::InsufficientShards {
+                            color,
+                            amount: cost,
+                        });
                     }
                     if item.card.computed().is_creature()
-                        && active_player.counters.cast_creatures > 0
+                        && cost == 0
+                        && active_player.counters.free_casted > 0
                     {
-                        return Err(Error::CreatureAlreadyCasted);
+                        return Err(Error::CreatureAlreadyFreeCasted);
                     }
                     let from = PlayerZone::new(active_player.id, Zone::Hand);
                     Ok(filter_vec![
                         Some(OpcodeList::new(filter_vec![
-                            if amount > 0 {
+                            if cost > 0 {
                                 Some(Opcode::ConsumeShards {
                                     player: active_player.id,
                                     source: item.card.id(),
                                     color: item.card.computed().color,
-                                    amount,
+                                    amount: cost,
                                 })
                             } else {
                                 None
@@ -254,6 +263,7 @@ impl Environment {
                             Some(Opcode::CastCard {
                                 player: active_player.id,
                                 card: item.card.id(),
+                                cost
                             }),
                         ],)),
                         self.apply_event(CardEvent::Casted { from }, &item.card, &item.card)
