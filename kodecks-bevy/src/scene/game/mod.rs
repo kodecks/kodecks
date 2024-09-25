@@ -4,5 +4,6 @@ pub mod cleanup;
 pub mod event;
 pub mod loading;
 pub mod main;
+pub mod mode;
 pub mod result;
 pub mod server;

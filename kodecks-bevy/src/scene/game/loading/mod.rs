@@ -1,10 +1,14 @@
 use super::{
     board, event,
+    mode::{GameMode, GameModeKind},
     server::{self, Server},
 };
 use crate::scene::{spinner::SpinnerState, GlobalState};
 use bevy::prelude::*;
-use kodecks_catalog::profile;
+use kodecks::{
+    player::PlayerConfig,
+    profile::{BotConfig, DebugConfig, DebugFlags, GameProfile},
+};
 use kodecks_engine::{
     message::{Command, Input},
     Connection,
@@ -57,12 +61,31 @@ fn init_loading_screen(
     mut commands: Commands,
     mut conn: ResMut<Server>,
     mut next_spinner_state: ResMut<NextState<SpinnerState>>,
+    mode: Res<GameMode>,
 ) {
     next_spinner_state.set(SpinnerState::On);
 
-    conn.send(Input::Command(Command::CreateSession {
-        profile: profile::default_profile(),
-    }));
+    let GameModeKind::BotMatch { bot_deck } = &mode.kind;
+    let profile = GameProfile {
+        regulation: mode.regulation.clone(),
+        debug: DebugConfig {
+            flags: DebugFlags::DEBUG_COMMAND,
+            ..Default::default()
+        },
+        players: vec![
+            PlayerConfig {
+                id: 1,
+                deck: mode.player_deck.clone(),
+            },
+            PlayerConfig {
+                id: 2,
+                deck: bot_deck.clone(),
+            },
+        ],
+        bots: vec![BotConfig { player: 2 }],
+    };
+
+    conn.send(Input::Command(Command::CreateSession { profile }));
 
     commands.spawn((
         NodeBundle {
