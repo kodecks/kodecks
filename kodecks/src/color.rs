@@ -70,7 +70,7 @@ impl FromStr for Color {
                 "red" => color |= Color::RED,
                 "yellow" => color |= Color::YELLOW,
                 "green" => color |= Color::GREEN,
-                "Blue" => color |= Color::BLUE,
+                "blue" => color |= Color::BLUE,
                 "colorless" => color = Color::empty(),
                 _ => return Err("Invalid color"),
             }
