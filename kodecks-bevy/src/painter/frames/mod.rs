@@ -4,8 +4,8 @@ use super::{
 };
 use bevy::{ecs::system::Resource, utils::HashMap};
 use dashmap::DashMap;
-use image::{DynamicImage, GenericImageView, ImageReader, Rgba};
-use kodecks::{color::Color, computed::ComputedAttribute};
+use image::{DynamicImage, GenericImage, GenericImageView, ImageReader, Rgba};
+use kodecks::{card::CreatureType, color::Color, computed::ComputedAttribute};
 use std::{io::Cursor, sync::LazyLock};
 
 #[derive(Default, Resource)]
@@ -46,6 +46,14 @@ impl CardFramePainter {
         if let Some(shields) = frame.shields {
             draw_shield(&mut frame_base, 35, 47, shields);
         }
+        if let Some(creature_type) = frame.creature_type {
+            let image = Self::get_creature_type(creature_type);
+            for (x, y, pixel) in image.as_rgba8().unwrap().enumerate_pixels() {
+                if pixel[3] != 0 {
+                    frame_base.put_pixel(x + 26, y + 5, *pixel);
+                }
+            }
+        }
         frame_base
     }
 
@@ -65,6 +73,24 @@ impl CardFramePainter {
         });
         FRAMES.get(&color).unwrap()
     }
+
+    fn get_creature_type(creature_type: CreatureType) -> &'static DynamicImage {
+        static CREATURE_TYPE_IMAGES: LazyLock<HashMap<CreatureType, DynamicImage>> =
+            LazyLock::new(|| {
+                CREATURE_TYPES
+                    .iter()
+                    .map(|(t, data)| {
+                        let image = ImageReader::new(Cursor::new(data))
+                            .with_guessed_format()
+                            .unwrap()
+                            .decode()
+                            .unwrap();
+                        (*t, image)
+                    })
+                    .collect()
+            });
+        CREATURE_TYPE_IMAGES.get(&creature_type).unwrap()
+    }
 }
 
 const FRAME_IMAGES: &[(Color, &[u8])] = &[
@@ -75,12 +101,21 @@ const FRAME_IMAGES: &[(Color, &[u8])] = &[
     (Color::empty(), include_bytes!("frame_colorless.png")),
 ];
 
+const CREATURE_TYPES: &[(CreatureType, &[u8])] = &[
+    (CreatureType::Mutant, include_bytes!("mutant.png")),
+    (CreatureType::Cyborg, include_bytes!("cyborg.png")),
+    (CreatureType::Robot, include_bytes!("robot.png")),
+    (CreatureType::Ghost, include_bytes!("ghost.png")),
+    (CreatureType::Program, include_bytes!("program.png")),
+];
+
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub struct CardFrame {
     pub color: Color,
     pub cost: u8,
     pub power: Option<u32>,
     pub shields: Option<u8>,
+    pub creature_type: Option<CreatureType>,
 }
 
 impl CardFrame {
@@ -90,6 +125,7 @@ impl CardFrame {
             cost: attr.cost.value(),
             power: attr.power.map(|p| p.value()),
             shields: attr.shields.map(|p| p.value()),
+            creature_type: attr.creature_type,
         }
     }
 }
