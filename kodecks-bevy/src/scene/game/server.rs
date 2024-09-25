@@ -1,4 +1,4 @@
-use crate::scene::{spinner::SpinnerState, GlobalState};
+use crate::scene::GlobalState;
 use bevy::{ecs::world::Command, prelude::*};
 use kodecks::{action::Action, env::LocalGameState};
 use kodecks_engine::{
@@ -39,8 +39,6 @@ fn recv_events(
     mut commands: Commands,
     mut server: ResMut<Server>,
     mut events: EventWriter<ServerEvent>,
-    session: Option<Res<Session>>,
-    mut next_spinner_state: ResMut<NextState<SpinnerState>>,
 ) {
     while let Some(event) = server.recv() {
         match event {
@@ -52,18 +50,10 @@ fn recv_events(
                     });
                 }
                 message::SessionEventKind::GameUpdated { state } => {
-                    if state.available_actions.is_some() {
-                        next_spinner_state.set(SpinnerState::Off);
-                    }
                     events.send(ServerEvent(state));
                 }
                 message::SessionEventKind::PlayerThinking { thinking } => {
                     info!("Player {} is thinking", thinking);
-                    if let Some(session) = &session {
-                        if session.player != thinking {
-                            next_spinner_state.set(SpinnerState::On);
-                        }
-                    }
                 }
             },
         }
