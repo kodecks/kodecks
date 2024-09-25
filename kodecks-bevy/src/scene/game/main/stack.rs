@@ -120,7 +120,11 @@ fn update_effect_stack(
     for (item, mut transform, mut material) in query.iter_mut() {
         if let Some(stack_item) = env.stack.as_slice().get(item.index) {
             if item.state == AnimationState::Init || item.state == AnimationState::Done {
-                let zone = env.find_zone(stack_item.source).unwrap();
+                let zone = if let Ok(zone) = env.find_zone(stack_item.source) {
+                    zone
+                } else {
+                    continue;
+                };
                 let card = env.find_card(stack_item.source).unwrap();
                 let archetype = &CATALOG[card.archetype_id];
                 let card_image = asset_server.load(format!(
