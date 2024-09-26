@@ -4,7 +4,10 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use http::Method;
+use http::{
+    header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
+    Method,
+};
 use std::{net::SocketAddr, sync::Arc};
 use tokio::try_join;
 use tower_http::{
@@ -41,6 +44,7 @@ async fn main() -> anyhow::Result<()> {
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST])
+        .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE])
         .allow_origin(Any);
 
     let state = Arc::new(app::AppState::new());
