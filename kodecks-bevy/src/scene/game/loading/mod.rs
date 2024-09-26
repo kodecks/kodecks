@@ -1,11 +1,10 @@
 use super::{
     board, event,
     mode::{GameMode, GameModeKind},
-    server::{self, Server},
+    server::{self, ServerConnection},
 };
-use crate::scene::{config::GlobalConfig, spinner::SpinnerState, GlobalState};
-use bevy::{prelude::*, utils::HashMap};
-use bevy_mod_reqwest::*;
+use crate::scene::{spinner::SpinnerState, GlobalState};
+use bevy::prelude::*;
 use kodecks::{
     player::PlayerConfig,
     profile::{BotConfig, DebugConfig, DebugFlags, GameProfile},
@@ -14,8 +13,6 @@ use kodecks_engine::{
     message::{Command, Input},
     Connection,
 };
-
-mod net;
 
 pub struct GameLoadingPlugin;
 
@@ -36,7 +33,6 @@ impl Plugin for GameLoadingPlugin {
                 Update,
                 (
                     init_game_mode.run_if(in_state(GameLoadingState::Idle)),
-                    net::start_session.run_if(resource_added::<net::ServerSession>),
                     wait_env.run_if(resource_exists::<board::Environment>),
                 )
                     .run_if(in_state(GlobalState::GameInit)),
@@ -100,10 +96,9 @@ fn init_loading_screen(
 }
 
 fn init_game_mode(
-    mut conn: ResMut<Server>,
+    mut commands: Commands,
     mut next_loading_state: ResMut<NextState<GameLoadingState>>,
     mode: Res<GameMode>,
-    mut client: BevyReqwest,
 ) {
     match &mode.kind {
         GameModeKind::BotMatch { bot_deck } => {
@@ -125,39 +120,18 @@ fn init_game_mode(
                 ],
                 bots: vec![BotConfig { player: 2 }],
             };
+
+            let mut conn = ServerConnection::new_local();
             conn.send(Input::Command(Command::CreateSession { profile }));
+            commands.insert_resource(conn);
+
             next_loading_state.set(GameLoadingState::BotMatch);
         }
         GameModeKind::RandomMatch { server } => {
-            let url = server.join("login").unwrap();
-            let request = client
-                .post(url.clone())
-                .json(&HashMap::<String, u32>::new())
-                .build()
-                .unwrap();
+            let mut conn = ServerConnection::new_websocket(server.clone());
+            conn.send(Input::Command(Command::CreateSession { profile: Default::default() }));
+            commands.insert_resource(conn);
 
-            client
-                .send(request)
-                .on_response(
-                    |trigger: Trigger<ReqwestResponseEvent>,
-                     mut commands: Commands,
-                     config: Res<GlobalConfig>| {
-                        let response = trigger.event();
-                        let data = response.deserialize_json::<net::LoginResponse>().ok();
-                        let status = response.status();
-                        info!("code: {status}, data: {data:?}");
-                        if let Some(data) = data {
-                            commands.insert_resource(net::ServerSession {
-                                url: config.server.clone(),
-                                token: data.token,
-                            });
-                        }
-                    },
-                )
-                .on_error(|trigger: Trigger<ReqwestErrorEvent>| {
-                    let e = &trigger.event().0;
-                    error!("error: {e:?}");
-                });
             next_loading_state.set(GameLoadingState::RandomMatch);
         }
     }
