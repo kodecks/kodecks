@@ -36,6 +36,7 @@ impl Plugin for GameLoadingPlugin {
                 Update,
                 (
                     init_game_mode.run_if(in_state(GameLoadingState::Idle)),
+                    net::start_session.run_if(resource_added::<net::ServerSession>),
                     wait_env.run_if(resource_exists::<board::Environment>),
                 )
                     .run_if(in_state(GlobalState::GameInit)),

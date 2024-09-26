@@ -347,6 +347,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-tungstenite"
+version = "0.27.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c5359381fd414fbdb272c48f2111c16cb0bb3447bfacd59311ff3736da9f6664"
+dependencies = [
+ "futures-io",
+ "futures-util",
+ "log",
+ "pin-project-lite",
+ "tungstenite",
+]
+
+[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3522,6 +3535,7 @@ name = "kodecks-bevy"
 version = "0.1.0"
 dependencies = [
  "async-channel",
+ "async-compat",
  "bevy",
  "bevy_embedded_assets",
  "bevy_mod_picking",
@@ -3532,6 +3546,7 @@ dependencies = [
  "fluent-bundle",
  "fluent-syntax",
  "fluent_content",
+ "futures-util",
  "gloo-storage",
  "image",
  "kodecks",
@@ -3541,6 +3556,7 @@ dependencies = [
  "leafwing-input-manager",
  "log",
  "rand",
+ "reqwest-websocket",
  "serde",
  "serde_default",
  "serde_json",
@@ -4949,6 +4965,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "reqwest-websocket"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8dd71dc5a9a049b062c671cb05b3becae446b82a853c89c058161e256a84f52e"
+dependencies = [
+ "async-tungstenite",
+ "futures-util",
+ "reqwest",
+ "thiserror",
+ "tokio",
+ "tokio-util",
+ "tracing",
+ "tungstenite",
+ "web-sys",
+]
+
+[[package]]
 name = "ring"
 version = "0.17.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5579,6 +5612,7 @@ checksum = "61e7c3654c13bcd040d4a03abee2c75b1d14a37b423cf5a813ceae1cc903ec6a"
 dependencies = [
  "bytes",
  "futures-core",
+ "futures-io",
  "futures-sink",
  "pin-project-lite",
  "tokio",
