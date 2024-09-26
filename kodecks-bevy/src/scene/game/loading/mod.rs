@@ -3,8 +3,9 @@ use super::{
     mode::{GameMode, GameModeKind},
     server::{self, Server},
 };
-use crate::scene::{spinner::SpinnerState, GlobalState};
-use bevy::prelude::*;
+use crate::scene::{config::GlobalConfig, spinner::SpinnerState, GlobalState};
+use bevy::{prelude::*, utils::HashMap};
+use bevy_mod_reqwest::*;
 use kodecks::{
     player::PlayerConfig,
     profile::{BotConfig, DebugConfig, DebugFlags, GameProfile},
@@ -14,26 +15,40 @@ use kodecks_engine::{
     Connection,
 };
 
+mod net;
+
 pub struct GameLoadingPlugin;
 
 impl Plugin for GameLoadingPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(server::ServerPlugin)
+        app.init_state::<GameLoadingState>()
+            .add_plugins(server::ServerPlugin)
             .add_plugins(board::BoardPlugin)
             .add_plugins(event::EventPlugin)
             .add_systems(OnEnter(GlobalState::GameInit), init_loading_screen)
             .add_systems(OnExit(GlobalState::GameLoading), cleanup_loading_screen)
             .add_systems(
                 Update,
-                (finish_load.run_if(resource_exists::<board::Environment>))
+                (finish_load.run_if(resource_exists::<board::Environment>),)
                     .run_if(in_state(GlobalState::GameLoading)),
             )
             .add_systems(
                 Update,
-                (wait_env.run_if(resource_exists::<board::Environment>))
+                (
+                    init_game_mode.run_if(in_state(GameLoadingState::Idle)),
+                    wait_env.run_if(resource_exists::<board::Environment>),
+                )
                     .run_if(in_state(GlobalState::GameInit)),
             );
     }
+}
+
+#[derive(Debug, Default, States, Copy, Clone, Eq, PartialEq, Hash)]
+enum GameLoadingState {
+    #[default]
+    Idle,
+    BotMatch,
+    RandomMatch,
 }
 
 #[derive(Component)]
@@ -59,33 +74,11 @@ fn wait_env(mut next_state: ResMut<NextState<GlobalState>>) {
 
 fn init_loading_screen(
     mut commands: Commands,
-    mut conn: ResMut<Server>,
     mut next_spinner_state: ResMut<NextState<SpinnerState>>,
-    mode: Res<GameMode>,
+    mut next_loading_state: ResMut<NextState<GameLoadingState>>,
 ) {
     next_spinner_state.set(SpinnerState::On);
-
-    let GameModeKind::BotMatch { bot_deck } = &mode.kind;
-    let profile = GameProfile {
-        regulation: mode.regulation.clone(),
-        debug: DebugConfig {
-            flags: DebugFlags::DEBUG_COMMAND,
-            ..Default::default()
-        },
-        players: vec![
-            PlayerConfig {
-                id: 1,
-                deck: mode.player_deck.clone(),
-            },
-            PlayerConfig {
-                id: 2,
-                deck: bot_deck.clone(),
-            },
-        ],
-        bots: vec![BotConfig { player: 2 }],
-    };
-
-    conn.send(Input::Command(Command::CreateSession { profile }));
+    next_loading_state.set(GameLoadingState::Idle);
 
     commands.spawn((
         NodeBundle {
@@ -103,6 +96,70 @@ fn init_loading_screen(
         },
         UiRoot,
     ));
+}
+
+fn init_game_mode(
+    mut conn: ResMut<Server>,
+    mut next_loading_state: ResMut<NextState<GameLoadingState>>,
+    mode: Res<GameMode>,
+    mut client: BevyReqwest,
+) {
+    match &mode.kind {
+        GameModeKind::BotMatch { bot_deck } => {
+            let profile = GameProfile {
+                regulation: mode.regulation.clone(),
+                debug: DebugConfig {
+                    flags: DebugFlags::DEBUG_COMMAND,
+                    ..Default::default()
+                },
+                players: vec![
+                    PlayerConfig {
+                        id: 1,
+                        deck: mode.player_deck.clone(),
+                    },
+                    PlayerConfig {
+                        id: 2,
+                        deck: bot_deck.clone(),
+                    },
+                ],
+                bots: vec![BotConfig { player: 2 }],
+            };
+            conn.send(Input::Command(Command::CreateSession { profile }));
+            next_loading_state.set(GameLoadingState::BotMatch);
+        }
+        GameModeKind::RandomMatch { server } => {
+            let url = server.join("login").unwrap();
+            let request = client
+                .post(url.clone())
+                .json(&HashMap::<String, u32>::new())
+                .build()
+                .unwrap();
+
+            client
+                .send(request)
+                .on_response(
+                    |trigger: Trigger<ReqwestResponseEvent>,
+                     mut commands: Commands,
+                     config: Res<GlobalConfig>| {
+                        let response = trigger.event();
+                        let data = response.deserialize_json::<net::LoginResponse>().ok();
+                        let status = response.status();
+                        info!("code: {status}, data: {data:?}");
+                        if let Some(data) = data {
+                            commands.insert_resource(net::ServerSession {
+                                url: config.server.clone(),
+                                token: data.token,
+                            });
+                        }
+                    },
+                )
+                .on_error(|trigger: Trigger<ReqwestErrorEvent>| {
+                    let e = &trigger.event().0;
+                    error!("error: {e:?}");
+                });
+            next_loading_state.set(GameLoadingState::RandomMatch);
+        }
+    }
 }
 
 fn cleanup_loading_screen(

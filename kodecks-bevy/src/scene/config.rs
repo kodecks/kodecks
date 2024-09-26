@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_default::DefaultFromSerde;
 use unic_langid::LanguageIdentifier;
+use url::Url;
 
 pub struct ConfigPlugin;
 
@@ -18,6 +19,16 @@ impl Plugin for ConfigPlugin {
 pub struct GlobalConfig {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub lang: Option<LanguageIdentifier>,
+    #[serde(default = "default_url", skip_serializing_if = "is_default_url")]
+    pub server: Url,
+}
+
+fn default_url() -> Url {
+    Url::parse("https://kodecks.onrender.com").unwrap()
+}
+
+fn is_default_url(url: &Url) -> bool {
+    *url == default_url()
 }
 
 impl GlobalConfig {

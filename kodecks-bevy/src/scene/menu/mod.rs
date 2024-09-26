@@ -1,4 +1,5 @@
 use super::{
+    config::GlobalConfig,
     game::mode::{GameMode, GameModeKind},
     translator::{TextPurpose, Translator},
     GlobalState,
@@ -25,6 +26,7 @@ struct UiRoot;
 #[derive(Event)]
 enum MenuEvent {
     StartBotMatch { deck_list: DeckList },
+    StartRandomMatch,
 }
 
 fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<AssetServer>) {
@@ -196,6 +198,37 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
                                 Label,
                             ));
                         });
+
+                    parent
+                        .spawn((
+                            ImageBundle {
+                                style: Style {
+                                    width: Val::Px(280.),
+                                    height: Val::Px(50.),
+                                    padding: UiRect::all(Val::Px(15.)),
+                                    justify_content: JustifyContent::Center,
+                                    align_items: AlignItems::Center,
+                                    ..default()
+                                },
+                                image: button.clone().into(),
+                                ..default()
+                            },
+                            ImageScaleMode::Sliced(slicer.clone()),
+                            On::<Pointer<Click>>::commands_mut(move |_, commands| {
+                                commands.add(move |w: &mut World| {
+                                    w.send_event(MenuEvent::StartRandomMatch);
+                                });
+                            }),
+                        ))
+                        .with_children(|parent| {
+                            parent.spawn((
+                                TextBundle::from_section(
+                                    translator.get("menu-button-random-match"),
+                                    translator.style(TextPurpose::Button),
+                                ),
+                                Label,
+                            ));
+                        });
                 });
         });
 }
@@ -204,6 +237,7 @@ fn handle_menu_events(
     mut commands: Commands,
     mut events: EventReader<MenuEvent>,
     mut next_state: ResMut<NextState<GlobalState>>,
+    config: Res<GlobalConfig>,
 ) {
     let event = if let Some(event) = events.read().next() {
         event
@@ -211,36 +245,39 @@ fn handle_menu_events(
         return;
     };
 
-    let mode = match event {
-        MenuEvent::StartBotMatch { deck_list } => {
-            let deck_list_green = DeckList::parse(
-                "
-            Vigilant Lynx 2
-            Moonlit Gecko 2
-            Scrapyard Raven 3
-            Radio Deer 1
-            Moss-Grown Mastodon 2
-            Voracious Anteater 1
-            Mire Alligator 3
-            Wasteland Cobra 2
-            Marshland Moose 2
-            Quartz Moth 2
-            ",
-                &CATALOG,
-            )
-            .unwrap();
+    let kind = match event {
+        MenuEvent::StartBotMatch { deck_list } => GameModeKind::BotMatch {
+            bot_deck: deck_list.clone(),
+        },
+        MenuEvent::StartRandomMatch => GameModeKind::RandomMatch {
+            server: config.server.clone(),
+        },
+    };
 
-            GameMode {
-                regulation: Regulation {
-                    initial_life: 1000,
-                    ..Default::default()
-                },
-                player_deck: deck_list_green,
-                kind: GameModeKind::BotMatch {
-                    bot_deck: deck_list.clone(),
-                },
-            }
-        }
+    let deck_list_green = DeckList::parse(
+        "
+    Vigilant Lynx 2
+    Moonlit Gecko 2
+    Scrapyard Raven 3
+    Radio Deer 1
+    Moss-Grown Mastodon 2
+    Voracious Anteater 1
+    Mire Alligator 3
+    Wasteland Cobra 2
+    Marshland Moose 2
+    Quartz Moth 2
+    ",
+        &CATALOG,
+    )
+    .unwrap();
+
+    let mode = GameMode {
+        regulation: Regulation {
+            initial_life: 1000,
+            ..Default::default()
+        },
+        player_deck: deck_list_green,
+        kind,
     };
 
     commands.insert_resource(mode);

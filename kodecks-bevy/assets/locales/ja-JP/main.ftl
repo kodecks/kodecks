@@ -1,5 +1,6 @@
 menu-button-cpu-match-1 = CPU対戦1
 menu-button-cpu-match-2 = CPU対戦2
+menu-button-random-match = ランダム対戦
 
 your-turn = Your Turn
 opponents-turn = Opponent's Turn
