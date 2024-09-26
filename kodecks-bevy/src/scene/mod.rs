@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_mod_picking::DefaultPickingPlugins;
+use bevy_mod_reqwest::ReqwestPlugin;
 
 pub mod app;
 pub mod config;
@@ -27,6 +28,7 @@ pub struct ScenePlugin;
 impl Plugin for ScenePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(DefaultPickingPlugins)
+            .add_plugins(ReqwestPlugin::default())
             .add_plugins(app::AppLoadingPlugin)
             .add_plugins(menu::MenuPlugin)
             .add_plugins(spinner::SpinnerPlugin)
