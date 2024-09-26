@@ -5,6 +5,7 @@ edition = "2021"
 default-run = "kodecks-bevy"
 
 [dependencies]
+anyhow = "1.0.89"
 async-channel = "2.3.1"
 async-compat = "0.2.4"
 bevy = "0.14.1"
@@ -14,12 +15,12 @@ bevy_mod_picking = { version = "0.20.1", features = [
     "backend_bevy_ui",
     "backend_sprite",
 ], default-features = false }
-bevy_mod_reqwest = "0.16.0"
 build-info = "0.0.38"
 dashmap = "6.0.1"
 fluent-bundle = "0.15.3"
 fluent-syntax = "0.11.1"
 fluent_content = "0.0.5"
+futures = "0.3.30"
 futures-util = "0.3.30"
 image = { version = "0.25.2", default-features = false, features = ["png"] }
 kodecks = { path = "../kodecks" }
@@ -32,6 +33,7 @@ log = { version = "0.4", features = [
     "release_max_level_warn",
 ] }
 rand = "0.8.5"
+reqwest = { version = "0.12.7", features = ["json"] }
 reqwest-websocket = "0.4.2"
 serde = { version = "1.0.208", features = ["derive"] }
 serde_default = "0.2.0"
