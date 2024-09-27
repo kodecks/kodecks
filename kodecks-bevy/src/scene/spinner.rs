@@ -38,6 +38,7 @@ fn setup(
     commands
         .spawn((
             NodeBundle {
+                z_index: ZIndex::Global(3),
                 style: Style {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
