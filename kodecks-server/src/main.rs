@@ -21,8 +21,10 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 mod app;
 mod auth;
 mod background;
+mod game;
 mod login;
 mod session;
+mod pool;
 mod socket;
 
 #[tokio::main]

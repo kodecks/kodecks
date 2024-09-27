@@ -126,14 +126,14 @@ async fn connect(server: Url, mut command_recv: Receiver<Input>, mut event_send:
                 if let Some(command) = command {
                     websocket
                         .send(reqwest_websocket::Message::Text(serde_json::to_string(&command)?))
-                        .await?;
+                        .await.unwrap();
                 }
             }
             message = websocket.next() => {
                 if let Some(Ok(reqwest_websocket::Message::Text(text))) = message {
                     info!("received: {text}");
                     if let Ok(event) = serde_json::from_str(&text) {
-                        event_send.send(event).await?;
+                        event_send.send(event).await.unwrap();
                     }
                 }
             }

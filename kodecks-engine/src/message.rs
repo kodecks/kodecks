@@ -1,4 +1,4 @@
-use kodecks::{action::Action, env::LocalGameState, profile::GameProfile};
+use kodecks::{action::Action, deck::DeckList, env::LocalGameState, profile::GameProfile};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -12,6 +12,7 @@ pub enum Input {
 #[serde(tag = "command", rename_all = "snake_case")]
 pub enum Command {
     CreateSession { profile: GameProfile },
+    StartRandomMatch { deck: DeckList },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
