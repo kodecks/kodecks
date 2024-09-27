@@ -31,10 +31,8 @@ impl Engine {
 
     pub fn handle_input(&mut self, input: message::Input) {
         match input {
-            Input::Command(command) => match command {
-                Command::CreateSession { profile } => {
-                    self.create_session(profile);
-                }
+            Input::Command(command) => if let Command::CreateSession { profile } = command {
+                self.create_session(profile);
             },
             message::Input::SessionCommand(session_command) => {
                 let id = session_command.session;

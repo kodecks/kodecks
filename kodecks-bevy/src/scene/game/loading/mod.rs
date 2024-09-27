@@ -129,7 +129,7 @@ fn init_game_mode(
         }
         GameModeKind::RandomMatch { server } => {
             let mut conn = ServerConnection::new_websocket(server.clone());
-            conn.send(Input::Command(Command::CreateSession { profile: Default::default() }));
+            conn.send(Input::Command(Command::StartRandomMatch { deck: mode.player_deck.clone() }));
             commands.insert_resource(conn);
 
             next_loading_state.set(GameLoadingState::RandomMatch);

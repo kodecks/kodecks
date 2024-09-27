@@ -1,14 +1,17 @@
-use crate::session::Session;
+use std::sync::Mutex;
+use crate::{game::PlayerData, pool::RandomMatchPool, session::Session};
 use dashmap::{mapref::one::RefMut, DashMap};
 
 pub struct AppState {
     sessions: DashMap<String, Session>,
+    pool: Mutex<RandomMatchPool>
 }
 
 impl AppState {
     pub fn new() -> Self {
         Self {
             sessions: DashMap::new(),
+            pool: Mutex::new(RandomMatchPool::default())
         }
     }
 
@@ -28,5 +31,9 @@ impl AppState {
 
     pub fn cleanup(&self) {
         self.sessions.retain(|_, session| !session.is_expired());
+    }
+
+    pub fn add_to_random_match_pool(&self, player: PlayerData) {
+        self.pool.lock().unwrap().add(player);
     }
 }

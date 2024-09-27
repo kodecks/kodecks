@@ -12,9 +12,12 @@ headers = "0.4.0"
 http = "1.1.0"
 kodecks = { path = "../kodecks" }
 kodecks-engine = { path = "../kodecks-engine" }
+kodecks-catalog = { path = "../kodecks-catalog" }
 nanoid = "0.4.0"
 serde = { version = "1.0.210", features = ["derive"] }
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
 tower-http = { version = "0.6.0", features = ["full"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+serde_json = "1.0.128"
+futures-util = "0.3.30"
