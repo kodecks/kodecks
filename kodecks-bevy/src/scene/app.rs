@@ -1,5 +1,6 @@
 use super::{
     config::{ConfigPlugin, GlobalConfig},
+    spinner::SpinnerState,
     translator::Translator,
     GlobalState,
 };
@@ -25,12 +26,18 @@ impl Plugin for AppLoadingPlugin {
             .add_plugins(RenderedCardPlugin)
             .add_plugins(FluentPlugin)
             .add_systems(Startup, init)
-            .add_systems(Update, update.run_if(in_state(GlobalState::AppInit)));
+            .add_systems(Update, update.run_if(in_state(GlobalState::AppInit)))
+            .add_systems(OnExit(GlobalState::AppInit), cleanup);
     }
 }
 
-fn init() {
+fn init(mut next_spinner_state: ResMut<NextState<SpinnerState>>) {
     info!("{}", build_info::format!("{}", $));
+    next_spinner_state.set(SpinnerState::On);
+}
+
+fn cleanup(mut next_spinner_state: ResMut<NextState<SpinnerState>>) {
+    next_spinner_state.set(SpinnerState::Off);
 }
 
 fn update(
