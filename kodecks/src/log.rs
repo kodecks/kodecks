@@ -2,10 +2,11 @@ use crate::{
     color::Color, effect::EffectId, id::ObjectId, phase::Phase, player::PlayerZone, target::Target,
     zone::MoveReason,
 };
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Display)]
+#[derive(Debug, Clone, Serialize, Deserialize, Display, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
 pub enum LogAction {
     #[strum(to_string = "Game started")]

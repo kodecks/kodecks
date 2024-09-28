@@ -2,9 +2,10 @@ use crate::{
     card::Card,
     id::{CardId, ObjectId, TimedObjectId},
 };
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct HandItem<T: CardId> {
     pub card: T,
     pub cost_delta: i8,

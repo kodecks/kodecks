@@ -15,6 +15,7 @@ bevy_mod_picking = { version = "0.20.1", features = [
     "backend_bevy_ui",
     "backend_sprite",
 ], default-features = false }
+bincode = "2.0.0-rc.3"
 build-info = "0.0.38"
 dashmap = "6.0.1"
 fluent-bundle = "0.15.3"

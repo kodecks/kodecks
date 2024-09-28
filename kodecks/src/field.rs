@@ -4,6 +4,7 @@ use crate::{
     list::CardList,
     score::Score,
 };
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
@@ -56,7 +57,7 @@ impl CardList<FieldItem<Card>> {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct FieldItem<T: CardId> {
     pub card: T,
     pub state: FieldState,
@@ -117,14 +118,16 @@ where
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Display, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode,
+)]
 pub enum FieldState {
     #[default]
     Active,
     Exhausted,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode)]
 pub enum FieldBattleState {
     Attacking,
     Blocking { attacker: ObjectId },

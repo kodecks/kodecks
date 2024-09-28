@@ -1,12 +1,15 @@
 use super::Ability;
 use crate::score::Score;
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::{
     mem,
     ops::{Add, Sub},
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Encode, Decode,
+)]
 #[non_exhaustive]
 #[serde(rename_all = "snake_case")]
 pub enum AnonymousAbility {

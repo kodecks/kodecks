@@ -9,6 +9,12 @@ use crate::{
     id::{ObjectId, ObjectIdCounter},
     stack::StackItem,
 };
+use bincode::{
+    de::{BorrowDecoder, Decoder},
+    enc::Encoder,
+    error::{DecodeError, EncodeError},
+    BorrowDecode, Decode, Encode,
+};
 use dyn_clone::DynClone;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -59,6 +65,29 @@ pub struct EffectId(TinyAsciiStr<16>);
 impl fmt::Display for EffectId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl Encode for EffectId {
+    fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
+        Encode::encode(self.0.as_str(), encoder)?;
+        Ok(())
+    }
+}
+
+impl Decode for EffectId {
+    fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
+        Ok(Self(TinyAsciiStr::from_bytes_lossy(
+            <String as Decode>::decode(decoder)?.as_bytes(),
+        )))
+    }
+}
+
+impl<'de> BorrowDecode<'de> for EffectId {
+    fn borrow_decode<D: BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, DecodeError> {
+        Ok(Self(TinyAsciiStr::from_bytes_lossy(
+            <String as Decode>::decode(decoder)?.as_bytes(),
+        )))
     }
 }
 

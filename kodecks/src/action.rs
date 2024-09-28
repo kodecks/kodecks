@@ -3,10 +3,11 @@ use crate::{
     id::ObjectId,
     message::{Message, MessageDialog},
 };
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use serde_tuple::{Deserialize_tuple, Serialize_tuple};
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(tag = "name", rename_all = "snake_case")]
 pub enum AvailableAction {
     SelectCard {
@@ -44,7 +45,7 @@ impl Ord for AvailableAction {
     }
 }
 
-#[derive(Debug, Clone, Serialize_tuple, Deserialize_tuple)]
+#[derive(Debug, Clone, Serialize_tuple, Deserialize_tuple, Encode, Decode)]
 pub struct PlayerAvailableActions {
     pub player: u8,
     pub actions: AvailableActionList,
@@ -70,7 +71,7 @@ impl PlayerAvailableActions {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Encode, Decode)]
 #[serde(transparent)]
 pub struct AvailableActionList(Vec<AvailableAction>);
 
@@ -224,7 +225,7 @@ impl IntoIterator for AvailableActionList {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 #[serde(tag = "name", rename_all = "snake_case")]
 pub enum Action {
     CastCard { card: ObjectId },

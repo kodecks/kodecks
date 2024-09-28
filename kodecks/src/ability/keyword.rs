@@ -1,5 +1,6 @@
 use super::Ability;
 use crate::score::Score;
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::{
     mem,
@@ -22,6 +23,8 @@ use strum::{Display, EnumIter, EnumString, IntoStaticStr};
     Deserialize,
     EnumString,
     EnumIter,
+    Encode,
+    Decode,
 )]
 #[non_exhaustive]
 #[serde(rename_all = "snake_case")]

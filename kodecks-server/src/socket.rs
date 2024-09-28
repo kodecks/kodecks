@@ -38,26 +38,27 @@ pub async fn ws_handler(
 async fn handle_socket(state: Arc<AppState>, mut socket: WebSocket, who: SocketAddr) {
     let (command_sender, command_receiver) = broadcast::channel(256);
     let (event_sender, mut event_receiver) = mpsc::channel(256);
+    let config = bincode::config::standard();
 
     loop {
         select! {
             Some(event) = event_receiver.recv() => {
-                let event = match serde_json::to_string(&event) {
+                let event = match bincode::encode_to_vec(&event, config) {
                     Ok(event) => event,
                     Err(err) => {
                         warn!("failed to serialize event: {}", err);
                         continue;
                     }
                 };
-                if let Err(err) = socket.send(Message::Text(event)).await {
+                if let Err(err) = socket.send(Message::Binary(event)).await {
                     warn!("failed to send event: {}", err);
                     break;
                 }
             }
             msg = socket.recv() => {
-                if let Some(Ok(Message::Text(msg))) = msg {
-                    let command = match serde_json::from_str(&msg) {
-                        Ok(msg) => msg,
+                if let Some(Ok(Message::Binary(msg))) = msg {
+                    let command = match bincode::decode_from_slice(&msg, config) {
+                        Ok((msg, _)) => msg,
                         Err(err) => {
                             warn!("failed to parse message: {}", err);
                             break;

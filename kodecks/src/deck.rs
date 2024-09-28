@@ -2,11 +2,12 @@ use crate::{
     card::{safe_name, ArchetypeId, Catalog},
     id::ObjectId,
 };
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::iter;
 
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 pub struct DeckList {
     pub cards: Vec<DeckItem>,
 }
@@ -31,7 +32,7 @@ impl DeckList {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 pub struct DeckItem {
     pub archetype_id: ArchetypeId,
     pub base_id: Option<ObjectId>,

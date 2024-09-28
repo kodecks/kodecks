@@ -17,6 +17,7 @@ use crate::{
     stack::{Stack, StackItem},
     zone::{CardZone, Zone},
 };
+use bincode::{Decode, Encode};
 use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
 use rand::SeedableRng;
@@ -365,7 +366,7 @@ impl Environment {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 pub enum GameCondition {
     Progress,
     Win(u8),
