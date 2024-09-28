@@ -1,9 +1,14 @@
 use crate::scene::GlobalState;
+use bevy::{
+    ecs::world::Command,
+    prelude::*,
+    tasks::{block_on, Task},
+    utils::HashMap,
+};
 use futures::{
     channel::mpsc::{self, Receiver, Sender},
     select, StreamExt,
 };
-use bevy::{ecs::world::Command, prelude::*, utils::HashMap};
 use futures_util::SinkExt;
 use kodecks::{action::Action, env::LocalGameState};
 use kodecks_engine::{
@@ -70,6 +75,7 @@ impl Connection for ServerConnection {
 pub struct WebSocketEngine {
     command_send: Sender<Input>,
     event_recv: Receiver<Output>,
+    task: Task<()>,
 }
 
 impl WebSocketEngine {
@@ -77,23 +83,30 @@ impl WebSocketEngine {
         let (event_send, event_recv) = mpsc::channel(256);
         let (command_send, command_recv) = mpsc::channel(256);
 
-        bevy::tasks::IoTaskPool::get()
-            .spawn(async move {
-                #[cfg(target_arch = "wasm32")]
-                connect(server, command_recv, event_send).await.unwrap();
+        let task = bevy::tasks::IoTaskPool::get().spawn(async move {
+            #[cfg(target_arch = "wasm32")]
+            connect(server, command_recv, event_send).await.unwrap();
 
-                #[cfg(not(target_arch = "wasm32"))]
-                async_compat::Compat::new(async {
-                    connect(server, command_recv, event_send).await.unwrap();
-                })
-                .await;
+            #[cfg(not(target_arch = "wasm32"))]
+            async_compat::Compat::new(async {
+                connect(server, command_recv, event_send).await.unwrap();
             })
-            .detach();
+            .await;
+        });
 
         Self {
             command_send,
             event_recv,
+            task,
         }
+    }
+}
+
+impl Drop for WebSocketEngine {
+    fn drop(&mut self) {
+        self.command_send.close_channel();
+        self.event_recv.close();
+        block_on(&mut self.task);
     }
 }
 
@@ -102,7 +115,11 @@ pub struct LoginResponse {
     pub token: String,
 }
 
-async fn connect(server: Url, mut command_recv: Receiver<Input>, mut event_send: Sender<Output>) -> anyhow::Result<()> {
+async fn connect(
+    server: Url,
+    mut command_recv: Receiver<Input>,
+    mut event_send: Sender<Output>,
+) -> anyhow::Result<()> {
     let url = server.join("login")?;
 
     let client = reqwest::Client::new();
@@ -127,18 +144,24 @@ async fn connect(server: Url, mut command_recv: Receiver<Input>, mut event_send:
                     websocket
                         .send(reqwest_websocket::Message::Text(serde_json::to_string(&command)?))
                         .await.unwrap();
+                } else {
+                    break;
                 }
             }
             message = websocket.next() => {
                 if let Some(Ok(reqwest_websocket::Message::Text(text))) = message {
-                    info!("received: {text}");
                     if let Ok(event) = serde_json::from_str(&text) {
                         event_send.send(event).await.unwrap();
                     }
+                } else {
+                    break;
                 }
             }
         }
     }
+
+    info!("Connection closed");
+    Ok(())
 }
 
 #[derive(Resource)]
