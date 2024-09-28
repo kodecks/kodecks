@@ -3,7 +3,6 @@ use message::{Command, Input};
 use session::Session;
 use std::{collections::HashMap, sync::Arc};
 
-pub mod codec;
 pub mod local;
 pub mod message;
 pub mod session;
@@ -31,9 +30,11 @@ impl Engine {
 
     pub fn handle_input(&mut self, input: message::Input) {
         match input {
-            Input::Command(command) => if let Command::CreateSession { profile } = command {
-                self.create_session(profile);
-            },
+            Input::Command(command) => {
+                if let Command::CreateSession { profile } = command {
+                    self.create_session(profile);
+                }
+            }
             message::Input::SessionCommand(session_command) => {
                 let id = session_command.session;
                 if let Some(session) = self.sessions.get_mut(&id) {

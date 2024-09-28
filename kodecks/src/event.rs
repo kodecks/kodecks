@@ -1,10 +1,11 @@
+use bincode::{Decode, Encode};
 use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
 use crate::player::PlayerZone;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode)]
 #[non_exhaustive]
 pub enum CardEvent {
     Casted {
@@ -60,7 +61,7 @@ bitflags! {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
 pub enum EventReason {
     Battle,

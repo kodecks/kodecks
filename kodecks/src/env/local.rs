@@ -11,9 +11,10 @@ use crate::{
     stack::{LocalStackItem, Stack},
     zone::CardZone,
 };
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct LocalEnvironment {
     pub player: u8,
     pub turn: u32,

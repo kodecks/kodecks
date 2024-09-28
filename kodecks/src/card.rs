@@ -11,6 +11,12 @@ use crate::{
     score::Score,
     zone::Zone,
 };
+use bincode::{
+    de::{BorrowDecoder, Decoder},
+    enc::Encoder,
+    error::{DecodeError, EncodeError},
+    BorrowDecode, Decode, Encode,
+};
 use core::{fmt, panic};
 use serde::{Deserialize, Serialize};
 use std::{ops::Index, sync::LazyLock};
@@ -260,7 +266,7 @@ pub fn safe_name(name: &str) -> Result<String, idna::Errors> {
     idna::domain_to_ascii(&name.replace(' ', "-"))
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct CardSnapshot {
     pub id: ObjectId,
     pub archetype_id: ArchetypeId,
@@ -342,6 +348,29 @@ impl fmt::Display for ArchetypeId {
     }
 }
 
+impl Encode for ArchetypeId {
+    fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
+        Encode::encode(self.0.as_str(), encoder)?;
+        Ok(())
+    }
+}
+
+impl Decode for ArchetypeId {
+    fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
+        Ok(Self(TinyAsciiStr::from_bytes_lossy(
+            <String as Decode>::decode(decoder)?.as_bytes(),
+        )))
+    }
+}
+
+impl<'de> BorrowDecode<'de> for ArchetypeId {
+    fn borrow_decode<D: BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, DecodeError> {
+        Ok(Self(TinyAsciiStr::from_bytes_lossy(
+            <String as Decode>::decode(decoder)?.as_bytes(),
+        )))
+    }
+}
+
 impl ArchetypeId {
     pub fn new(id: &str) -> Self {
         Self(TinyAsciiStr::from_bytes_lossy(id.as_bytes()))
@@ -417,14 +446,14 @@ impl Default for CardAttribute {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
 pub enum CardType {
     Creature,
     Hex,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
 pub enum CreatureType {
     Mutant,

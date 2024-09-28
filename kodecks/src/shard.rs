@@ -1,8 +1,9 @@
 use crate::color::Color;
 use crate::error::Error;
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, Encode, Decode)]
 #[serde(transparent)]
 pub struct ShardList(Vec<(Color, u32)>);
 

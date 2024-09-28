@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.86"
+bincode = "2.0.0-rc.3"
 bitflags = { version = "2.6.0", features = ["serde"] }
 dyn-clone = "1.0.17"
 fluent-bundle = "0.15.3"

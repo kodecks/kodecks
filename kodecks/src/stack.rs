@@ -1,4 +1,5 @@
 use crate::{effect::StackEffectHandler, id::ObjectId};
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -9,7 +10,7 @@ pub struct StackItem {
     pub handler: Arc<Box<StackEffectHandler>>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Hash, Encode, Decode)]
 pub struct LocalStackItem {
     pub source: ObjectId,
     pub id: String,
@@ -24,8 +25,8 @@ impl From<StackItem> for LocalStackItem {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Stack<T> {
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
+pub struct Stack<T: 'static> {
     items: Vec<T>,
 }
 

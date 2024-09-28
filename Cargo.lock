@@ -1506,6 +1506,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "bincode"
+version = "2.0.0-rc.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f11ea1a0346b94ef188834a65c068a03aec181c94896d481d7a0a40d85b0ce95"
+dependencies = [
+ "bincode_derive",
+ "serde",
+]
+
+[[package]]
+name = "bincode_derive"
+version = "2.0.0-rc.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e30759b3b99a1b802a7a3aa21c85c3ded5c28e1c83170d82d70f08bbf7f3e4c"
+dependencies = [
+ "virtue",
+]
+
+[[package]]
 name = "bindgen"
 version = "0.69.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1633,7 +1652,7 @@ version = "0.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3465eaabbf2f3bf2a28a4ee66d16316071ef63c1ab9f336e833ea67f519c0348"
 dependencies = [
- "bincode",
+ "bincode 1.3.3",
  "build-info-common",
  "build-info-proc",
 ]
@@ -1646,7 +1665,7 @@ checksum = "c967db0724d13dfcd67d6f54023bfd0f7093872810c1377f00c6b86ce507513f"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
- "bincode",
+ "bincode 1.3.3",
  "build-info-common",
  "cargo_metadata",
  "chrono",
@@ -1678,7 +1697,7 @@ checksum = "58463d44fa27e9afbf377c0f5661eaf8d3b69b1a4a45b0fa601b822ccf7512e8"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
- "bincode",
+ "bincode 1.3.3",
  "build-info-common",
  "chrono",
  "num-bigint",
@@ -2814,7 +2833,7 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "085f262d7604911c8150162529cefab3782e91adb20202e8658f7275d2aefe5d"
 dependencies = [
- "bincode",
+ "bincode 1.3.3",
  "futures",
  "gloo-utils",
  "gloo-worker-macros",
@@ -3555,6 +3574,7 @@ name = "kodecks"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bincode 2.0.0-rc.3",
  "bitflags 2.6.0",
  "dyn-clone",
  "fluent-bundle",
@@ -3582,6 +3602,7 @@ dependencies = [
  "bevy",
  "bevy_embedded_assets",
  "bevy_mod_picking",
+ "bincode 2.0.0-rc.3",
  "build-info",
  "build-info-build",
  "dashmap",
@@ -3636,6 +3657,7 @@ dependencies = [
 name = "kodecks-engine"
 version = "0.1.0"
 dependencies = [
+ "bincode 2.0.0-rc.3",
  "console_error_panic_hook",
  "futures",
  "futures-util",
@@ -3645,7 +3667,6 @@ dependencies = [
  "kodecks-bot",
  "kodecks-catalog",
  "serde",
- "serde_json",
  "tracing",
  "wasm-bindgen-futures",
 ]
@@ -3657,6 +3678,7 @@ dependencies = [
  "anyhow",
  "axum",
  "axum-extra",
+ "bincode 2.0.0-rc.3",
  "dashmap",
  "futures-util",
  "headers",
@@ -3666,7 +3688,6 @@ dependencies = [
  "kodecks-engine",
  "nanoid",
  "serde",
- "serde_json",
  "tokio",
  "tower-http",
  "tracing",
@@ -3765,7 +3786,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c2a198fb6b0eada2a8df47933734e6d35d350665a33a3593d7164fa52c75c19"
 dependencies = [
  "cfg-if",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -6183,6 +6204,12 @@ name = "version_check"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
+
+[[package]]
+name = "virtue"
+version = "0.0.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9dcc60c0624df774c82a0ef104151231d37da4962957d691c011c852b2473314"
 
 [[package]]
 name = "walkdir"

@@ -1,9 +1,10 @@
 use std::cmp::Ordering;
 
+use bincode::{Decode, Encode};
 use num::{Bounded, NumCast};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Encode, Decode)]
 pub enum Linear<T> {
     Value(T),
     Modified {
@@ -174,7 +175,7 @@ where
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Encode, Decode)]
 #[serde(untagged)]
 enum SerializedLinear<T> {
     Value(T),

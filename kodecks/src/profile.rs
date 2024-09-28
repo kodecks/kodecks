@@ -1,8 +1,14 @@
 use crate::{player::PlayerConfig, regulation::Regulation};
+use bincode::{
+    de::{BorrowDecoder, Decoder},
+    enc::Encoder,
+    error::{DecodeError, EncodeError},
+    BorrowDecode, Decode, Encode,
+};
 use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct GameProfile {
     pub regulation: Regulation,
     pub debug: DebugConfig,
@@ -10,7 +16,7 @@ pub struct GameProfile {
     pub bots: Vec<BotConfig>,
 }
 
-#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, Encode, Decode)]
 pub struct DebugConfig {
     pub rng_seed: Option<u64>,
     pub no_deck_shuffle: bool,
@@ -26,7 +32,26 @@ bitflags! {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+impl Encode for DebugFlags {
+    fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
+        Encode::encode(&self.bits(), encoder)?;
+        Ok(())
+    }
+}
+
+impl Decode for DebugFlags {
+    fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
+        Ok(Self::from_bits_truncate(Decode::decode(decoder)?))
+    }
+}
+
+impl<'de> BorrowDecode<'de> for DebugFlags {
+    fn borrow_decode<D: BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, DecodeError> {
+        Ok(Self::from_bits_truncate(Decode::decode(decoder)?))
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct BotConfig {
     pub player: u8,
 }

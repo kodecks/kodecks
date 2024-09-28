@@ -11,17 +11,18 @@ use crate::{
     shard::ShardList,
     zone::{CardZone, Zone},
 };
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct PlayerConfig {
     pub id: u8,
     pub deck: DeckList,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PlayerList<T> {
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
+pub struct PlayerList<T: 'static> {
     player_in_turn: u8,
     players: Vec<T>,
 }
@@ -244,7 +245,7 @@ impl PlayerState {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Encode, Decode)]
 pub struct PlayerStats {
     pub life: u32,
 }
@@ -255,7 +256,7 @@ impl Default for PlayerStats {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
 pub enum PlayerCondition {
     Win,
@@ -268,7 +269,7 @@ pub struct PlayerCounters {
     pub free_casted: u32,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 pub struct PlayerZone {
     pub player: u8,
     pub zone: Zone,
@@ -280,7 +281,7 @@ impl PlayerZone {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct LocalPlayerState {
     pub id: u8,
     pub deck: usize,

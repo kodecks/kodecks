@@ -1,13 +1,13 @@
 use crate::ability::KeywordAbility;
 use crate::error::Error;
+use bincode::{Decode, Encode};
 use fluent_bundle::{FluentArgs, FluentValue};
 use serde::{de, ser, Deserialize, Serialize};
 use std::borrow::Cow;
 use std::fmt;
 use strum::Display;
-use tinystr::TinyAsciiStr;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode)]
 #[non_exhaustive]
 #[serde(untagged)]
 pub enum Value {
@@ -65,8 +65,8 @@ impl From<i32> for Value {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct VariableList(Vec<(TinyAsciiStr<16>, Value)>);
+#[derive(Debug, Clone, Default, PartialEq, Eq, Encode, Decode)]
+pub struct VariableList(Vec<(String, Value)>);
 
 impl VariableList {
     pub fn new() -> Self {
@@ -79,21 +79,19 @@ impl VariableList {
 
     pub fn set<K, T>(mut self, key: K, value: T) -> Self
     where
-        K: AsRef<[u8]>,
+        K: ToString,
         T: Into<Value>,
     {
-        self.0
-            .push((TinyAsciiStr::from_bytes_lossy(key.as_ref()), value.into()));
+        self.0.push((key.to_string(), value.into()));
         self
     }
 
     pub fn insert<K, T>(&mut self, key: K, value: T)
     where
-        K: AsRef<[u8]>,
+        K: ToString,
         T: Into<Value>,
     {
-        self.0
-            .push((TinyAsciiStr::from_bytes_lossy(key.as_ref()), value.into()));
+        self.0.push((key.to_string(), value.into()));
     }
 
     pub fn get<T>(&self, key: &str) -> Result<T, Error>

@@ -141,21 +141,22 @@ async fn connect(
 
     let response = client.get(url).upgrade().send().await?;
     let mut websocket = response.into_websocket().await?.fuse();
+    let config = bincode::config::standard();
 
     loop {
         select! {
             command = command_recv.next() => {
                 if let Some(command) = command {
                     websocket
-                        .send(reqwest_websocket::Message::Text(serde_json::to_string(&command)?))
+                        .send(reqwest_websocket::Message::Binary(bincode::encode_to_vec(&command, config)?))
                         .await?;
                 } else {
                     break;
                 }
             }
             message = websocket.next() => {
-                if let Some(Ok(reqwest_websocket::Message::Text(text))) = message {
-                    if let Ok(event) = serde_json::from_str(&text) {
+                if let Some(Ok(reqwest_websocket::Message::Binary(data))) = message {
+                    if let Ok((event, _)) = bincode::decode_from_slice(&data, config) {
                         event_send.send(event).await?;
                     }
                 } else {

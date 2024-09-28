@@ -1,3 +1,4 @@
+use bincode::{Decode, Encode};
 use serde_tuple::{Deserialize_tuple, Serialize_tuple};
 
 use crate::{
@@ -57,7 +58,7 @@ impl GameState {
     }
 }
 
-#[derive(Debug, Clone, Serialize_tuple, Deserialize_tuple)]
+#[derive(Debug, Clone, Serialize_tuple, Deserialize_tuple, Encode, Decode)]
 pub struct LocalGameState {
     pub env: LocalEnvironment,
     pub logs: Vec<LogAction>,
@@ -115,5 +116,9 @@ mod tests {
 
         let serialized = serde_json::to_string(&game_state).unwrap();
         serde_json::from_str::<LocalGameState>(&serialized).unwrap();
+
+        let config = bincode::config::standard();
+        let serialized = bincode::encode_to_vec(&game_state, bincode::config::standard()).unwrap();
+        bincode::decode_from_slice::<LocalGameState, _>(&serialized, config).unwrap();
     }
 }

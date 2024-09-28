@@ -1,4 +1,5 @@
 use crate::score::Score;
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Deserializer, Serialize};
 use std::ops::{Add, Sub};
 
@@ -23,8 +24,8 @@ pub trait Ability:
 {
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum AbilityList<T> {
+#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode)]
+pub enum AbilityList<T: 'static> {
     List(Vec<T>),
     Modified { list: Vec<T>, removed: Vec<T> },
 }

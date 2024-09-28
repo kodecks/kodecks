@@ -1,3 +1,9 @@
+use bincode::{
+    de::{BorrowDecoder, Decoder},
+    enc::Encoder,
+    error::{DecodeError, EncodeError},
+    BorrowDecode, Decode, Encode,
+};
 use bitflags::bitflags;
 use core::fmt;
 use serde::{Deserialize, Serialize};
@@ -95,5 +101,24 @@ impl<'de> Deserialize<'de> for Color {
     {
         let s = String::deserialize(deserializer)?;
         Color::from_str(&s).map_err(serde::de::Error::custom)
+    }
+}
+
+impl Encode for Color {
+    fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
+        Encode::encode(&self.bits(), encoder)?;
+        Ok(())
+    }
+}
+
+impl Decode for Color {
+    fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
+        Ok(Self::from_bits_truncate(Decode::decode(decoder)?))
+    }
+}
+
+impl<'de> BorrowDecode<'de> for Color {
+    fn borrow_decode<D: BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, DecodeError> {
+        Ok(Self::from_bits_truncate(Decode::decode(decoder)?))
     }
 }
