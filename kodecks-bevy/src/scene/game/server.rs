@@ -1,10 +1,5 @@
 use crate::scene::GlobalState;
-use bevy::{
-    ecs::world::Command,
-    prelude::*,
-    tasks::{block_on, Task},
-    utils::HashMap,
-};
+use bevy::{ecs::world::Command, prelude::*, utils::HashMap};
 use futures::{
     channel::mpsc::{self, Receiver, Sender},
     select, StreamExt,
@@ -75,7 +70,8 @@ impl Connection for ServerConnection {
 pub struct WebSocketEngine {
     command_send: Sender<Input>,
     event_recv: Receiver<Output>,
-    task: Task<()>,
+    #[cfg(not(target_arch = "wasm32"))]
+    task: bevy::tasks::Task<()>,
 }
 
 impl WebSocketEngine {
@@ -94,9 +90,13 @@ impl WebSocketEngine {
             .await;
         });
 
+        #[cfg(target_arch = "wasm32")]
+        task.detach();
+
         Self {
             command_send,
             event_recv,
+            #[cfg(not(target_arch = "wasm32"))]
             task,
         }
     }
@@ -106,7 +106,8 @@ impl Drop for WebSocketEngine {
     fn drop(&mut self) {
         self.command_send.close_channel();
         self.event_recv.close();
-        block_on(&mut self.task);
+        #[cfg(not(target_arch = "wasm32"))]
+        bevy::tasks::block_on(&mut self.task);
     }
 }
 
