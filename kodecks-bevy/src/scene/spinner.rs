@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{asset::embedded_asset, prelude::*};
 use bevy_mod_picking::prelude::*;
 pub struct SpinnerPlugin;
 
@@ -13,6 +13,7 @@ impl Plugin for SpinnerPlugin {
                     toggle_spinner.run_if(state_changed::<SpinnerState>),
                 ),
             );
+        embedded_asset!(app, "spinner.png");
     }
 }
 
@@ -31,7 +32,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let texture_handle = asset_server.load("ui/spinner.png");
+    let texture_handle = asset_server.load("embedded://kodecks_bevy/scene/spinner.png");
     let texture_atlas = TextureAtlasLayout::from_grid(UVec2::splat(23), 4, 2, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
