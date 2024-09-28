@@ -1,7 +1,6 @@
 use bincode::{Decode, Encode};
 use core::fmt;
 use serde::{Deserialize, Serialize};
-use serde_tuple::{Deserialize_tuple, Serialize_tuple};
 
 const MAX_RESERVED_ID: u64 = 100;
 
@@ -41,9 +40,7 @@ impl ObjectIdCounter {
     }
 }
 
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize_tuple, Deserialize_tuple, Hash, Encode, Decode,
-)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash, Encode, Decode)]
 pub struct TimedObjectId {
     pub id: ObjectId,
     pub timestamp: u64,

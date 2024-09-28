@@ -3585,7 +3585,6 @@ dependencies = [
  "regex-lite",
  "serde",
  "serde_json",
- "serde_tuple",
  "strum",
  "thiserror",
  "tinystr",
@@ -3625,7 +3624,6 @@ dependencies = [
  "serde",
  "serde_default",
  "serde_json",
- "serde_tuple",
  "strum",
  "sys-locale",
  "thiserror",
@@ -5326,27 +5324,6 @@ checksum = "af99884400da37c88f5e9146b7f1fd0fbcae8f6eec4e9da38b67d05486f814a6"
 dependencies = [
  "itoa",
  "serde",
-]
-
-[[package]]
-name = "serde_tuple"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4f025b91216f15a2a32aa39669329a475733590a015835d1783549a56d09427"
-dependencies = [
- "serde",
- "serde_tuple_macros",
-]
-
-[[package]]
-name = "serde_tuple_macros"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4076151d1a2b688e25aaf236997933c66e18b870d0369f8b248b8ab2be630d7e"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
