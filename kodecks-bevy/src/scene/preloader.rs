@@ -26,8 +26,13 @@ fn update(
     mut loading: Local<Handle<Image>>,
     mut index: Local<usize>,
     mut next_state: ResMut<NextState<PreloaderState>>,
+    mut timer: Local<Option<Timer>>,
+    time: Res<Time<Real>>,
 ) {
-    if asset_server.load_state(loading.id()) == LoadState::Loading {
+    let timer = timer.get_or_insert_with(|| Timer::from_seconds(0.1, TimerMode::Repeating));
+    if !timer.tick(time.delta()).just_finished()
+        || asset_server.load_state(loading.id()) == LoadState::Loading
+    {
         return;
     }
     if let Some(archetype) = CATALOG.iter().nth(*index) {
