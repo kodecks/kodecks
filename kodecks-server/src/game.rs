@@ -9,16 +9,13 @@ use kodecks::{
 use kodecks_catalog::CATALOG;
 use kodecks_engine::message::{Input, Output, SessionCommandKind, SessionEvent, SessionEventKind};
 use std::sync::Arc;
-use tokio::{
-    select,
-    sync::mpsc::{Receiver, Sender},
-};
+use tokio::{select, sync::broadcast, sync::mpsc};
 
 #[derive(Debug)]
 pub struct PlayerData {
     pub deck: DeckList,
-    pub command_receiver: Receiver<Input>,
-    pub event_sender: Sender<Output>,
+    pub command_receiver: broadcast::Receiver<Input>,
+    pub event_sender: mpsc::Sender<Output>,
 }
 
 pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
@@ -59,13 +56,13 @@ pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
         if available_actions.is_some() {
             select! {
                 command = left[0].command_receiver.recv() => {
-                    if let Some(Input::SessionCommand(command)) = command {
+                    if let Ok(Input::SessionCommand(command)) = command {
                         let SessionCommandKind::NextAction { action } = command.kind;
                         next_actions[0] = Some(action);
                     }
                 }
                 command = right[0].command_receiver.recv() => {
-                    if let Some(Input::SessionCommand(command)) = command {
+                    if let Ok(Input::SessionCommand(command)) = command {
                         let SessionCommandKind::NextAction { action } = command.kind;
                         next_actions[1] = Some(action);
                     }
