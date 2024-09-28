@@ -15,7 +15,7 @@ use kodecks_engine::{
     message::{self, Input, Output},
     Connection,
 };
-use reqwest_websocket::RequestBuilderExt;
+use reqwest_websocket::{CloseCode, RequestBuilderExt};
 use serde::Deserialize;
 use url::Url;
 
@@ -160,6 +160,10 @@ async fn connect(
         }
     }
 
+    websocket
+        .into_inner()
+        .close(CloseCode::Away, Some("Window closed"))
+        .await?;
     info!("Connection closed");
     Ok(())
 }
