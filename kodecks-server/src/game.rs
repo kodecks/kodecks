@@ -1,5 +1,5 @@
 use kodecks::{
-    action::PlayerAvailableActions,
+    action::{Action, PlayerAvailableActions},
     deck::DeckList,
     env::{Environment, LocalGameState},
     player::PlayerConfig,
@@ -8,8 +8,11 @@ use kodecks::{
 };
 use kodecks_catalog::CATALOG;
 use kodecks_engine::message::{Input, Output, SessionCommandKind, SessionEvent, SessionEventKind};
-use std::sync::Arc;
+use std::{collections::VecDeque, sync::Arc, time::Duration};
 use tokio::{select, sync::broadcast, sync::mpsc};
+use tracing::warn;
+
+const CHANNEL_TIMEOUT: Duration = Duration::from_secs(1);
 
 #[derive(Debug)]
 pub struct PlayerData {
@@ -34,21 +37,28 @@ pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
     };
 
     let mut env = Arc::new(Environment::new(profile, &CATALOG));
-    for player in env.state.players.iter() {
-        players[player.id as usize]
-            .event_sender
-            .send(Output::SessionEvent(SessionEvent {
-                session: 0,
-                player: player.id,
-                event: SessionEventKind::Created,
-            }))
-            .await
-            .unwrap();
-    }
 
-    let mut next_actions = vec![None; 2];
+    let mut next_actions = vec![VecDeque::new(); 2];
     let mut available_actions: Option<PlayerAvailableActions> = None;
     let mut player_in_action = env.state.players.player_in_turn().id;
+
+    for player in env.state.players.iter() {
+        let result = players[player.id as usize]
+            .event_sender
+            .send_timeout(
+                Output::SessionEvent(SessionEvent {
+                    session: 0,
+                    player: player.id,
+                    event: SessionEventKind::Created,
+                }),
+                CHANNEL_TIMEOUT,
+            )
+            .await;
+        if let Err(err) = result {
+            warn!("failed to send event: {}", err);
+            next_actions[player.id as usize].push_back(Action::Concede);
+        }
+    }
 
     while !env.game_condition().is_ended() {
         let (left, right) = players.split_at_mut(1);
@@ -56,15 +66,29 @@ pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
         if available_actions.is_some() {
             select! {
                 command = left[0].command_receiver.recv() => {
-                    if let Ok(Input::SessionCommand(command)) = command {
-                        let SessionCommandKind::NextAction { action } = command.kind;
-                        next_actions[0] = Some(action);
+                    match command {
+                        Ok(Input::SessionCommand(command)) => {
+                            let SessionCommandKind::NextAction { action } = command.kind;
+                            next_actions[0].push_back(action);
+                        }
+                        Err(err) => {
+                            warn!("failed to receive command: {}", err);
+                            next_actions[0].push_back(Action::Concede);
+                        }
+                        _ => {}
                     }
                 }
                 command = right[0].command_receiver.recv() => {
-                    if let Ok(Input::SessionCommand(command)) = command {
-                        let SessionCommandKind::NextAction { action } = command.kind;
-                        next_actions[1] = Some(action);
+                    match command {
+                        Ok(Input::SessionCommand(command)) => {
+                            let SessionCommandKind::NextAction { action } = command.kind;
+                            next_actions[1].push_back(action);
+                        }
+                        Err(err) => {
+                            warn!("failed to receive command: {}", err);
+                            next_actions[1].push_back(Action::Concede);
+                        }
+                        _ => {}
                     }
                 }
             }
@@ -72,7 +96,7 @@ pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
 
         while !env.game_condition().is_ended() {
             let next_action = if let Some(available_actions) = &available_actions {
-                if let Some(action) = next_actions[available_actions.player as usize].take() {
+                if let Some(action) = next_actions[available_actions.player as usize].pop_front() {
                     Some(action)
                 } else {
                     break;
@@ -102,11 +126,14 @@ pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
                     player: player.id,
                     event: SessionEventKind::GameUpdated { state },
                 };
-                players[player.id as usize]
+                let result = players[player.id as usize]
                     .event_sender
-                    .send(Output::SessionEvent(event))
-                    .await
-                    .unwrap();
+                    .send_timeout(Output::SessionEvent(event), CHANNEL_TIMEOUT)
+                    .await;
+                if let Err(err) = result {
+                    warn!("failed to send event: {}", err);
+                    next_actions[player.id as usize].push_back(Action::Concede);
+                }
             }
         }
     }
