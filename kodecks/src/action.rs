@@ -5,7 +5,6 @@ use crate::{
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use serde_tuple::{Deserialize_tuple, Serialize_tuple};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(tag = "name", rename_all = "snake_case")]
@@ -45,7 +44,7 @@ impl Ord for AvailableAction {
     }
 }
 
-#[derive(Debug, Clone, Serialize_tuple, Deserialize_tuple, Encode, Decode)]
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct PlayerAvailableActions {
     pub player: u8,
     pub actions: AvailableActionList,

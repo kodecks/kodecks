@@ -1,5 +1,5 @@
 use bincode::{Decode, Encode};
-use serde_tuple::{Deserialize_tuple, Serialize_tuple};
+use serde::{Deserialize, Serialize};
 
 use crate::{
     action::PlayerAvailableActions,
@@ -58,7 +58,7 @@ impl GameState {
     }
 }
 
-#[derive(Debug, Clone, Serialize_tuple, Deserialize_tuple, Encode, Decode)]
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct LocalGameState {
     pub env: LocalEnvironment,
     pub logs: Vec<LogAction>,
