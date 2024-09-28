@@ -54,23 +54,27 @@ async fn handle_socket(state: Arc<AppState>, mut socket: WebSocket, who: SocketA
                     break;
                 }
             }
-            Some(Ok(Message::Text(msg))) = socket.recv() => {
-                let command = match serde_json::from_str(&msg) {
-                    Ok(msg) => msg,
-                    Err(err) => {
-                        warn!("failed to parse message: {}", err);
+            msg = socket.recv() => {
+                if let Some(Ok(Message::Text(msg))) = msg {
+                    let command = match serde_json::from_str(&msg) {
+                        Ok(msg) => msg,
+                        Err(err) => {
+                            warn!("failed to parse message: {}", err);
+                            break;
+                        }
+                    };
+                    if let Input::Command(Command::StartRandomMatch { deck }) = &command {
+                        let player = PlayerData {
+                            deck: deck.clone(),
+                            command_receiver: command_receiver.resubscribe(),
+                            event_sender: event_sender.clone(),
+                        };
+                        state.add_to_random_match_pool(player);
+                    } else if let Err(err) = command_sender.send(command) {
+                        warn!("failed to send command: {}", err);
                         break;
                     }
-                };
-                if let Input::Command(Command::StartRandomMatch { deck }) = &command {
-                    let player = PlayerData {
-                        deck: deck.clone(),
-                        command_receiver: command_receiver.resubscribe(),
-                        event_sender: event_sender.clone(),
-                    };
-                    state.add_to_random_match_pool(player);
-                } else if let Err(err) = command_sender.send(command) {
-                    warn!("failed to send command: {}", err);
+                } else {
                     break;
                 }
             }

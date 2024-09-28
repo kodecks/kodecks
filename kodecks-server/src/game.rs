@@ -56,7 +56,7 @@ pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
             .await;
         if let Err(err) = result {
             warn!("failed to send event: {}", err);
-            next_actions[player.id as usize].push_back(Action::Concede);
+            next_actions[player.id as usize].push_front(Action::Concede);
         }
     }
 
@@ -73,7 +73,7 @@ pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
                         }
                         Err(err) => {
                             warn!("failed to receive command: {}", err);
-                            next_actions[0].push_back(Action::Concede);
+                            next_actions[0].push_front(Action::Concede);
                         }
                         _ => {}
                     }
@@ -86,7 +86,7 @@ pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
                         }
                         Err(err) => {
                             warn!("failed to receive command: {}", err);
-                            next_actions[1].push_back(Action::Concede);
+                            next_actions[1].push_front(Action::Concede);
                         }
                         _ => {}
                     }
@@ -95,17 +95,22 @@ pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
         }
 
         while !env.game_condition().is_ended() {
-            let next_action = if let Some(available_actions) = &available_actions {
+            let (player, next_action) = if matches!(next_actions[0].front(), Some(Action::Concede))
+            {
+                (0, Some(Action::Concede))
+            } else if matches!(next_actions[1].front(), Some(Action::Concede)) {
+                (1, Some(Action::Concede))
+            } else if let Some(available_actions) = &available_actions {
                 if let Some(action) = next_actions[available_actions.player as usize].pop_front() {
-                    Some(action)
+                    (player_in_action, Some(action))
                 } else {
                     break;
                 }
             } else {
-                None
+                (player_in_action, None)
             };
 
-            let report = Arc::make_mut(&mut env).process(player_in_action, next_action);
+            let report = Arc::make_mut(&mut env).process(player, next_action);
             available_actions.clone_from(&report.available_actions);
 
             if let Some(available_actions) = &report.available_actions {

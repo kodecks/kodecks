@@ -134,6 +134,7 @@ impl Environment {
 
     pub fn process(&mut self, player: u8, action: Option<Action>) -> Report {
         let report = match (&self.last_available_actions, action.clone()) {
+            (_, Some(Action::Concede)) => self.process_turn(player, Some(Action::Concede)),
             (None, _) => self.process_turn(player, None),
             (Some(available), Some(action)) if available.validate(player, &action) => {
                 self.process_turn(player, Some(action))
@@ -155,9 +156,10 @@ impl Environment {
     fn process_turn(&mut self, player: u8, mut action: Option<Action>) -> Report {
         let action = match action.take() {
             Some(Action::Concede) => {
+                let winner = self.state.players.next_id(player);
                 let loser = self.state.players.get_mut(player);
                 loser.stats.life = 0;
-                self.game_condition = GameCondition::Win(loser.id);
+                self.game_condition = GameCondition::Win(winner);
                 None
             }
             Some(Action::DebugCommand { commands })
