@@ -16,6 +16,7 @@ pub enum UserAction {
     AllAttack,
     Block,
     Continue,
+    Concede,
 }
 
 fn init(mut commands: Commands) {
@@ -25,5 +26,9 @@ fn init(mut commands: Commands) {
         (UserAction::Continue, KeyCode::Space),
     ]);
     input_map.insert_chord(UserAction::AllAttack, [KeyCode::ShiftLeft, KeyCode::KeyA]);
+    input_map.insert_chord(
+        UserAction::Concede,
+        [KeyCode::ShiftLeft, KeyCode::ControlLeft, KeyCode::KeyO],
+    );
     commands.spawn(InputManagerBundle::with_map(input_map));
 }

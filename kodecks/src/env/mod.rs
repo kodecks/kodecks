@@ -159,7 +159,7 @@ impl Environment {
             Some(Action::Concede) => {
                 let loser = self.state.players.get_mut(player);
                 loser.endgame = Some(PlayerEndgameState::Lose(EndgameReason::Concede));
-                None
+                Some(Action::Concede)
             }
             Some(Action::DebugCommand { commands })
                 if self.state.debug.flags.contains(DebugFlags::DEBUG_COMMAND) =>
@@ -178,15 +178,6 @@ impl Environment {
             }
             other => other,
         };
-
-        if self.endgame.is_ended() {
-            return Report {
-                available_actions: None,
-                logs: vec![],
-                endgame: self.endgame,
-                timestamp: self.timestamp,
-            };
-        }
 
         if let Some(item) = self.stack.pop() {
             let card = self.state.find_card(item.source).unwrap();

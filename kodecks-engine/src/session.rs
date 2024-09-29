@@ -76,8 +76,14 @@ impl Session {
 
     fn progress(&mut self) {
         while !self.env.game_condition().is_ended() {
-            let mut next_action = None;
-            if let Some(available_actions) = &self.available_actions {
+            let conceded = self
+                .next_actions
+                .iter()
+                .find(|(_, action)| matches!(action, Action::Concede))
+                .map(|(player, _)| player);
+            let (player, next_action) = if let Some(player) = conceded {
+                (*player, Some(Action::Concede))
+            } else if let Some(available_actions) = &self.available_actions {
                 let is_bot = self
                     .bots
                     .iter()
@@ -85,16 +91,20 @@ impl Session {
                 if is_bot {
                     self.send_player_thinking(self.player_in_action);
                     let env = self.env.clone();
-                    next_action = self.default_bot.compute_best_action(env, available_actions);
+                    (
+                        self.player_in_action,
+                        self.default_bot.compute_best_action(env, available_actions),
+                    )
                 } else if let Some(action) = self.next_actions.remove(&self.player_in_action) {
-                    next_action = Some(action);
+                    (self.player_in_action, Some(action))
                 } else {
                     self.send_player_thinking(self.player_in_action);
                     return;
                 }
-            }
+            } else {
+                (self.player_in_action, None)
+            };
 
-            let player = self.player_in_action;
             let report = Arc::make_mut(&mut self.env).process(player, next_action);
             self.available_actions.clone_from(&report.available_actions);
 

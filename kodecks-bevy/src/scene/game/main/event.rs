@@ -116,6 +116,9 @@ fn handle_player_events(
             pairs: board.blocking_pairs().copied().collect(),
         });
     }
+    if action_state.just_pressed(&UserAction::Concede) {
+        action = Some(Action::Concede);
+    }
 
     if let Some(action) = action {
         commands.add(SendCommand(action.clone()));
