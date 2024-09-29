@@ -27,7 +27,7 @@ fn main() {
                 prevent_default_event_handling: true,
                 resize_constraints: WindowResizeConstraints {
                     min_width: 1100.0,
-                    min_height: 700.0,
+                    min_height: 600.0,
                     ..default()
                 },
                 ..default()
