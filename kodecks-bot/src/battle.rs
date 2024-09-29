@@ -161,7 +161,7 @@ fn evaluate_battle(env: &Environment, player: u8, action: Option<Action>) -> i32
     let mut env = env.clone();
     while !(matches!(env.state.phase, Phase::End) && env.state.turn > initial_turn) {
         let report = env.process(current_player, next_action.take());
-        if report.condition.is_ended() {
+        if report.endgame.is_ended() {
             break;
         }
         if let Some(available_actions) = &report.available_actions {

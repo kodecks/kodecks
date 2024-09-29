@@ -1,4 +1,4 @@
-use super::{Environment, GameCondition};
+use super::{EndgameState, Environment};
 use crate::{
     action::{Action, AvailableActionList, PlayerAvailableActions},
     card::CardSnapshot,
@@ -22,7 +22,7 @@ pub struct LocalEnvironment {
     pub players: PlayerList<LocalPlayerState>,
     pub phase: Phase,
     pub stack: Stack<LocalStackItem>,
-    pub game_condition: GameCondition,
+    pub endgame: EndgameState,
 }
 
 impl LocalEnvironment {
@@ -78,7 +78,7 @@ impl LocalEnvironment {
                 message_dialog: None,
             }),
             logs: vec![],
-            condition: self.game_condition,
+            endgame: self.endgame,
             timestamp: self.timestamp,
         }
     }
@@ -100,7 +100,7 @@ impl Environment {
             players,
             phase: self.state.phase.clone(),
             stack,
-            game_condition: self.game_condition,
+            endgame: self.endgame,
             timestamp: self.timestamp,
         }
     }

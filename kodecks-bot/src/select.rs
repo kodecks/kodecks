@@ -48,7 +48,7 @@ fn evaluate_select(mut ctx: BotContext, action: Option<Action>) -> ComputedScore
     let initial_turn = env.state.turn;
     while !(matches!(env.state.phase, Phase::End) && env.state.turn > initial_turn) {
         let report = env.process(player, next_action.take());
-        if report.condition.is_ended() {
+        if report.endgame.is_ended() {
             break;
         }
         if let Some(available_actions) = &report.available_actions {
