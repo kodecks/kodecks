@@ -1,4 +1,4 @@
-use super::{Environment, GameState};
+use super::{EndgameReason, Environment, GameState};
 use crate::{
     ability::PlayerAbility,
     card::Card,
@@ -8,7 +8,7 @@ use crate::{
     field::FieldState,
     log::LogAction,
     opcode::Opcode,
-    player::{PlayerCondition, PlayerZone},
+    player::{PlayerEndgameState, PlayerZone},
     prelude::{ComputedAttribute, ContinuousEffect, ContinuousItem},
     sequence::CardSequence,
     zone::{CardZone, MoveReason, Zone},
@@ -132,7 +132,9 @@ impl Environment {
                         reason: MoveReason::Draw,
                     }]);
                 } else {
-                    player.condition.get_or_insert(PlayerCondition::Lose);
+                    player
+                        .endgame
+                        .get_or_insert(PlayerEndgameState::Lose(EndgameReason::DeckEmpty));
                 }
                 Ok(vec![])
             }

@@ -1,5 +1,5 @@
 use kodecks::{
-    env::{Environment, GameCondition},
+    env::{Environment, EndgameState},
     score::Score,
 };
 
@@ -70,14 +70,17 @@ pub fn get_score(env: &Environment, side: u8) -> i32 {
     }
 
     score += match env.game_condition() {
-        GameCondition::Win(player) => {
+        EndgameState::Finished {
+            winner: Some(player),
+            ..
+        } => {
             if player == side {
                 1000
             } else {
                 -1000
             }
         }
-        GameCondition::Draw => -500,
+        EndgameState::Finished { winner: None, .. } => -500,
         _ => 0,
     };
 

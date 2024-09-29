@@ -2,7 +2,7 @@ use crate::{
     ability::{AbilityList, PlayerAbility},
     card::{Card, CardSnapshot},
     deck::DeckList,
-    env::GameState,
+    env::{EndgameReason, GameState},
     field::{FieldItem, FieldState},
     hand::HandItem,
     id::ObjectId,
@@ -163,7 +163,7 @@ pub struct PlayerState {
     pub shards: ShardList,
     pub stats: PlayerStats,
     pub counters: PlayerCounters,
-    pub condition: Option<PlayerCondition>,
+    pub endgame: Option<PlayerEndgameState>,
     pub abilities: AbilityList<PlayerAbility>,
 }
 
@@ -184,7 +184,7 @@ impl PlayerState {
             shards: ShardList::new(),
             stats: PlayerStats::default(),
             counters: PlayerCounters::default(),
-            condition: None,
+            endgame: None,
             abilities: AbilityList::default(),
         }
     }
@@ -258,9 +258,9 @@ impl Default for PlayerStats {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
-pub enum PlayerCondition {
-    Win,
-    Lose,
+pub enum PlayerEndgameState {
+    Win(EndgameReason),
+    Lose(EndgameReason),
 }
 
 #[derive(Debug, Default, Clone, Copy)]

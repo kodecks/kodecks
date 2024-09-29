@@ -2,7 +2,7 @@ use super::{super::GlobalState, board::Environment};
 use crate::scene::translator::{TextPurpose, Translator};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
-use kodecks::env::GameCondition;
+use kodecks::env::EndgameState;
 
 pub struct GameResultPlugin;
 
@@ -37,8 +37,11 @@ fn init(
 ) {
     next_state.set(State::Await);
 
-    let message = match env.game_condition {
-        GameCondition::Win(player) => {
+    let message = match env.endgame {
+        EndgameState::Finished {
+            winner: Some(player),
+            ..
+        } => {
             if env.player == player {
                 translator.get("result-victory")
             } else {

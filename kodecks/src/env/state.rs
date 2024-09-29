@@ -70,7 +70,7 @@ mod tests {
     use super::*;
     use crate::{
         color::Color,
-        env::GameCondition,
+        env::EndgameState,
         id::ObjectIdCounter,
         phase::Phase,
         player::{LocalPlayerState, PlayerList},
@@ -108,7 +108,7 @@ mod tests {
                 }]
                 .into_iter()
                 .collect(),
-                game_condition: GameCondition::Progress,
+                endgame: EndgameState::InProgress,
             },
             logs: vec![LogAction::LifeChanged { player, life: 100 }],
             available_actions: Some(PlayerAvailableActions::new(player)),

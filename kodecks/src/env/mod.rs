@@ -10,7 +10,7 @@ use crate::{
     log::LogAction,
     opcode::OpcodeList,
     phase::Phase,
-    player::{PlayerCondition, PlayerList, PlayerState, PlayerZone},
+    player::{PlayerEndgameState, PlayerList, PlayerState, PlayerZone},
     profile::DebugFlags,
     profile::GameProfile,
     sequence::CardSequence,
@@ -41,7 +41,7 @@ pub struct Environment {
     opcodes: VecDeque<OpcodeList>,
     stack: Stack<StackItem>,
     continuous: ContinuousEffectList,
-    game_condition: GameCondition,
+    endgame: EndgameState,
     timestamp: u64,
     last_available_actions: Option<PlayerAvailableActions>,
     rng: SmallRng,
@@ -92,7 +92,7 @@ impl Environment {
             opcodes: VecDeque::new(),
             stack: Stack::new(),
             continuous: Default::default(),
-            game_condition: GameCondition::Progress,
+            endgame: EndgameState::InProgress,
             timestamp: 0,
             last_available_actions: None,
             rng,
@@ -145,7 +145,7 @@ impl Environment {
                 Report {
                     available_actions: self.last_available_actions.clone(),
                     logs: vec![],
-                    condition: self.game_condition,
+                    endgame: self.endgame,
                     timestamp: self.timestamp,
                 }
             }
@@ -157,10 +157,8 @@ impl Environment {
     fn process_turn(&mut self, player: u8, mut action: Option<Action>) -> Report {
         let action = match action.take() {
             Some(Action::Concede) => {
-                let winner = self.state.players.next_id(player);
                 let loser = self.state.players.get_mut(player);
-                loser.stats.life = 0;
-                self.game_condition = GameCondition::Win(winner);
+                loser.endgame = Some(PlayerEndgameState::Lose(EndgameReason::Concede));
                 None
             }
             Some(Action::DebugCommand { commands })
@@ -181,11 +179,11 @@ impl Environment {
             other => other,
         };
 
-        if self.game_condition.is_ended() {
+        if self.endgame.is_ended() {
             return Report {
                 available_actions: None,
                 logs: vec![],
-                condition: self.game_condition,
+                endgame: self.endgame,
                 timestamp: self.timestamp,
             };
         }
@@ -250,7 +248,7 @@ impl Environment {
                     return Report {
                         available_actions: report.available_actions,
                         logs,
-                        condition: self.game_condition,
+                        endgame: self.endgame,
                         timestamp: self.timestamp,
                     };
                 }
@@ -303,7 +301,7 @@ impl Environment {
         Report {
             available_actions,
             logs,
-            condition: self.game_condition,
+            endgame: self.endgame,
             timestamp: self.timestamp,
         }
     }
@@ -312,12 +310,12 @@ impl Environment {
         self.last_available_actions.as_ref()
     }
 
-    pub fn game_condition(&self) -> GameCondition {
-        self.game_condition
+    pub fn game_condition(&self) -> EndgameState {
+        self.endgame
     }
 
     pub fn check_game_condition(&mut self) {
-        if self.game_condition.is_ended() {
+        if self.endgame.is_ended() {
             return;
         }
 
@@ -325,10 +323,10 @@ impl Environment {
             .state
             .players
             .iter_mut()
-            .filter(|player| player.condition.is_none())
+            .filter(|player| player.endgame.is_none())
         {
             if player.stats.life == 0 {
-                player.condition = Some(PlayerCondition::Lose);
+                player.endgame = Some(PlayerEndgameState::Lose(EndgameReason::LifeZero));
             }
         }
 
@@ -336,24 +334,39 @@ impl Environment {
             .state
             .players
             .iter()
-            .filter(|player| player.condition == Some(PlayerCondition::Win))
+            .filter_map(|player| match player.endgame {
+                Some(PlayerEndgameState::Win(reason)) => Some((player, reason)),
+                _ => None,
+            })
             .collect::<Vec<_>>();
 
         let lost_players = self
             .state
             .players
             .iter()
-            .filter(|player| player.condition == Some(PlayerCondition::Lose))
+            .filter_map(|player| match player.endgame {
+                Some(PlayerEndgameState::Lose(reason)) => Some((player, reason)),
+                _ => None,
+            })
             .collect::<Vec<_>>();
 
-        self.game_condition = if won_players.is_empty() && lost_players.is_empty() {
-            GameCondition::Progress
-        } else if let [won] = won_players.as_slice() {
-            GameCondition::Win(won.id)
-        } else if let [lost] = lost_players.as_slice() {
-            GameCondition::Win(self.state.players.next_id(lost.id))
+        self.endgame = if won_players.is_empty() && lost_players.is_empty() {
+            EndgameState::InProgress
+        } else if let [(won, reason)] = won_players.as_slice() {
+            EndgameState::Finished {
+                winner: Some(won.id),
+                reason: *reason,
+            }
+        } else if let [(lost, reason)] = lost_players.as_slice() {
+            EndgameState::Finished {
+                winner: Some(self.state.players.next_id(lost.id)),
+                reason: *reason,
+            }
         } else {
-            GameCondition::Draw
+            EndgameState::Finished {
+                winner: None,
+                reason: EndgameReason::SimultaneousEnd,
+            }
         };
     }
 
@@ -367,32 +380,47 @@ impl Environment {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
-pub enum GameCondition {
-    Progress,
-    Win(u8),
-    Draw,
+pub enum EndgameState {
+    InProgress,
+    Finished {
+        winner: Option<u8>,
+        reason: EndgameReason,
+    },
 }
 
-impl GameCondition {
+impl EndgameState {
     pub fn is_ended(&self) -> bool {
-        !matches!(self, GameCondition::Progress)
+        !matches!(self, EndgameState::InProgress)
     }
 }
 
-impl fmt::Display for GameCondition {
+impl fmt::Display for EndgameState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            GameCondition::Progress => write!(f, "Progress"),
-            GameCondition::Win(player) => write!(f, "{} wins", player),
-            GameCondition::Draw => write!(f, "Draw"),
+            EndgameState::InProgress => write!(f, "In Progress"),
+            EndgameState::Finished { winner, .. } => {
+                if let Some(winner) = winner {
+                    write!(f, "Winner: {}", winner)
+                } else {
+                    write!(f, "Draw")
+                }
+            }
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+pub enum EndgameReason {
+    Concede,
+    LifeZero,
+    DeckEmpty,
+    SimultaneousEnd,
 }
 
 #[derive(Debug, Clone)]
 pub struct Report {
     pub available_actions: Option<PlayerAvailableActions>,
     pub logs: Vec<LogAction>,
-    pub condition: GameCondition,
+    pub endgame: EndgameState,
     pub timestamp: u64,
 }

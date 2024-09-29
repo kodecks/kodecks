@@ -144,7 +144,7 @@ fn handle_player_events(
 }
 
 fn check_game_condition(mut next_state: ResMut<NextState<GlobalState>>, env: Res<Environment>) {
-    if env.game_condition.is_ended() {
+    if env.endgame.is_ended() {
         next_state.set(GlobalState::GameResult);
     }
 }
