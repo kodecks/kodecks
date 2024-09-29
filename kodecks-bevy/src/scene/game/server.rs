@@ -1,8 +1,13 @@
+use std::pin::pin;
+
 use crate::scene::GlobalState;
 use bevy::{ecs::world::Command, prelude::*, utils::HashMap};
 use futures::{
-    channel::mpsc::{self, Receiver, Sender},
-    select, StreamExt,
+    channel::{
+        mpsc::{self, Receiver, Sender},
+        oneshot,
+    },
+    select, FutureExt, StreamExt,
 };
 use futures_util::SinkExt;
 use kodecks::{action::Action, env::LocalGameState};
@@ -10,7 +15,7 @@ use kodecks_engine::{
     message::{self, Input, Output},
     Connection,
 };
-use reqwest_websocket::{CloseCode, RequestBuilderExt};
+use reqwest_websocket::{CloseCode, RequestBuilderExt, WebSocket};
 use serde::Deserialize;
 use url::Url;
 
@@ -70,6 +75,7 @@ impl Connection for ServerConnection {
 pub struct WebSocketEngine {
     command_send: Sender<Input>,
     event_recv: Receiver<Output>,
+    close_send: Option<oneshot::Sender<()>>,
     #[cfg(not(target_arch = "wasm32"))]
     task: bevy::tasks::Task<()>,
 }
@@ -78,16 +84,17 @@ impl WebSocketEngine {
     pub fn new(server: Url) -> Self {
         let (event_send, event_recv) = mpsc::channel(256);
         let (command_send, command_recv) = mpsc::channel(256);
+        let (close_send, close_recv) = oneshot::channel();
 
         let task = bevy::tasks::IoTaskPool::get().spawn(async move {
             #[cfg(target_arch = "wasm32")]
-            if let Err(err) = connect(server, command_recv, event_send).await {
+            if let Err(err) = connect(server, command_recv, event_send, close_recv).await {
                 error!("Websocket error: {}", err);
             }
 
             #[cfg(not(target_arch = "wasm32"))]
             async_compat::Compat::new(async {
-                if let Err(err) = connect(server, command_recv, event_send).await {
+                if let Err(err) = connect(server, command_recv, event_send, close_recv).await {
                     error!("Websocket error: {}", err);
                 }
             })
@@ -100,6 +107,7 @@ impl WebSocketEngine {
         Self {
             command_send,
             event_recv,
+            close_send: Some(close_send),
             #[cfg(not(target_arch = "wasm32"))]
             task,
         }
@@ -110,6 +118,7 @@ impl Drop for WebSocketEngine {
     fn drop(&mut self) {
         self.command_send.close_channel();
         self.event_recv.close();
+        let _ = self.close_send.take().unwrap().send(());
         #[cfg(not(target_arch = "wasm32"))]
         bevy::tasks::block_on(&mut self.task);
     }
@@ -124,23 +133,20 @@ async fn connect(
     server: Url,
     mut command_recv: Receiver<Input>,
     mut event_send: Sender<Output>,
+    mut close_recv: oneshot::Receiver<()>,
 ) -> anyhow::Result<()> {
-    let url = server.join("login")?;
+    let socket = connect_websocket(server).fuse();
+    let mut socket = pin!(socket);
+    let websocket = select! {
+        socket = socket => {
+            socket?
+        },
+        _ = close_recv => {
+            return Ok(());
+        }
+    };
 
-    let client = reqwest::Client::new();
-    let res: LoginResponse = client
-        .post(url.clone())
-        .json(&HashMap::<String, u32>::new())
-        .send()
-        .await?
-        .json()
-        .await?;
-
-    let mut url = url.join("/ws")?;
-    url.query_pairs_mut().append_pair("token", &res.token);
-
-    let response = client.get(url).upgrade().send().await?;
-    let mut websocket = response.into_websocket().await?.fuse();
+    let mut websocket = websocket.fuse();
     let config = bincode::config::standard();
 
     loop {
@@ -163,6 +169,9 @@ async fn connect(
                     break;
                 }
             }
+            _ = close_recv => {
+                break;
+            }
         }
     }
 
@@ -172,6 +181,25 @@ async fn connect(
         .await?;
     info!("Connection closed");
     Ok(())
+}
+
+async fn connect_websocket(server: Url) -> anyhow::Result<WebSocket> {
+    let url = server.join("login")?;
+
+    let client = reqwest::Client::new();
+    let res: LoginResponse = client
+        .post(url.clone())
+        .json(&HashMap::<String, u32>::new())
+        .send()
+        .await?
+        .json()
+        .await?;
+
+    let mut url = url.join("/ws")?;
+    url.query_pairs_mut().append_pair("token", &res.token);
+
+    let response = client.get(url).upgrade().send().await?;
+    Ok(response.into_websocket().await?)
 }
 
 #[derive(Resource)]
