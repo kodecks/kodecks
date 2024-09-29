@@ -272,10 +272,7 @@ fn handle_menu_events(
     .unwrap();
 
     let mode = GameMode {
-        regulation: Regulation {
-            initial_life: 100,
-            ..Default::default()
-        },
+        regulation: Regulation::STANDARD,
         player_deck: deck_list_green,
         kind,
     };
