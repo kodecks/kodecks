@@ -11,7 +11,7 @@ use crate::{
     },
     scene::lang::find_language,
 };
-use bevy::prelude::*;
+use bevy::{asset::LoadState, prelude::*};
 use std::str::FromStr;
 use unic_langid::LanguageIdentifier;
 
@@ -43,9 +43,10 @@ fn cleanup(mut next_spinner_state: ResMut<NextState<SpinnerState>>) {
 fn update(
     mut commands: Commands,
     config: Res<GlobalConfig>,
-    mut fluent: Local<Option<Handle<FluentAsset>>>,
+    mut preloading_assets: Local<Option<Vec<UntypedHandle>>>,
     asset_server: Res<AssetServer>,
-    assets: ResMut<Assets<FluentAsset>>,
+    mut fluent: Local<Option<Handle<FluentAsset>>>,
+    fluent_assets: Res<Assets<FluentAsset>>,
     mut next_state: ResMut<NextState<GlobalState>>,
 ) {
     let fluent = fluent.get_or_insert_with(|| {
@@ -63,8 +64,20 @@ fn update(
         asset_server.load::<FluentAsset>(path)
     });
 
-    if let Some(res) = assets.get(fluent) {
-        commands.insert_resource(Translator::new(res));
-        next_state.set(GlobalState::MenuMain);
+    let preloading_assets = preloading_assets.get_or_insert_with(|| {
+        vec![
+            asset_server.load::<Image>("ui/button.png").untyped(),
+            asset_server.load::<Image>("ui/button-red.png").untyped(),
+        ]
+    });
+
+    preloading_assets
+        .retain(|handle| asset_server.get_load_state(handle) == Some(LoadState::Loading));
+
+    if preloading_assets.is_empty() {
+        if let Some(res) = fluent_assets.get(fluent) {
+            commands.insert_resource(Translator::new(res));
+            next_state.set(GlobalState::MenuMain);
+        }
     }
 }
