@@ -2,7 +2,8 @@ use super::{super::GlobalState, board::Environment};
 use crate::scene::translator::{TextPurpose, Translator};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
-use kodecks::env::EndgameState;
+use fluent_content::Request;
+use kodecks::env::{EndgameReason, EndgameState};
 
 pub struct GameResultPlugin;
 
@@ -37,18 +38,26 @@ fn init(
 ) {
     next_state.set(State::Await);
 
-    let message = match env.endgame {
-        EndgameState::Finished {
-            winner: Some(player),
-            ..
-        } => {
-            if env.player == player {
-                translator.get("result-victory")
+    let (message, reason) = match env.endgame {
+        EndgameState::Finished { winner, reason } => {
+            let attr = match reason {
+                EndgameReason::Concede => "reason-concede",
+                EndgameReason::DeckEmpty => "reason-deck-empty",
+                EndgameReason::LifeZero => "reason-life-zero",
+                EndgameReason::SimultaneousEnd => "reason-simultaneous-end",
+            };
+            let request = if let Some(winner) = winner {
+                if env.player == winner {
+                    Request::new("result-victory")
+                } else {
+                    Request::new("result-defeat")
+                }
             } else {
-                translator.get("result-defeat")
-            }
+                Request::new("result-draw")
+            };
+            (translator.get(request), translator.get(request.attr(attr)))
         }
-        _ => translator.get("result-draw"),
+        _ => ("".into(), "".into()),
     };
 
     commands
@@ -87,6 +96,20 @@ fn init(
                         sections: vec![TextSection {
                             value: message.to_string(),
                             style: translator.style(TextPurpose::Result),
+                        }],
+                        ..Default::default()
+                    },
+                    z_index: ZIndex::Global(1),
+                    ..default()
+                },
+                Label,
+            ));
+            parent.spawn((
+                TextBundle {
+                    text: Text {
+                        sections: vec![TextSection {
+                            value: reason.to_string(),
+                            style: translator.style(TextPurpose::CardName),
                         }],
                         ..Default::default()
                     },

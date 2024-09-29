@@ -12,8 +12,15 @@ your-turn = Your Turn
 opponents-turn = Opponent's Turn
 
 result-victory = Victory!
+    .reason-concede = Your opponent has conceded.
+    .reason-deck-empty = Your opponent's deck is empty.
+    .reason-life-zero = Your opponent's life is zero.
 result-defeat = Defeat...
+    .reason-concede = You have conceded.
+    .reason-deck-empty = Your deck is empty.
+    .reason-life-zero = Your life is zero.
 result-draw = Draw
+    .reason-simultaneous-end = Both players fulfill the winning or losing condition at the same time.
 
 message-discard-excess-cards = Discard cards until you have { $maxHandSize } cards in your hand.
 

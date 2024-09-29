@@ -273,7 +273,7 @@ fn handle_menu_events(
 
     let mode = GameMode {
         regulation: Regulation {
-            initial_life: 1000,
+            initial_life: 100,
             ..Default::default()
         },
         player_deck: deck_list_green,
