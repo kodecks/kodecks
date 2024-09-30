@@ -1632,6 +1632,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "bpaf"
+version = "0.9.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d4e5ca9929037866947af4b8b7418124f2ec7c411a8b9ee24e46ad2b8470497"
+dependencies = [
+ "bpaf_derive",
+]
+
+[[package]]
+name = "bpaf_derive"
+version = "0.5.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf95d9c7e6aba67f8fc07761091e93254677f4db9e27197adecebc7039a58722"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.60",
+]
+
+[[package]]
 name = "brotli"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3609,6 +3629,7 @@ dependencies = [
  "bevy_embedded_assets",
  "bevy_mod_picking",
  "bincode 2.0.0-rc.3",
+ "bpaf",
  "build-info",
  "build-info-build",
  "dashmap",

@@ -1,3 +1,4 @@
+use crate::opts::StartupOptions;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_default::DefaultFromSerde;
@@ -8,7 +9,7 @@ pub struct ConfigPlugin;
 
 impl Plugin for ConfigPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(GlobalConfig::load()).add_systems(
+        app.add_systems(Startup, init).add_systems(
             Update,
             write_config.run_if(resource_changed::<GlobalConfig>),
         );
@@ -31,32 +32,43 @@ fn is_default_url(url: &Url) -> bool {
     *url == default_url()
 }
 
+fn init(mut commands: Commands, opts: Res<StartupOptions>) {
+    commands.insert_resource(GlobalConfig::load(&opts));
+}
+
 impl GlobalConfig {
-    pub fn load() -> Self {
-        io::read_config()
+    pub fn load(opts: &StartupOptions) -> Self {
+        io::read_config(opts)
     }
 }
 
-fn write_config(config: Res<GlobalConfig>) {
+fn write_config(config: Res<GlobalConfig>, opts: Res<StartupOptions>) {
     if *config == GlobalConfig::default() {
         return;
     }
-    io::write_config(&config);
+    io::write_config(&config, &opts);
 }
 
 #[cfg(not(target_arch = "wasm32"))]
 mod io {
     use super::GlobalConfig;
+    use crate::opts::StartupOptions;
     use std::path::PathBuf;
     use tracing::{error, info};
 
-    fn get_config_path() -> Option<PathBuf> {
-        let exe_path = std::env::current_exe().ok()?;
-        Some(exe_path.parent()?.join("config.json"))
+    const FILENAME: &str = "config.json";
+
+    fn get_config_path(opts: &StartupOptions) -> Option<PathBuf> {
+        if let Some(data_dir) = &opts.data_dir {
+            Some(data_dir.join(FILENAME))
+        } else {
+            let exe_path = std::env::current_exe().ok()?;
+            Some(exe_path.parent()?.join(FILENAME))
+        }
     }
 
-    pub fn read_config() -> GlobalConfig {
-        let path = match get_config_path() {
+    pub fn read_config(opts: &StartupOptions) -> GlobalConfig {
+        let path = match get_config_path(opts) {
             Some(path) => path,
             None => {
                 error!("Could not find config file");
@@ -79,8 +91,8 @@ mod io {
         }
     }
 
-    pub fn write_config(config: &GlobalConfig) {
-        let path = match get_config_path() {
+    pub fn write_config(config: &GlobalConfig, opts: &StartupOptions) {
+        let path = match get_config_path(opts) {
             Some(path) => path,
             None => {
                 error!("Could not find config file");
@@ -103,11 +115,14 @@ mod io {
 #[cfg(target_arch = "wasm32")]
 mod io {
     use super::GlobalConfig;
+    use crate::opts::StartupOptions;
     use gloo_storage::{LocalStorage, Storage};
     use tracing::{error, warn};
 
-    pub fn read_config() -> GlobalConfig {
-        match LocalStorage::get("config") {
+    const KEY: &str = "config";
+
+    pub fn read_config(_opts: &StartupOptions) -> GlobalConfig {
+        match LocalStorage::get(KEY) {
             Ok(config) => config,
             Err(err) => {
                 warn!("Could not load config: {}", err);
@@ -116,8 +131,8 @@ mod io {
         }
     }
 
-    pub fn write_config(config: &GlobalConfig) {
-        if let Err(err) = LocalStorage::set("config", config) {
+    pub fn write_config(config: &GlobalConfig, _opts: &StartupOptions) {
+        if let Err(err) = LocalStorage::set(KEY, config) {
             error!("Could not save config: {}", err);
         }
     }

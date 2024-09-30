@@ -4,12 +4,16 @@ use bevy::{prelude::*, window::WindowTheme};
 
 mod assets;
 mod input;
+mod opts;
 mod painter;
 mod save_data;
 mod scene;
 
 fn main() {
+    let opts = opts::get();
+
     let mut app = App::new();
+    app.insert_resource(opts);
 
     #[cfg(feature = "embed_assets")]
     let app = app.add_plugins(bevy_embedded_assets::EmbeddedAssetPlugin {

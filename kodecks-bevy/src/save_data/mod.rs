@@ -1,3 +1,4 @@
+use crate::opts::StartupOptions;
 use bevy::prelude::*;
 use futures::{
     channel::mpsc::{self, Sender},
@@ -11,8 +12,7 @@ pub struct SaveDataPlugin;
 
 impl Plugin for SaveDataPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<DataWriter>()
-            .insert_resource(SaveData::load())
+        app.add_systems(Startup, init)
             .add_systems(Update, write_data.run_if(resource_changed::<SaveData>));
     }
 }
@@ -21,9 +21,14 @@ impl Plugin for SaveDataPlugin {
 pub struct SaveData(v1::SaveDataV1);
 
 impl SaveData {
-    pub fn load() -> Self {
-        io::read_data()
+    pub fn load(opts: &StartupOptions) -> Self {
+        io::read_data(opts)
     }
+}
+
+fn init(mut commands: Commands, opts: Res<StartupOptions>) {
+    commands.insert_resource(DataWriter::new(opts.clone()));
+    commands.insert_resource(SaveData::load(&opts));
 }
 
 fn write_data(config: Res<SaveData>, mut data_writer: ResMut<DataWriter>) {
@@ -40,18 +45,12 @@ struct DataWriter {
     task: bevy::tasks::Task<()>,
 }
 
-impl Default for DataWriter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl DataWriter {
-    fn new() -> Self {
+    fn new(opts: StartupOptions) -> Self {
         let (send, mut recv) = mpsc::channel(256);
         let task = bevy::tasks::IoTaskPool::get().spawn(async move {
             while let Some(new_data) = recv.next().await {
-                io::write_data(&new_data);
+                io::write_data(&new_data, &opts);
             }
         });
         #[cfg(not(target_arch = "wasm32"))]
@@ -81,16 +80,23 @@ impl Drop for DataWriter {
 #[cfg(not(target_arch = "wasm32"))]
 mod io {
     use super::{container, SaveData};
+    use crate::opts::StartupOptions;
     use std::{fs, path::PathBuf};
     use tracing::{error, info};
 
-    fn get_data_path() -> Option<PathBuf> {
-        let exe_path = std::env::current_exe().ok()?;
-        Some(exe_path.parent()?.join("savedata.txt"))
+    const FILENAME: &str = "savedata.txt";
+
+    fn get_data_path(opts: &StartupOptions) -> Option<PathBuf> {
+        if let Some(dir) = &opts.data_dir {
+            Some(dir.join(FILENAME))
+        } else {
+            let exe_path = std::env::current_exe().ok()?;
+            Some(exe_path.parent()?.join(FILENAME))
+        }
     }
 
-    pub fn read_data() -> SaveData {
-        let path = match get_data_path() {
+    pub fn read_data(opts: &StartupOptions) -> SaveData {
+        let path = match get_data_path(opts) {
             Some(path) => path,
             None => {
                 error!("Could not find save data file");
@@ -113,8 +119,8 @@ mod io {
         }
     }
 
-    pub fn write_data(data: &SaveData) {
-        let path = match get_data_path() {
+    pub fn write_data(data: &SaveData, opts: &StartupOptions) {
+        let path = match get_data_path(opts) {
             Some(path) => path,
             None => {
                 error!("Could not find save data file");
@@ -138,11 +144,14 @@ mod io {
 mod io {
     use super::container;
     use super::SaveData;
+    use crate::opts::StartupOptions;
     use gloo_storage::{LocalStorage, Storage};
     use tracing::{error, warn};
 
-    pub fn read_data() -> SaveData {
-        let data = match LocalStorage::get::<String>("savedata") {
+    const KEY: &str = "savedata";
+
+    pub fn read_data(_opts: &StartupOptions) -> SaveData {
+        let data = match LocalStorage::get::<String>(KEY) {
             Ok(data) => data,
             Err(err) => {
                 warn!("Could not load save data: {}", err);
@@ -158,7 +167,7 @@ mod io {
         }
     }
 
-    pub fn write_data(data: &SaveData) {
+    pub fn write_data(data: &SaveData, _opts: &StartupOptions) {
         let data = match container::SaveData::V1(data.0.clone()).encode() {
             Ok(data) => data,
             Err(err) => {
@@ -166,7 +175,7 @@ mod io {
                 return;
             }
         };
-        if let Err(err) = LocalStorage::set("savedata", data) {
+        if let Err(err) = LocalStorage::set(KEY, data) {
             error!("Could not save save data: {}", err);
         }
     }
