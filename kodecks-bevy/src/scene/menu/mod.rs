@@ -259,13 +259,12 @@ fn handle_menu_events(
     Vigilant Lynx 2
     Moonlit Gecko 2
     Scrapyard Raven 3
-    Radio Deer 1
+    Radio Deer 2
     Moss-Grown Mastodon 2
-    Voracious Anteater 1
-    Mire Alligator 30
+    Voracious Anteater 3
+    Mire Alligator 2
     Wasteland Cobra 2
     Marshland Moose 2
-    Quartz Moth 2
     ",
         &CATALOG,
     )
