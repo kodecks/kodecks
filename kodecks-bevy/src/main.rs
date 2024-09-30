@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use bevy::{prelude::*, window::WindowTheme};
+use bevy::{asset::AssetMetaCheck, prelude::*, window::WindowTheme};
 
 mod assets;
 mod input;
@@ -24,6 +24,10 @@ fn main() {
 
     let default_plugins = DefaultPlugins
         .set(ImagePlugin::default_nearest())
+        .set(AssetPlugin {
+            meta_check: AssetMetaCheck::Never,
+            ..default()
+        })
         .set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Kodecks".into(),
