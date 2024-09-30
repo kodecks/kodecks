@@ -180,10 +180,16 @@ impl Board {
             })
             .collect();
 
+        self.temp_blocking_pairs.retain(|(attacker, blocker)| {
+            self.opponent_field.iter().any(|(id, _)| id == attacker)
+                && self.player_field.iter().any(|(id, _)| id == blocker)
+        });
+        self.temp_attackers
+            .retain(|attacker| self.player_field.iter().any(|(id, _)| id == attacker));
+
         let battle = matches!(env.phase, Phase::Block | Phase::Battle);
         if !battle {
-            self.temp_attackers.clear();
-            self.temp_blocking_pairs.clear();
+            self.clear_battle();
         }
     }
 

@@ -262,7 +262,7 @@ fn handle_menu_events(
     Radio Deer 1
     Moss-Grown Mastodon 2
     Voracious Anteater 1
-    Mire Alligator 3
+    Mire Alligator 30
     Wasteland Cobra 2
     Marshland Moose 2
     Quartz Moth 2
