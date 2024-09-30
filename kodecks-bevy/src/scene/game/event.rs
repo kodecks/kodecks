@@ -3,7 +3,10 @@ use super::{
     main::AnimationState,
     server::{SendCommand, ServerEvent},
 };
-use crate::scene::{translator::Translator, GlobalState};
+use crate::{
+    save_data::SaveData,
+    scene::{translator::Translator, GlobalState},
+};
 use bevy::utils::Duration;
 use bevy::{
     asset::LoadState, ecs::system::SystemParam, prelude::*, time::Stopwatch, utils::HashMap,
@@ -51,6 +54,7 @@ impl Plugin for EventPlugin {
                     .run_if(in_state(GlobalState::GameMain)),
             )
             .add_systems(OnEnter(GlobalState::GameInit), init)
+            .add_systems(OnEnter(GlobalState::GameMain), start_game)
             .add_systems(OnEnter(GlobalState::GameCleanup), cleanup);
     }
 }
@@ -105,6 +109,10 @@ fn queue_events(mut queue: ResMut<EventQueue>, mut events: EventReader<ServerEve
     for event in events.read() {
         queue.queue.push_back(event.clone());
     }
+}
+
+fn start_game(mut data: ResMut<SaveData>) {
+    data.statistics.games += 1;
 }
 
 fn preload_actions(
