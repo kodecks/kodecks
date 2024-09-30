@@ -27,7 +27,7 @@ fn main() {
                 fit_canvas_to_parent: true,
                 prevent_default_event_handling: true,
                 resize_constraints: WindowResizeConstraints {
-                    min_width: 1100.0,
+                    min_width: 1000.0,
                     min_height: 600.0,
                     ..default()
                 },
