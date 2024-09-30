@@ -86,7 +86,7 @@ mod io {
 
     fn get_data_path() -> Option<PathBuf> {
         let exe_path = std::env::current_exe().ok()?;
-        Some(exe_path.parent()?.join("save data.txt"))
+        Some(exe_path.parent()?.join("savedata.txt"))
     }
 
     pub fn read_data() -> SaveData {
@@ -142,7 +142,7 @@ mod io {
     use tracing::{error, warn};
 
     pub fn read_data() -> SaveData {
-        let data = match LocalStorage::get::<String>("save data") {
+        let data = match LocalStorage::get::<String>("savedata") {
             Ok(data) => data,
             Err(err) => {
                 warn!("Could not load save data: {}", err);
@@ -166,7 +166,7 @@ mod io {
                 return;
             }
         };
-        if let Err(err) = LocalStorage::set("save data", data) {
+        if let Err(err) = LocalStorage::set("savedata", data) {
             error!("Could not save save data: {}", err);
         }
     }
