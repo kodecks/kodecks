@@ -11,7 +11,7 @@ use futures_util::SinkExt;
 use k256::{ecdsa::signature::SignerMut, schnorr::SigningKey, SecretKey};
 use kodecks::{action::Action, env::LocalGameState};
 use kodecks_engine::{
-    login::{LoginRequest, LoginResponse},
+    login::{LoginRequest, LoginResponse, LoginType},
     message::{self, Input, Output},
     Connection,
 };
@@ -182,11 +182,15 @@ async fn connect(
 async fn connect_websocket(server: Url, key: SecretKey) -> anyhow::Result<WebSocket> {
     let url = server.join("login")?;
 
+    let client_version = env!("CARGO_PKG_VERSION").to_string();
     let pubkey = key.public_key();
     let client = reqwest::Client::new();
     let res: LoginResponse = client
         .post(url.clone())
-        .json(&LoginRequest::PubkeyChallenge { pubkey })
+        .json(&LoginRequest {
+            client_version: client_version.clone(),
+            ty: LoginType::PubkeyChallenge { pubkey },
+        })
         .send()
         .await?
         .json()
@@ -202,7 +206,10 @@ async fn connect_websocket(server: Url, key: SecretKey) -> anyhow::Result<WebSoc
     let signature = key.sign(challenge.as_bytes());
     let res: LoginResponse = client
         .post(url.clone())
-        .json(&LoginRequest::PubkeyResponse { pubkey, signature })
+        .json(&LoginRequest {
+            client_version: client_version.clone(),
+            ty: LoginType::PubkeyResponse { pubkey, signature },
+        })
         .send()
         .await?
         .json()

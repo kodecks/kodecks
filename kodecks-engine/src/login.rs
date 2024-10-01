@@ -3,8 +3,15 @@ use k256::{schnorr::Signature, PublicKey};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
+pub struct LoginRequest {
+    pub client_version: String,
+    #[serde(flatten)]
+    pub ty: LoginType,
+}
+
+#[derive(Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", tag = "type")]
-pub enum LoginRequest {
+pub enum LoginType {
     PubkeyChallenge {
         #[serde(
             serialize_with = "serialize_pubkey",
