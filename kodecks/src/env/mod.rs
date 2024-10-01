@@ -281,13 +281,13 @@ impl Environment {
             error!("Error computing effects: {:?}", err);
         }
 
-        let available_actions = if next_empty && self.stack.is_empty() {
+        self.check_game_condition();
+
+        let available_actions = if next_empty {
             self.available_actions()
         } else {
             None
         };
-
-        self.check_game_condition();
 
         Report {
             available_actions,

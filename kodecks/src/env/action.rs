@@ -10,6 +10,10 @@ use crate::{
 
 impl Environment {
     pub fn available_actions(&self) -> Option<PlayerAvailableActions> {
+        if !self.stack.is_empty() || self.endgame.is_ended() {
+            return None;
+        }
+
         let used_hexes = self.state.players.iter().any(|player| {
             player
                 .field
