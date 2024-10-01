@@ -3,10 +3,13 @@ use super::{
     mode::{GameMode, GameModeKind},
     server::{self, ServerConnection},
 };
-use crate::scene::{
-    spinner::SpinnerState,
-    translator::{TextPurpose, Translator},
-    GlobalState,
+use crate::{
+    save_data,
+    scene::{
+        spinner::SpinnerState,
+        translator::{TextPurpose, Translator},
+        GlobalState,
+    },
 };
 use bevy::prelude::*;
 use kodecks::{
@@ -145,6 +148,7 @@ fn init_game_mode(
     mut commands: Commands,
     mut next_loading_state: ResMut<NextState<GameLoadingState>>,
     mode: Res<GameMode>,
+    save_data: Res<save_data::SaveData>,
 ) {
     match &mode.kind {
         GameModeKind::BotMatch { bot_deck } => {
@@ -174,7 +178,8 @@ fn init_game_mode(
             next_loading_state.set(GameLoadingState::BotMatch);
         }
         GameModeKind::RandomMatch { server } => {
-            let mut conn = ServerConnection::new_websocket(server.clone());
+            let key = save_data.auth.private_key.clone();
+            let mut conn = ServerConnection::new_websocket(server.clone(), key);
             conn.send(Input::Command(Command::StartRandomMatch {
                 deck: mode.player_deck.clone(),
             }));

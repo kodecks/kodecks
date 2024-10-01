@@ -24,7 +24,7 @@ pub async fn ws_handler(
     auth: Query<SocketAuth>,
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
 ) -> impl IntoResponse {
-    if let Some(mut session) = state.session_mut(&auth.token) {
+    if let Some(mut session) = state.session_from_token(&auth.token) {
         session.update();
         std::mem::drop(session);
         let state = state.clone();

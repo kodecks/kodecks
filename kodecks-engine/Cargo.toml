@@ -4,12 +4,20 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+base64 = "0.22.1"
 bincode = "2.0.0-rc.3"
 futures = "0.3.30"
 futures-util = "0.3.30"
+k256 = { version = "0.13.4", features = [
+    "arithmetic",
+    "precomputed-tables",
+    "schnorr",
+    "std",
+], default-features = false }
 kodecks = { path = "../kodecks" }
 kodecks-bot = { path = "../kodecks-bot" }
 kodecks-catalog = { path = "../kodecks-catalog" }
+serde = { version = "1.0.210", features = ["derive"] }
 tracing = "0.1.40"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

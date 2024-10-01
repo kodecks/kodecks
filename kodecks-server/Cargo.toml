@@ -11,6 +11,12 @@ bincode = "2.0.0-rc.3"
 dashmap = "6.1.0"
 headers = "0.4.0"
 http = "1.1.0"
+k256 = { version = "0.13.4", features = [
+    "arithmetic",
+    "precomputed-tables",
+    "schnorr",
+    "std",
+], default-features = false }
 kodecks = { path = "../kodecks" }
 kodecks-engine = { path = "../kodecks-engine" }
 kodecks-catalog = { path = "../kodecks-catalog" }
@@ -21,3 +27,4 @@ tower-http = { version = "0.6.0", features = ["full"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 futures-util = "0.3.30"
+base64 = "0.22.1"

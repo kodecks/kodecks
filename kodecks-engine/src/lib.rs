@@ -4,6 +4,7 @@ use session::Session;
 use std::{collections::HashMap, sync::Arc};
 
 pub mod local;
+pub mod login;
 pub mod message;
 pub mod session;
 pub mod worker;

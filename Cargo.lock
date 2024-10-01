@@ -3794,15 +3794,18 @@ dependencies = [
 name = "kodecks-engine"
 version = "0.1.0"
 dependencies = [
+ "base64 0.22.1",
  "bincode 2.0.0-rc.3",
  "console_error_panic_hook",
  "futures",
  "futures-util",
  "getrandom",
  "gloo-worker",
+ "k256",
  "kodecks",
  "kodecks-bot",
  "kodecks-catalog",
+ "serde",
  "tracing",
  "wasm-bindgen-futures",
 ]
@@ -3814,11 +3817,13 @@ dependencies = [
  "anyhow",
  "axum",
  "axum-extra",
+ "base64 0.22.1",
  "bincode 2.0.0-rc.3",
  "dashmap",
  "futures-util",
  "headers",
  "http",
+ "k256",
  "kodecks",
  "kodecks-catalog",
  "kodecks-engine",

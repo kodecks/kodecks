@@ -1,32 +1,51 @@
-use std::sync::Mutex;
 use crate::{game::PlayerData, pool::RandomMatchPool, session::Session};
-use dashmap::{mapref::one::RefMut, DashMap};
+use base64::{engine::general_purpose::URL_SAFE, Engine as _};
+use dashmap::{
+    mapref::one::{Ref, RefMut},
+    DashMap,
+};
+use k256::PublicKey;
+use std::sync::Mutex;
 
 pub struct AppState {
     sessions: DashMap<String, Session>,
-    pool: Mutex<RandomMatchPool>
+    tokens: DashMap<String, String>,
+    pool: Mutex<RandomMatchPool>,
 }
 
 impl AppState {
     pub fn new() -> Self {
         Self {
             sessions: DashMap::new(),
-            pool: Mutex::new(RandomMatchPool::default())
+            tokens: DashMap::new(),
+            pool: Mutex::new(RandomMatchPool::default()),
         }
     }
 
-    pub fn new_token(&self) -> String {
-        let token = nanoid::nanoid!();
-        self.sessions.insert(token.clone(), Session::new());
-        token
+    pub fn new_session(&self, pubkey: &PublicKey) -> Ref<String, Session> {
+        let id = URL_SAFE.encode(pubkey.to_sec1_bytes());
+        let new_session = Session::new();
+        self.tokens
+            .insert(new_session.token().to_string(), id.clone());
+        self.sessions.insert(id.clone(), new_session);
+        self.sessions.get(&id).unwrap()
     }
 
-    pub fn session_mut(&self, token: &str) -> Option<RefMut<String, Session>> {
-        self.sessions.get_mut(token)
+    pub fn session_from_pubkey(&self, pubkey: &PublicKey) -> Option<Ref<String, Session>> {
+        let id = URL_SAFE.encode(pubkey.to_sec1_bytes());
+        self.sessions.get(&id)
+    }
+
+    pub fn session_from_token(&self, token: &str) -> Option<RefMut<String, Session>> {
+        self.tokens
+            .get(token)
+            .and_then(|entry| self.sessions.get_mut(entry.value()))
     }
 
     pub fn logout(&self, token: &str) {
-        self.sessions.remove(token);
+        if let Some((_, id)) = self.tokens.remove(token) {
+            self.sessions.remove(&id);
+        }
     }
 
     pub fn cleanup(&self) {
