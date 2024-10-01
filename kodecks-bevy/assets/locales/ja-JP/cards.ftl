@@ -44,3 +44,4 @@ card-icefall-weasel = 氷瀑のイタチ
 card-marshland-moose = 湿地帯のヘラジカ
 card-quartz-moth = 水晶蛾
 card-electric-clione = 電子クリオネ
+card-electric-flytrap = 電気蝿取草

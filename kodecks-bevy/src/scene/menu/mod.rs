@@ -259,12 +259,13 @@ fn handle_menu_events(
     Vigilant Lynx 2
     Moonlit Gecko 2
     Scrapyard Raven 3
-    Radio Deer 2
+    Radio Deer 1
     Moss-Grown Mastodon 2
-    Voracious Anteater 3
+    Voracious Anteater 2
     Mire Alligator 2
     Wasteland Cobra 2
     Marshland Moose 2
+    Electric Flytrap 2
     ",
         &CATALOG,
     )
