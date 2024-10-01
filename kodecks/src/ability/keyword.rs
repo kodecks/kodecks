@@ -32,6 +32,7 @@ pub enum KeywordAbility {
     Toxic,
     Volatile,
     Stealth,
+    Devour,
 }
 
 impl Ability for KeywordAbility {}
@@ -42,6 +43,7 @@ impl Score for KeywordAbility {
             KeywordAbility::Toxic => 1,
             KeywordAbility::Volatile => -1,
             KeywordAbility::Stealth => 1,
+            KeywordAbility::Devour => 1,
         }
     }
 }

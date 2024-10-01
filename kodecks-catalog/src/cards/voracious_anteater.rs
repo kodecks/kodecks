@@ -10,6 +10,7 @@ card_def!(
     card_type: CardType::Creature,
     creature_type: CreatureType::Cyborg,
     power: 400,
+    abilities: &[KeywordAbility::Devour][..],
 );
 
 impl Effect for CardDef {
