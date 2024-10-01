@@ -30,3 +30,5 @@ ability-volatile = 揮発
     .description = このクリーチャーは死んだときにカケラを生成しない。
 ability-stealth = ステルス
     .description = このクリーチャーはカード効果の対象に指定できない。
+ability-devour = 貪食
+    .description = このクリーチャーによって破壊されたクリーチャーはカケラを生成しない。

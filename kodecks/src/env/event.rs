@@ -35,8 +35,12 @@ impl Environment {
                     .computed()
                     .abilities
                     .contains(&KeywordAbility::Volatile);
+                let devour = source
+                    .computed()
+                    .abilities
+                    .contains(&KeywordAbility::Devour);
                 Ok(filter_vec![
-                    if volatile {
+                    if volatile || devour {
                         None
                     } else {
                         Some(OpcodeList::new(vec![Opcode::GenerateShards {

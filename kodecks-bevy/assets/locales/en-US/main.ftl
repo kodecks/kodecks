@@ -30,3 +30,5 @@ ability-volatile = Volatile
     .description = This creature does not generate a shard when it dies.
 ability-stealth = Stealth
     .description = This creature cannot be targeted by card effects.
+ability-devour = Devour
+    .description = Creatures destroyed by this creature do not generate a shard.
