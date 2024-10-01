@@ -1,7 +1,5 @@
-use std::pin::pin;
-
 use crate::scene::GlobalState;
-use bevy::{ecs::world::Command, prelude::*, utils::HashMap};
+use bevy::{ecs::world::Command, prelude::*};
 use futures::{
     channel::{
         mpsc::{self, Receiver, Sender},
@@ -10,13 +8,15 @@ use futures::{
     select, FutureExt, StreamExt,
 };
 use futures_util::SinkExt;
+use k256::{ecdsa::signature::SignerMut, schnorr::SigningKey, SecretKey};
 use kodecks::{action::Action, env::LocalGameState};
 use kodecks_engine::{
+    login::{LoginRequest, LoginResponse},
     message::{self, Input, Output},
     Connection,
 };
 use reqwest_websocket::{CloseCode, RequestBuilderExt, WebSocket};
-use serde::Deserialize;
+use std::pin::pin;
 use url::Url;
 
 pub struct ServerPlugin;
@@ -51,8 +51,8 @@ impl ServerConnection {
         Self::Local(Default::default())
     }
 
-    pub fn new_websocket(server: Url) -> Self {
-        Self::WebSocket(WebSocketEngine::new(server))
+    pub fn new_websocket(server: Url, key: SecretKey) -> Self {
+        Self::WebSocket(WebSocketEngine::new(server, key))
     }
 }
 
@@ -81,20 +81,20 @@ pub struct WebSocketEngine {
 }
 
 impl WebSocketEngine {
-    pub fn new(server: Url) -> Self {
+    pub fn new(server: Url, key: SecretKey) -> Self {
         let (event_send, event_recv) = mpsc::channel(256);
         let (command_send, command_recv) = mpsc::channel(256);
         let (close_send, close_recv) = oneshot::channel();
 
         let task = bevy::tasks::IoTaskPool::get().spawn(async move {
             #[cfg(target_arch = "wasm32")]
-            if let Err(err) = connect(server, command_recv, event_send, close_recv).await {
+            if let Err(err) = connect(server, command_recv, event_send, close_recv, key).await {
                 error!("Websocket error: {}", err);
             }
 
             #[cfg(not(target_arch = "wasm32"))]
             async_compat::Compat::new(async {
-                if let Err(err) = connect(server, command_recv, event_send, close_recv).await {
+                if let Err(err) = connect(server, command_recv, event_send, close_recv, key).await {
                     error!("Websocket error: {}", err);
                 }
             })
@@ -124,18 +124,14 @@ impl Drop for WebSocketEngine {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
-pub struct LoginResponse {
-    pub token: String,
-}
-
 async fn connect(
     server: Url,
     mut command_recv: Receiver<Input>,
     mut event_send: Sender<Output>,
     mut close_recv: oneshot::Receiver<()>,
+    key: SecretKey,
 ) -> anyhow::Result<()> {
-    let socket = connect_websocket(server).fuse();
+    let socket = connect_websocket(server, key).fuse();
     let mut socket = pin!(socket);
     let websocket = select! {
         socket = socket => {
@@ -183,20 +179,43 @@ async fn connect(
     Ok(())
 }
 
-async fn connect_websocket(server: Url) -> anyhow::Result<WebSocket> {
+async fn connect_websocket(server: Url, key: SecretKey) -> anyhow::Result<WebSocket> {
     let url = server.join("login")?;
 
+    let pubkey = key.public_key();
     let client = reqwest::Client::new();
     let res: LoginResponse = client
         .post(url.clone())
-        .json(&HashMap::<String, u32>::new())
+        .json(&LoginRequest::PubkeyChallenge { pubkey })
         .send()
         .await?
         .json()
         .await?;
 
+    let challenge = if let LoginResponse::Challenge { challenge } = res {
+        challenge
+    } else {
+        return Err(anyhow::anyhow!("Unexpected response"));
+    };
+
+    let mut key: SigningKey = key.into();
+    let signature = key.sign(challenge.as_bytes());
+    let res: LoginResponse = client
+        .post(url.clone())
+        .json(&LoginRequest::PubkeyResponse { pubkey, signature })
+        .send()
+        .await?
+        .json()
+        .await?;
+
+    let token = if let LoginResponse::Session { token } = res {
+        token
+    } else {
+        return Err(anyhow::anyhow!("Unexpected response"));
+    };
+
     let mut url = url.join("/ws")?;
-    url.query_pairs_mut().append_pair("token", &res.token);
+    url.query_pairs_mut().append_pair("token", &token);
 
     let response = client.get(url).upgrade().send().await?;
     Ok(response.into_websocket().await?)

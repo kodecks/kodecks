@@ -1,14 +1,26 @@
 use std::time::Instant;
 
 pub struct Session {
+    challenge: String,
+    token: String,
     last_active: Instant,
 }
 
 impl Session {
     pub fn new() -> Self {
         Self {
+            challenge: nanoid::nanoid!(),
+            token: nanoid::nanoid!(),
             last_active: Instant::now(),
         }
+    }
+
+    pub fn challenge(&self) -> &str {
+        &self.challenge
+    }
+
+    pub fn token(&self) -> &str {
+        &self.token
     }
 
     pub fn update(&mut self) {
