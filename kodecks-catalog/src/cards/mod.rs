@@ -9,6 +9,7 @@ mod deep_sea_wyrm;
 mod demilune_nighthawk;
 mod diamond_porcupine;
 mod electric_clione;
+mod electric_flytrap;
 mod flash_bang_jellyfish;
 mod graphite_armadillo;
 mod helium_puffer;
@@ -91,4 +92,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "quar" => quartz_moth::ARCHETYPE,
     "electric-clione" => electric_clione::ARCHETYPE,
     "elec" => electric_clione::ARCHETYPE,
+    "electric-flytrap" => electric_flytrap::ARCHETYPE,
+    "elfl" => electric_flytrap::ARCHETYPE,
 };
