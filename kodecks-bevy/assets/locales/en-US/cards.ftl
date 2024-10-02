@@ -45,3 +45,4 @@ card-marshland-moose = Marshland Moose
 card-quartz-moth = Quartz Moth
 card-electric-clione = Electric Clione
 card-electric-flytrap = Electric Flytrap
+card-tungsten-rhino = Tungsten Rhino

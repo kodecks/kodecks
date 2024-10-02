@@ -24,6 +24,7 @@ mod pyrosnail;
 mod quartz_moth;
 mod radio_deer;
 mod scrapyard_raven;
+mod tungsten_rhino;
 mod turbofish;
 mod vigilant_lynx;
 mod volcanic_wyrm;
@@ -94,4 +95,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "elec" => electric_clione::ARCHETYPE,
     "electric-flytrap" => electric_flytrap::ARCHETYPE,
     "elfl" => electric_flytrap::ARCHETYPE,
+    "tungsten-rhino" => tungsten_rhino::ARCHETYPE,
+    "tung" => tungsten_rhino::ARCHETYPE,
 };
