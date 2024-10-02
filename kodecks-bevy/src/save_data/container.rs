@@ -59,11 +59,17 @@ impl SaveData {
             .zip(nonce.iter().cycle())
             .for_each(|(a, b)| *a ^= *b);
 
-        Ok(URL_SAFE.encode(data))
+        let data = URL_SAFE.encode(data);
+        Ok(format!("Do NOT share this data with anyone.\nIt contains a secret key to access your account on the server.\n\n{}", data))
     }
 
     pub fn decode(s: &str) -> anyhow::Result<Self> {
-        let data = URL_SAFE.decode(s.as_bytes())?;
+        let data = s
+            .trim()
+            .rsplit(|c: char| c.is_ascii_whitespace())
+            .next()
+            .ok_or_else(|| anyhow::anyhow!("Invalid data"))?;
+        let data = URL_SAFE.decode(data.as_bytes())?;
         if data.len() < NONCE_LEN {
             return Err(anyhow::anyhow!("Invalid data length"));
         }
