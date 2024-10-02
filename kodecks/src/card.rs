@@ -63,6 +63,7 @@ pub struct Card {
     zone: PlayerZone,
     controller: u8,
     archetype: &'static CardArchetype,
+    style: u8,
     computed: ComputedAttribute,
     flags: ComputedFlags,
     event_filter: EventFilter,
@@ -82,6 +83,7 @@ impl Card {
         counter: &mut ObjectIdCounter,
         item: &DeckItem,
         archetype: &'static CardArchetype,
+        style: u8,
         owner: u8,
     ) -> Self {
         let effect = (archetype.effect)();
@@ -91,6 +93,7 @@ impl Card {
             zone: PlayerZone::new(owner, Zone::Deck),
             controller: owner,
             archetype,
+            style,
             computed: archetype.into(),
             flags: ComputedFlags::empty(),
             event_filter: effect.event_filter(),
@@ -108,6 +111,7 @@ impl Card {
             zone: PlayerZone::new(owner, Zone::Deck),
             controller: owner,
             archetype,
+            style: 0,
             computed: archetype.into(),
             flags: ComputedFlags::empty(),
             event_filter: effect.event_filter(),
@@ -192,6 +196,7 @@ impl Card {
         CardSnapshot {
             id: self.id,
             archetype_id: self.archetype.id,
+            style: self.style,
             owner: self.owner,
             computed: Some(self.computed.clone()),
             timestamp: self.timestamp,
@@ -212,6 +217,7 @@ impl Clone for Card {
             zone: self.zone,
             controller: self.controller,
             archetype: self.archetype,
+            style: self.style,
             computed: self.computed.clone(),
             flags: self.flags,
             event_filter: self.event_filter,
@@ -270,6 +276,7 @@ pub fn safe_name(name: &str) -> Result<String, idna::Errors> {
 pub struct CardSnapshot {
     pub id: ObjectId,
     pub archetype_id: ArchetypeId,
+    pub style: u8,
     pub owner: u8,
     pub computed: Option<ComputedAttribute>,
     pub timestamp: u64,
@@ -428,6 +435,7 @@ pub struct CardAttribute {
     pub power: Option<u32>,
     pub shields: Option<u8>,
     pub is_token: bool,
+    pub alt_styles: &'static [CardStyle],
 }
 
 impl Default for CardAttribute {
@@ -442,6 +450,7 @@ impl Default for CardAttribute {
             power: None,
             shields: None,
             is_token: false,
+            alt_styles: &[],
         }
     }
 }
@@ -461,4 +470,9 @@ pub enum CreatureType {
     Robot,
     Ghost,
     Program,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CardStyle {
+    pub illustration: u8,
 }

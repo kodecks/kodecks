@@ -35,6 +35,7 @@ impl DeckList {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 pub struct DeckItem {
     pub archetype_id: ArchetypeId,
+    pub style: u8,
     pub base_id: Option<ObjectId>,
 }
 
@@ -58,6 +59,7 @@ impl DeckItem {
         let card = &catalog[name.as_str()];
         iter::repeat(Self {
             archetype_id: card.id,
+            style: 0,
             base_id: None,
         })
         .take(count)
