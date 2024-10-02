@@ -232,6 +232,40 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
                         });
                 });
         });
+
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    flex_direction: FlexDirection::Column,
+                    justify_content: JustifyContent::End,
+                    align_items: AlignItems::Start,
+                    ..default()
+                },
+                ..default()
+            },
+            UiRoot,
+            Pickable::IGNORE,
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                TextBundle::from_section(
+                    build_info::format!("v{} ({}) {}", $.crate_info.version, $.version_control?.git()?.commit_short_id, $.target.triple),
+                    TextStyle {
+                        font_size: 20.0,
+                        color: Color::linear_rgb(0.5, 0.5, 0.5),
+                        ..translator.style(TextPurpose::Title)
+                    },
+                )
+                .with_style(Style {
+                    margin: UiRect::all(Val::Px(10.)),
+                    ..default()
+                }),
+                Pickable::IGNORE,
+            ));
+        });
 }
 
 fn handle_menu_events(
