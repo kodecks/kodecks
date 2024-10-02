@@ -1,4 +1,5 @@
 use crate::{
+    ability::KeywordAbility,
     card::ArchetypeId,
     color::Color,
     env::Environment,
@@ -80,12 +81,16 @@ impl ActionCommand {
                 if current_target.timed_id() != target {
                     return Err(Error::TargetLost { target });
                 }
+                let piercing = source
+                    .computed()
+                    .abilities
+                    .contains(&KeywordAbility::Piercing);
                 let shields = current_target
                     .computed()
                     .shields
                     .map(|shields| shields.value())
                     .unwrap_or_default();
-                if shields > 0 {
+                if !piercing && shields > 0 {
                     return Ok(vec![OpcodeList::new(vec![Opcode::BreakShield {
                         card: current_target.id(),
                     }])]);

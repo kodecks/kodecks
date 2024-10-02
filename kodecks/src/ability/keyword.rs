@@ -33,6 +33,7 @@ pub enum KeywordAbility {
     Volatile,
     Stealth,
     Devour,
+    Piercing,
 }
 
 impl Ability for KeywordAbility {}
@@ -44,6 +45,7 @@ impl Score for KeywordAbility {
             KeywordAbility::Volatile => -1,
             KeywordAbility::Stealth => 1,
             KeywordAbility::Devour => 1,
+            KeywordAbility::Piercing => 1,
         }
     }
 }
