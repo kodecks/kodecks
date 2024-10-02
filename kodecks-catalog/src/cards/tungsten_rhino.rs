@@ -6,10 +6,12 @@ card_def!(
     "tung",
     "Tungsten Rhino",
     color: Color::RED,
-    cost: 4,
+    cost: 5,
     card_type: CardType::Creature,
     creature_type: CreatureType::Robot,
     power: 500,
+    abilities: &[KeywordAbility::Piercing][..],
+    shields: 1,
 );
 
 impl Effect for CardDef {}
