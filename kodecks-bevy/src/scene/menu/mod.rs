@@ -56,8 +56,9 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
     Electric Clione 2
     Flash-Bang Jellyfish 2
     Helium Puffer 2
-    Icefall Weasel 3
-    Turbofish 3
+    Icefall Weasel 2
+    Turbofish 2
+    Saltmarsh Moray 2
     ",
         &CATALOG,
     )
