@@ -23,6 +23,7 @@ mod oil_leaking_droid;
 mod pyrosnail;
 mod quartz_moth;
 mod radio_deer;
+mod saltmarsh_moray;
 mod scrapyard_raven;
 mod tungsten_rhino;
 mod turbofish;
@@ -97,4 +98,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "elfl" => electric_flytrap::ARCHETYPE,
     "tungsten-rhino" => tungsten_rhino::ARCHETYPE,
     "tung" => tungsten_rhino::ARCHETYPE,
+    "saltmarsh-moray" => saltmarsh_moray::ARCHETYPE,
+    "salt" => saltmarsh_moray::ARCHETYPE,
 };
