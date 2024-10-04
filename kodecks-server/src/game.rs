@@ -84,9 +84,23 @@ impl GameList {
 
 #[derive(Debug, Clone)]
 pub struct PlayerData {
-    pub user_id: UserId,
-    pub config: PlayerConfig,
-    pub sender: Sender<Output>,
+    user_id: UserId,
+    config: PlayerConfig,
+    sender: Sender<Output>,
+    next_actions: VecDeque<Action>,
+    consecutive_timeouts: u8,
+}
+
+impl PlayerData {
+    pub fn new(user_id: UserId, config: PlayerConfig, sender: Sender<Output>) -> Self {
+        Self {
+            user_id,
+            config,
+            sender,
+            next_actions: VecDeque::new(),
+            consecutive_timeouts: 0,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -126,13 +140,12 @@ impl Game {
     async fn start_game(
         game_id: u32,
         profile: GameProfile,
-        players: Vec<PlayerData>,
+        mut players: Vec<PlayerData>,
         mut receiver: Receiver<GameCommand>,
     ) {
         let regulation = profile.regulation.clone();
 
         let mut env = Arc::new(Environment::new(profile, &CATALOG));
-        let mut next_actions = vec![VecDeque::<Action>::new(); 2];
         let mut available_actions: Option<PlayerAvailableActions> = None;
         let mut player_in_action = env.state.players.player_in_turn().id;
 
@@ -150,7 +163,9 @@ impl Game {
                 .await;
             if let Err(err) = result {
                 warn!("failed to send event: {}", err);
-                next_actions[player.id as usize].push_front(Action::Concede);
+                players[player.id as usize]
+                    .next_actions
+                    .push_front(Action::Concede);
             }
         }
 
@@ -164,27 +179,36 @@ impl Game {
                 select! {
                     command = receiver.recv() => {
                         if let Some(command) = command {
+                            let player = &mut players[command.player as usize];
                             let GameCommandKind::NextAction { action } = command.kind;
-                            next_actions[command.player as usize].push_back(action);
+                            player.next_actions.push_back(action);
+                            player.consecutive_timeouts = 0;
                         } else {
                             return;
                         }
                     }
                     _ = action_timeout => {
-                        let action = available_actions.actions.default_action().unwrap_or(Action::Concede);
-                        next_actions[player_in_action as usize].push_back(action);
+                        let player = &mut players[player_in_action as usize];
+                        player.consecutive_timeouts += 1;
+                        let action = if player.consecutive_timeouts >= regulation.max_consecutive_timeouts {
+                            Action::Concede
+                        } else {
+                            available_actions.actions.default_action().unwrap_or(Action::Concede)
+                        };
+                        player.next_actions.push_back(action);
                     }
                 }
             }
 
             while !env.game_condition().is_ended() {
                 let (player, next_action) =
-                    if matches!(next_actions[0].front(), Some(Action::Concede)) {
+                    if matches!(players[0].next_actions.front(), Some(Action::Concede)) {
                         (0, Some(Action::Concede))
-                    } else if matches!(next_actions[1].front(), Some(Action::Concede)) {
+                    } else if matches!(players[1].next_actions.front(), Some(Action::Concede)) {
                         (1, Some(Action::Concede))
                     } else if let Some(available_actions) = &available_actions {
-                        let next_actions = &mut next_actions[available_actions.player as usize];
+                        let next_actions =
+                            &mut players[available_actions.player as usize].next_actions;
                         while let Some(action) = next_actions.front() {
                             if available_actions.actions.validate(action) {
                                 break;
@@ -237,7 +261,9 @@ impl Game {
                         .await;
                     if let Err(err) = result {
                         warn!("failed to send event: {}", err);
-                        next_actions[player.id as usize].push_back(Action::Concede);
+                        players[player.id as usize]
+                            .next_actions
+                            .push_back(Action::Concede);
                     }
                 }
             }

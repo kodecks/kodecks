@@ -129,11 +129,7 @@ impl AppState {
                             .session_from_id(&owner)
                             .and_then(|session| session.event_sender().clone())
                         {
-                            players.push(PlayerData {
-                                user_id: owner,
-                                config: room.player,
-                                sender,
-                            });
+                            players.push(PlayerData::new(owner, room.player, sender));
                         }
                     }
                     if let Some(room) = rooms.remove_by_owner(&guest) {
@@ -141,11 +137,7 @@ impl AppState {
                             .session_from_id(&guest)
                             .and_then(|session| session.event_sender().clone())
                         {
-                            players.push(PlayerData {
-                                user_id: guest,
-                                config: room.player,
-                                sender,
-                            });
+                            players.push(PlayerData::new(guest, room.player, sender));
                         }
                     }
                     if players.len() == 2 {
