@@ -8,7 +8,7 @@ use futures::{
     select, FutureExt, StreamExt,
 };
 use futures_util::SinkExt;
-use k256::{ecdsa::signature::SignerMut, schnorr::SigningKey, SecretKey};
+use k256::{ecdsa::signature::SignerMut, schnorr::SigningKey};
 use kodecks::{action::Action, env::LocalGameState};
 use kodecks_engine::{
     login::{LoginRequest, LoginResponse, LoginType},
@@ -51,7 +51,7 @@ impl ServerConnection {
         Self::Local(Default::default())
     }
 
-    pub fn new_websocket(server: Url, key: SecretKey) -> Self {
+    pub fn new_websocket(server: Url, key: SigningKey) -> Self {
         Self::WebSocket(WebSocketEngine::new(server, key))
     }
 }
@@ -81,7 +81,7 @@ pub struct WebSocketEngine {
 }
 
 impl WebSocketEngine {
-    pub fn new(server: Url, key: SecretKey) -> Self {
+    pub fn new(server: Url, key: SigningKey) -> Self {
         let (event_send, event_recv) = mpsc::channel(256);
         let (command_send, command_recv) = mpsc::channel(256);
         let (close_send, close_recv) = oneshot::channel();
@@ -129,7 +129,7 @@ async fn connect(
     mut command_recv: Receiver<Input>,
     mut event_send: Sender<Output>,
     mut close_recv: oneshot::Receiver<()>,
-    key: SecretKey,
+    key: SigningKey,
 ) -> anyhow::Result<()> {
     let socket = connect_websocket(server, key).fuse();
     let mut socket = pin!(socket);
@@ -179,17 +179,17 @@ async fn connect(
     Ok(())
 }
 
-async fn connect_websocket(server: Url, key: SecretKey) -> anyhow::Result<WebSocket> {
+async fn connect_websocket(server: Url, key: SigningKey) -> anyhow::Result<WebSocket> {
     let url = server.join("login")?;
 
     let client_version = env!("CARGO_PKG_VERSION").to_string();
-    let pubkey = key.public_key();
+    let pubkey = key.verifying_key();
     let client = reqwest::Client::new();
     let res: LoginResponse = client
         .post(url.clone())
         .json(&LoginRequest {
             client_version: client_version.clone(),
-            ty: LoginType::PubkeyChallenge { pubkey },
+            ty: LoginType::PubkeyChallenge { pubkey: *pubkey },
         })
         .send()
         .await?
@@ -202,13 +202,16 @@ async fn connect_websocket(server: Url, key: SecretKey) -> anyhow::Result<WebSoc
         return Err(anyhow::anyhow!("Unexpected response"));
     };
 
-    let mut key: SigningKey = key.into();
+    let mut key: SigningKey = key.clone();
     let signature = key.sign(challenge.as_bytes());
     let res: LoginResponse = client
         .post(url.clone())
         .json(&LoginRequest {
             client_version: client_version.clone(),
-            ty: LoginType::PubkeyResponse { pubkey, signature },
+            ty: LoginType::PubkeyResponse {
+                pubkey: *pubkey,
+                signature,
+            },
         })
         .send()
         .await?

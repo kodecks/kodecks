@@ -1,5 +1,5 @@
 use base64::{engine::general_purpose::URL_SAFE, Engine as _};
-use k256::{schnorr::Signature, PublicKey};
+use k256::schnorr::{Signature, VerifyingKey};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -17,14 +17,14 @@ pub enum LoginType {
             serialize_with = "serialize_pubkey",
             deserialize_with = "deserialize_pubkey"
         )]
-        pubkey: PublicKey,
+        pubkey: VerifyingKey,
     },
     PubkeyResponse {
         #[serde(
             serialize_with = "serialize_pubkey",
             deserialize_with = "deserialize_pubkey"
         )]
-        pubkey: PublicKey,
+        pubkey: VerifyingKey,
         #[serde(
             serialize_with = "serialize_signature",
             deserialize_with = "deserialize_signature"
@@ -33,22 +33,22 @@ pub enum LoginType {
     },
 }
 
-fn serialize_pubkey<S>(pubkey: &PublicKey, serializer: S) -> Result<S::Ok, S::Error>
+fn serialize_pubkey<S>(pubkey: &VerifyingKey, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
 {
-    let bytes = pubkey.to_sec1_bytes();
-    let s = URL_SAFE.encode(&bytes);
+    let bytes = pubkey.to_bytes();
+    let s = URL_SAFE.encode(bytes);
     serializer.serialize_str(&s)
 }
 
-fn deserialize_pubkey<'de, D>(deserializer: D) -> Result<PublicKey, D::Error>
+fn deserialize_pubkey<'de, D>(deserializer: D) -> Result<VerifyingKey, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
     let bytes = URL_SAFE.decode(s).map_err(serde::de::Error::custom)?;
-    PublicKey::from_sec1_bytes(&bytes).map_err(serde::de::Error::custom)
+    VerifyingKey::from_bytes(&bytes).map_err(serde::de::Error::custom)
 }
 
 fn serialize_signature<S>(signature: &Signature, serializer: S) -> Result<S::Ok, S::Error>

@@ -4,7 +4,7 @@ use dashmap::{
     mapref::one::{Ref, RefMut},
     DashMap,
 };
-use k256::PublicKey;
+use k256::schnorr::VerifyingKey;
 use std::sync::Mutex;
 
 pub struct AppState {
@@ -22,8 +22,8 @@ impl AppState {
         }
     }
 
-    pub fn new_session(&self, pubkey: &PublicKey) -> Ref<String, Session> {
-        let id = URL_SAFE.encode(pubkey.to_sec1_bytes());
+    pub fn new_session(&self, pubkey: &VerifyingKey) -> Ref<String, Session> {
+        let id = URL_SAFE.encode(pubkey.to_bytes());
         let new_session = Session::new();
         self.tokens
             .insert(new_session.token().to_string(), id.clone());
@@ -31,8 +31,8 @@ impl AppState {
         self.sessions.get(&id).unwrap()
     }
 
-    pub fn session_from_pubkey(&self, pubkey: &PublicKey) -> Option<Ref<String, Session>> {
-        let id = URL_SAFE.encode(pubkey.to_sec1_bytes());
+    pub fn session_from_pubkey(&self, pubkey: &VerifyingKey) -> Option<Ref<String, Session>> {
+        let id = URL_SAFE.encode(pubkey.to_bytes());
         self.sessions.get(&id)
     }
 

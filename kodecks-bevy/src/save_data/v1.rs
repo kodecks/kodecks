@@ -1,7 +1,9 @@
 use super::container::VersionTag;
 use base64::{engine::general_purpose::URL_SAFE, Engine as _};
+use k256::schnorr::SigningKey;
 use serde::{Deserialize, Serialize};
 use serde_default::DefaultFromSerde;
+use std::fmt;
 
 #[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SaveDataV1 {
@@ -15,17 +17,31 @@ pub struct Statistics {
     pub games: u32,
 }
 
-#[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, DefaultFromSerde, Serialize, Deserialize)]
 pub struct Auth {
     #[serde(
         default = "private_key_default",
         serialize_with = "serialize_private_key",
         deserialize_with = "deserialize_private_key"
     )]
-    pub private_key: k256::SecretKey,
+    pub private_key: SigningKey,
 }
 
-fn serialize_private_key<S>(private_key: &k256::SecretKey, serializer: S) -> Result<S::Ok, S::Error>
+impl PartialEq for Auth {
+    fn eq(&self, other: &Self) -> bool {
+        self.private_key.to_bytes() == other.private_key.to_bytes()
+    }
+}
+
+impl Eq for Auth {}
+
+impl fmt::Debug for Auth {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Auth").finish()
+    }
+}
+
+fn serialize_private_key<S>(private_key: &SigningKey, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
 {
@@ -33,7 +49,7 @@ where
     serializer.serialize_str(&URL_SAFE.encode(&*private_key))
 }
 
-fn deserialize_private_key<'de, D>(deserializer: D) -> Result<k256::SecretKey, D::Error>
+fn deserialize_private_key<'de, D>(deserializer: D) -> Result<SigningKey, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
@@ -41,12 +57,12 @@ where
     let private_key = URL_SAFE
         .decode(private_key.as_bytes())
         .map_err(serde::de::Error::custom)?;
-    k256::SecretKey::from_slice(&private_key).map_err(serde::de::Error::custom)
+    SigningKey::from_bytes(&private_key).map_err(serde::de::Error::custom)
 }
 
-fn private_key_default() -> k256::SecretKey {
+fn private_key_default() -> SigningKey {
     let mut rng = rand::thread_rng();
-    k256::SecretKey::random(&mut rng)
+    SigningKey::random(&mut rng)
 }
 
 #[cfg(test)]

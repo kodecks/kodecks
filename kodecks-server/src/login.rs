@@ -2,7 +2,7 @@ use crate::app::AppState;
 use axum::{extract::State, http::StatusCode, Json};
 use axum_extra::TypedHeader;
 use headers::{authorization::Bearer, Authorization};
-use k256::schnorr::{signature::Verifier, VerifyingKey};
+use k256::schnorr::signature::Verifier;
 use kodecks_engine::login::{LoginRequest, LoginResponse, LoginType};
 use serde::Serialize;
 use std::sync::Arc;
@@ -18,9 +18,10 @@ pub async fn login(
         }
         LoginType::PubkeyResponse { pubkey, signature } => {
             if let Some(session) = state.session_from_pubkey(&pubkey) {
-                let verified = TryInto::<VerifyingKey>::try_into(pubkey)
-                    .and_then(|key| key.verify(session.challenge().as_bytes(), &signature));
-                if verified.is_ok() {
+                if pubkey
+                    .verify(session.challenge().as_bytes(), &signature)
+                    .is_ok()
+                {
                     return (
                         StatusCode::OK,
                         Json(LoginResponse::Session {
