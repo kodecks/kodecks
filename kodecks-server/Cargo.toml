@@ -28,3 +28,4 @@ tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 futures-util = "0.3.30"
 base64 = "0.22.1"
+bech32 = "0.11.0"

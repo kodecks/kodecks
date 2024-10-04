@@ -18,6 +18,7 @@ use kodecks::{
 };
 use kodecks_engine::{
     message::{Command, Input},
+    room::{RoomConfig, RoomType},
     Connection,
 };
 
@@ -180,8 +181,15 @@ fn init_game_mode(
         GameModeKind::RandomMatch { server } => {
             let key = save_data.auth.private_key.clone();
             let mut conn = ServerConnection::new_websocket(server.clone(), key);
-            conn.send(Input::Command(Command::StartRandomMatch {
-                deck: mode.player_deck.clone(),
+            conn.send(Input::Command(Command::CreateRoom {
+                config: RoomConfig {
+                    regulation: mode.regulation.clone(),
+                    room_type: RoomType::RandomMatch,
+                },
+                host_player: PlayerConfig {
+                    id: 0,
+                    deck: mode.player_deck.clone(),
+                },
             }));
             commands.insert_resource(conn);
 

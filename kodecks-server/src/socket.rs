@@ -1,46 +1,52 @@
-use crate::{app::AppState, game::PlayerData};
+use crate::{app::AppState, token::Token};
 use axum::{
     extract::{
         ws::{Message, WebSocket},
-        ConnectInfo, Query, State, WebSocketUpgrade,
+        Query, State, WebSocketUpgrade,
     },
     response::IntoResponse,
 };
 use http::StatusCode;
-use kodecks_engine::message::{Command, Input};
+use kodecks_engine::{message::Input, user::UserId};
 use serde::Deserialize;
-use std::{net::SocketAddr, sync::Arc};
-use tokio::{select, sync::broadcast, sync::mpsc};
+use std::sync::Arc;
+use tokio::{select, sync::mpsc};
 use tracing::*;
 
 #[derive(Deserialize)]
 pub struct SocketAuth {
-    token: String,
+    token: Token,
 }
 
 pub async fn ws_handler(
     State(state): State<Arc<AppState>>,
     ws: WebSocketUpgrade,
     auth: Query<SocketAuth>,
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
 ) -> impl IntoResponse {
-    if let Some(mut session) = state.session_from_token(&auth.token) {
+    if let Some(mut session) = state.session_from_token_mut(&auth.token) {
         session.update();
+        let id = session.user_id().clone();
         std::mem::drop(session);
         let state = state.clone();
-        ws.on_upgrade(move |socket| handle_socket(state, socket, addr))
+        ws.on_upgrade(move |socket| handle_socket(state, socket, id))
             .into_response()
     } else {
         StatusCode::UNAUTHORIZED.into_response()
     }
 }
 
-async fn handle_socket(state: Arc<AppState>, mut socket: WebSocket, who: SocketAddr) {
-    let (command_sender, command_receiver) = broadcast::channel(256);
+async fn handle_socket(state: Arc<AppState>, mut socket: WebSocket, user_id: UserId) {
     let (event_sender, mut event_receiver) = mpsc::channel(256);
     let config = bincode::config::standard();
 
+    if let Some(mut session) = state.session_from_id_mut(&user_id) {
+        session.set_event_sender(Some(event_sender.clone()));
+    }
+
     loop {
+        if let Some(mut session) = state.session_from_id_mut(&user_id) {
+            session.update();
+        }
         select! {
             Some(event) = event_receiver.recv() => {
                 let event = match bincode::encode_to_vec(&event, config) {
@@ -57,24 +63,15 @@ async fn handle_socket(state: Arc<AppState>, mut socket: WebSocket, who: SocketA
             }
             msg = socket.recv() => {
                 if let Some(Ok(Message::Binary(msg))) = msg {
-                    let command = match bincode::decode_from_slice(&msg, config) {
+                    let command: Input = match bincode::decode_from_slice(&msg, config) {
                         Ok((msg, _)) => msg,
                         Err(err) => {
                             warn!("failed to parse message: {}", err);
                             break;
                         }
                     };
-                    if let Input::Command(Command::StartRandomMatch { deck }) = &command {
-                        let player = PlayerData {
-                            deck: deck.clone(),
-                            command_receiver: command_receiver.resubscribe(),
-                            event_sender: event_sender.clone(),
-                        };
-                        state.add_to_random_match_pool(player);
-                    } else if let Err(err) = command_sender.send(command) {
-                        warn!("failed to send command: {}", err);
-                        break;
-                    }
+
+                    state.handle_command(&user_id, command.clone());
                 } else {
                     break;
                 }
@@ -83,5 +80,6 @@ async fn handle_socket(state: Arc<AppState>, mut socket: WebSocket, who: SocketA
         }
     }
 
-    info!("client {who} disconnected");
+    state.logout(&user_id);
+    info!("client {user_id} disconnected");
 }

@@ -498,6 +498,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 
 [[package]]
+name = "bech32"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d965446196e3b7decd44aa7ee49e31d630118f90ef12f97900f262eb915c951d"
+
+[[package]]
 name = "bevy"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3795,6 +3801,7 @@ name = "kodecks-engine"
 version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
+ "bech32",
  "bincode 2.0.0-rc.3",
  "console_error_panic_hook",
  "futures",
@@ -3818,6 +3825,7 @@ dependencies = [
  "axum",
  "axum-extra",
  "base64 0.22.1",
+ "bech32",
  "bincode 2.0.0-rc.3",
  "dashmap",
  "futures-util",

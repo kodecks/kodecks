@@ -12,7 +12,7 @@ use k256::{ecdsa::signature::SignerMut, schnorr::SigningKey};
 use kodecks::{action::Action, env::LocalGameState};
 use kodecks_engine::{
     login::{LoginRequest, LoginResponse, LoginType},
-    message::{self, Input, Output},
+    message::{self, GameEventKind, Input, Output},
     Connection,
 };
 use reqwest_websocket::{CloseCode, RequestBuilderExt, WebSocket};
@@ -244,18 +244,30 @@ fn recv_events(
 ) {
     while let Some(event) = server.recv() {
         match event {
-            message::Output::SessionEvent(event) => match event.event {
-                message::SessionEventKind::Created => {
+            Output::GameEvent(event) => match event.event {
+                message::GameEventKind::Created => {
                     commands.insert_resource(Session {
-                        id: event.session,
+                        id: event.game_id,
                         player: event.player,
                     });
                 }
-                message::SessionEventKind::GameUpdated { state } => {
+                GameEventKind::StateUpdated { state } => {
                     events.send(ServerEvent(state));
                 }
-                message::SessionEventKind::PlayerThinking { thinking } => {
+                GameEventKind::PlayerThinking { thinking } => {
                     info!("Player {} is thinking", thinking);
+                }
+            },
+            Output::RoomEvent(event) => match event.event {
+                message::RoomEventKind::Created => {
+                    info!("Room created: {}", event.room_id);
+                }
+                message::RoomEventKind::GameRequested { guest } => {
+                    info!("Game requested by {} for {}", guest, event.room_id);
+                    server.send(Input::RoomCommand(message::RoomCommand {
+                        room_id: event.room_id,
+                        kind: message::RoomCommandKind::Approve { guest },
+                    }));
                 }
             },
         }
@@ -270,10 +282,10 @@ impl Command for SendCommand {
             let id = session.id;
             let player = session.player;
             if let Some(mut conn) = world.get_resource_mut::<ServerConnection>() {
-                conn.send(Input::SessionCommand(message::SessionCommand {
-                    session: id,
+                conn.send(Input::GameCommand(message::GameCommand {
+                    game_id: id,
                     player,
-                    kind: message::SessionCommandKind::NextAction { action: self.0 },
+                    kind: message::GameCommandKind::NextAction { action: self.0 },
                 }));
             }
         }

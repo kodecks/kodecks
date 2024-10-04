@@ -23,9 +23,10 @@ mod auth;
 mod background;
 mod game;
 mod login;
+mod room;
 mod session;
-mod pool;
 mod socket;
+mod token;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
