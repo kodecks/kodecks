@@ -25,6 +25,7 @@ use tokio::{
 use tracing::warn;
 
 const CHANNEL_TIMEOUT: Duration = Duration::from_secs(1);
+const PLAYER_THINKING_INTERVAL: Duration = Duration::from_secs(5);
 
 #[derive(Debug, Default)]
 pub struct GameList {
@@ -176,6 +177,9 @@ impl Game {
             if let Some(available_actions) = &available_actions {
                 let phase_timeout = time::timeout_at(next_phase_deadline, future::pending::<()>());
                 let action_timeout = time::timeout_at(next_action_deadline, phase_timeout);
+                let player_thinking_timeout =
+                    time::timeout(PLAYER_THINKING_INTERVAL, future::pending::<()>());
+
                 select! {
                     command = receiver.recv() => {
                         if let Some(command) = command {
@@ -196,6 +200,28 @@ impl Game {
                             available_actions.actions.default_action().unwrap_or(Action::Concede)
                         };
                         player.next_actions.push_back(action);
+                    }
+                    _ = player_thinking_timeout => {
+                        let timeout = next_action_deadline.checked_duration_since(Instant::now()).map(|d| d.as_secs() as u32);
+                        for player in env.state.players.iter() {
+                            let result = players[player.id as usize]
+                                .sender
+                                .send_timeout(
+                                    Output::GameEvent(GameEvent {
+                                        game_id,
+                                        player: player.id,
+                                        event: GameEventKind::PlayerThinking { thinking: player_in_action, timeout },
+                                    }),
+                                    CHANNEL_TIMEOUT,
+                                )
+                                .await;
+                            if let Err(err) = result {
+                                warn!("failed to send event: {}", err);
+                                players[player.id as usize]
+                                    .next_actions
+                                    .push_front(Action::Concede);
+                            }
+                        }
                     }
                 }
             }

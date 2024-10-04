@@ -1,4 +1,4 @@
-use crate::scene::GlobalState;
+use crate::scene::{spinner::SpinnerState, GlobalState};
 use bevy::{ecs::world::Command, prelude::*};
 use futures::{
     channel::{
@@ -241,6 +241,7 @@ fn recv_events(
     mut commands: Commands,
     mut server: ResMut<ServerConnection>,
     mut events: EventWriter<ServerEvent>,
+    mut next_spinner_state: ResMut<NextState<SpinnerState>>,
 ) {
     while let Some(event) = server.recv() {
         match event {
@@ -253,9 +254,13 @@ fn recv_events(
                 }
                 GameEventKind::StateUpdated { state } => {
                     events.send(ServerEvent(state));
+                    next_spinner_state.set(SpinnerState::Off);
                 }
-                GameEventKind::PlayerThinking { thinking } => {
-                    info!("Player {} is thinking", thinking);
+                GameEventKind::PlayerThinking { thinking, timeout } => {
+                    info!("Player {} is thinking: {:?}", thinking, timeout);
+                    if thinking != event.player {
+                        next_spinner_state.set(SpinnerState::On);
+                    }
                 }
             },
             Output::RoomEvent(event) => match event.event {

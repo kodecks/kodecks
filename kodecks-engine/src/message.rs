@@ -77,5 +77,5 @@ pub struct GameEvent {
 pub enum GameEventKind {
     Created,
     StateUpdated { state: LocalGameState },
-    PlayerThinking { thinking: u8 },
+    PlayerThinking { thinking: u8, timeout: Option<u32> },
 }

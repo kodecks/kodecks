@@ -1,5 +1,5 @@
 use crate::{
-    message::{GameCommand, GameEvent, GameEventKind, Output, GameCommandKind},
+    message::{GameCommand, GameCommandKind, GameEvent, GameEventKind, Output},
     EngineCallback,
 };
 use kodecks::{
@@ -68,7 +68,10 @@ impl Session {
             let event = GameEvent {
                 game_id: self.id,
                 player,
-                event: GameEventKind::PlayerThinking { thinking },
+                event: GameEventKind::PlayerThinking {
+                    thinking,
+                    timeout: None,
+                },
             };
             (self.callback)(Output::GameEvent(event));
         }
