@@ -49,7 +49,7 @@ fn write_config(config: Res<GlobalConfig>, opts: Res<StartupOptions>) {
     io::write_config(&config, &opts);
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 mod io {
     use super::GlobalConfig;
     use crate::opts::StartupOptions;
@@ -112,7 +112,7 @@ mod io {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_family = "wasm")]
 mod io {
     use super::GlobalConfig;
     use crate::opts::StartupOptions;

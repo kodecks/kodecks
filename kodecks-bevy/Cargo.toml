@@ -54,12 +54,12 @@ tracing = "0.1.40"
 unic-langid = { version = "0.9.5", features = ["macros"] }
 url = { version = "2.5.2", features = ["serde"] }
 
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
 kodecks-bot = { path = "../kodecks-bot", features = ["rayon"] }
 image = { version = "0.25.2", default-features = false, features = ["rayon"] }
 bpaf = { version = "0.9", features = ["derive"] }
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
+[target.'cfg(target_family = "wasm")'.dependencies]
 gloo-storage = "0.3.0"
 sys-locale = { version = "0.3.1", features = ["js"] }
 

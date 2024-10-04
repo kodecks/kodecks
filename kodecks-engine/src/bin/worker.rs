@@ -1,4 +1,4 @@
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_family = "wasm")]
 fn main() {
     use gloo_worker::Registrable;
     use kodecks_engine::worker::EngineReactor;
@@ -6,5 +6,5 @@ fn main() {
     EngineReactor::registrar().register();
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 fn main() {}

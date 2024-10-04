@@ -1,4 +1,4 @@
-#![cfg(target_arch = "wasm32")]
+#![cfg(target_family = "wasm")]
 
 use crate::{
     message::{Input, Output},

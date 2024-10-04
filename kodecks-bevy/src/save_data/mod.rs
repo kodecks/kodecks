@@ -41,7 +41,7 @@ fn write_data(config: Res<SaveData>, mut data_writer: ResMut<DataWriter>) {
 #[derive(Resource)]
 struct DataWriter {
     send: Sender<SaveData>,
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(not(target_family = "wasm"))]
     task: bevy::tasks::Task<()>,
 }
 
@@ -53,11 +53,11 @@ impl DataWriter {
                 io::write_data(&new_data, &opts);
             }
         });
-        #[cfg(not(target_arch = "wasm32"))]
+        #[cfg(not(target_family = "wasm"))]
         {
             Self { send, task }
         }
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(target_family = "wasm")]
         {
             task.detach();
             Self { send }
@@ -72,12 +72,12 @@ impl DataWriter {
 impl Drop for DataWriter {
     fn drop(&mut self) {
         self.send.close_channel();
-        #[cfg(not(target_arch = "wasm32"))]
+        #[cfg(not(target_family = "wasm"))]
         bevy::tasks::block_on(&mut self.task);
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(target_family = "wasm"))]
 mod io {
     use super::{container, SaveData};
     use crate::opts::StartupOptions;
@@ -140,7 +140,7 @@ mod io {
     }
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(target_family = "wasm")]
 mod io {
     use super::container;
     use super::SaveData;

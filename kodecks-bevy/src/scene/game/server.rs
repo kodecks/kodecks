@@ -39,9 +39,9 @@ fn cleanup(mut commands: Commands) {
 
 #[derive(Resource)]
 pub enum ServerConnection {
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(not(target_family = "wasm"))]
     Local(kodecks_engine::local::LocalEngine),
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(target_family = "wasm")]
     Local(kodecks_engine::worker::WebWorkerEngine),
     WebSocket(WebSocketEngine),
 }
@@ -76,7 +76,7 @@ pub struct WebSocketEngine {
     command_send: Sender<Input>,
     event_recv: Receiver<Output>,
     close_send: Option<oneshot::Sender<()>>,
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(not(target_family = "wasm"))]
     task: bevy::tasks::Task<()>,
 }
 
@@ -87,12 +87,12 @@ impl WebSocketEngine {
         let (close_send, close_recv) = oneshot::channel();
 
         let task = bevy::tasks::IoTaskPool::get().spawn(async move {
-            #[cfg(target_arch = "wasm32")]
+            #[cfg(target_family = "wasm")]
             if let Err(err) = connect(server, command_recv, event_send, close_recv, key).await {
                 error!("Websocket error: {}", err);
             }
 
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(not(target_family = "wasm"))]
             async_compat::Compat::new(async {
                 if let Err(err) = connect(server, command_recv, event_send, close_recv, key).await {
                     error!("Websocket error: {}", err);
@@ -101,14 +101,14 @@ impl WebSocketEngine {
             .await;
         });
 
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(target_family = "wasm")]
         task.detach();
 
         Self {
             command_send,
             event_recv,
             close_send: Some(close_send),
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(not(target_family = "wasm"))]
             task,
         }
     }
@@ -119,7 +119,7 @@ impl Drop for WebSocketEngine {
         self.command_send.close_channel();
         self.event_recv.close();
         let _ = self.close_send.take().unwrap().send(());
-        #[cfg(not(target_arch = "wasm32"))]
+        #[cfg(not(target_family = "wasm"))]
         bevy::tasks::block_on(&mut self.task);
     }
 }
