@@ -2,6 +2,7 @@ use futures_util::future;
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::{Environment, LocalGameState},
+    log::LogAction,
     player::PlayerConfig,
     profile::GameProfile,
     regulation::Regulation,
@@ -153,11 +154,13 @@ impl Game {
             }
         }
 
-        let mut next_action_timeout = Instant::now() + regulation.action_timeout;
+        let mut next_action_deadline = Instant::now() + regulation.action_timeout;
+        let mut next_phase_deadline = Instant::now() + regulation.phase_timeout;
 
         while !env.game_condition().is_ended() {
             if let Some(available_actions) = &available_actions {
-                let timeout = time::timeout_at(next_action_timeout, future::pending::<()>());
+                let phase_timeout = time::timeout_at(next_phase_deadline, future::pending::<()>());
+                let action_timeout = time::timeout_at(next_action_deadline, phase_timeout);
                 select! {
                     command = receiver.recv() => {
                         if let Some(command) = command {
@@ -167,7 +170,7 @@ impl Game {
                             return;
                         }
                     }
-                    _ = timeout => {
+                    _ = action_timeout => {
                         let action = available_actions.actions.default_action().unwrap_or(Action::Concede);
                         next_actions[player_in_action as usize].push_back(action);
                     }
@@ -203,7 +206,15 @@ impl Game {
 
                 if let Some(available_actions) = &report.available_actions {
                     player_in_action = available_actions.player;
-                    next_action_timeout = Instant::now() + regulation.action_timeout;
+                    next_action_deadline = Instant::now() + regulation.action_timeout;
+                }
+
+                let phase_changed = report
+                    .logs
+                    .iter()
+                    .any(|logs| matches!(logs, LogAction::PhaseChanged { .. }));
+                if phase_changed {
+                    next_phase_deadline = Instant::now() + regulation.phase_timeout;
                 }
 
                 for player in env.state.players.iter() {

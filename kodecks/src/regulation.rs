@@ -12,6 +12,7 @@ pub struct Regulation {
     pub initial_life: u32,
     pub max_hand_size: u8,
     pub action_timeout: Duration,
+    pub phase_timeout: Duration,
 }
 
 impl Default for Regulation {
@@ -29,6 +30,7 @@ impl Regulation {
         initial_life: 2000,
         max_hand_size: 6,
         action_timeout: Duration::from_secs(30),
+        phase_timeout: Duration::from_secs(60),
     };
 
     pub fn verify(&self, deck: &DeckList) -> bool {
