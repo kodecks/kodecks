@@ -299,9 +299,10 @@ fn handle_menu_events(
     Moss-Grown Mastodon 2
     Voracious Anteater 2
     Mire Alligator 2
-    Wasteland Cobra 2
+    Wasteland Cobra 1
     Marshland Moose 2
-    Electric Flytrap 2
+    Electric Flytrap 1
+    Poison-Tusk Babirusa 2
     ",
         &CATALOG,
     )
