@@ -112,7 +112,7 @@ impl Game {
     pub fn handle_command(&self, user_id: &UserId, command: GameCommand) {
         if let Some(player) = self.players.get(command.player as usize) {
             if player.user_id == *user_id {
-                self.sender.try_send(command).unwrap();
+                let _ = self.sender.try_send(command);
             }
         }
     }
