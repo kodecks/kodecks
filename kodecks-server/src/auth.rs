@@ -1,4 +1,4 @@
-use crate::app::AppState;
+use crate::{app::AppState, token::Token};
 use axum::{
     extract::{Request, State},
     http::StatusCode,
@@ -15,7 +15,8 @@ pub async fn auth(
     request: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
-    if let Some(mut session) = state.session_from_token(authorization.token()) {
+    if let Some(mut session) = state.session_from_token_mut(&Token::from_str(authorization.token()))
+    {
         session.update();
         std::mem::drop(session);
         Ok(next.run(request).await)

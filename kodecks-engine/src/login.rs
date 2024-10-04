@@ -2,14 +2,14 @@ use base64::{engine::general_purpose::URL_SAFE, Engine as _};
 use k256::schnorr::{Signature, VerifyingKey};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LoginRequest {
     pub client_version: String,
     #[serde(flatten)]
     pub ty: LoginType,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", tag = "type")]
 pub enum LoginType {
     PubkeyChallenge {

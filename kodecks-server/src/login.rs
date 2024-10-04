@@ -1,10 +1,9 @@
-use crate::app::AppState;
+use crate::{app::AppState, token::Token};
 use axum::{extract::State, http::StatusCode, Json};
 use axum_extra::TypedHeader;
 use headers::{authorization::Bearer, Authorization};
 use k256::schnorr::signature::Verifier;
 use kodecks_engine::login::{LoginRequest, LoginResponse, LoginType};
-use serde::Serialize;
 use std::sync::Arc;
 
 pub async fn login(
@@ -35,15 +34,10 @@ pub async fn login(
     }
 }
 
-#[derive(Serialize)]
-pub struct Session {
-    token: String,
-}
-
 pub async fn logout(
     State(state): State<Arc<AppState>>,
     TypedHeader(authorization): TypedHeader<Authorization<Bearer>>,
 ) -> StatusCode {
-    state.logout(authorization.token());
+    state.logout_by_token(&Token::from_str(authorization.token()));
     StatusCode::OK
 }

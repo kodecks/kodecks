@@ -1,143 +1,209 @@
 use kodecks::{
     action::{Action, PlayerAvailableActions},
-    deck::DeckList,
     env::{Environment, LocalGameState},
     player::PlayerConfig,
     profile::GameProfile,
     regulation::Regulation,
 };
 use kodecks_catalog::CATALOG;
-use kodecks_engine::message::{Input, Output, SessionCommandKind, SessionEvent, SessionEventKind};
-use std::{collections::VecDeque, sync::Arc, time::Duration};
-use tokio::{select, sync::broadcast, sync::mpsc};
+use kodecks_engine::{
+    message::{GameCommand, GameCommandKind, GameEvent, GameEventKind, Output},
+    user::UserId,
+};
+use std::{
+    collections::{HashMap, VecDeque},
+    sync::Arc,
+    time::Duration,
+};
+use tokio::sync::mpsc::{self, Receiver, Sender};
 use tracing::warn;
 
 const CHANNEL_TIMEOUT: Duration = Duration::from_secs(1);
 
-#[derive(Debug)]
-pub struct PlayerData {
-    pub deck: DeckList,
-    pub command_receiver: broadcast::Receiver<Input>,
-    pub event_sender: mpsc::Sender<Output>,
+#[derive(Debug, Default)]
+pub struct GameList {
+    counter: u32,
+    games: HashMap<u32, Game>,
+    players: HashMap<UserId, u32>,
 }
 
-pub async fn start_game(regulation: Regulation, mut players: Vec<PlayerData>) {
-    let player_configs = players
-        .iter()
-        .enumerate()
-        .map(|(id, player)| PlayerConfig {
-            id: id as u8,
-            deck: player.deck.clone(),
-        })
-        .collect();
-    let profile = GameProfile {
-        regulation,
-        players: player_configs,
-        ..Default::default()
-    };
+impl GameList {
+    pub fn create(&mut self, regulation: Regulation, players: Vec<PlayerData>) -> u32 {
+        let id = self.counter;
+        self.counter += 1;
 
-    let mut env = Arc::new(Environment::new(profile, &CATALOG));
+        for player in &players {
+            self.players.insert(player.user_id.clone(), id);
+        }
 
-    let mut next_actions = vec![VecDeque::new(); 2];
-    let mut available_actions: Option<PlayerAvailableActions> = None;
-    let mut player_in_action = env.state.players.player_in_turn().id;
+        let game = Game::new(id, regulation, players);
+        self.games.insert(id, game);
+        id
+    }
 
-    for player in env.state.players.iter() {
-        let result = players[player.id as usize]
-            .event_sender
-            .send_timeout(
-                Output::SessionEvent(SessionEvent {
-                    session: 0,
-                    player: player.id,
-                    event: SessionEventKind::Created,
-                }),
-                CHANNEL_TIMEOUT,
-            )
-            .await;
-        if let Err(err) = result {
-            warn!("failed to send event: {}", err);
-            next_actions[player.id as usize].push_front(Action::Concede);
+    pub fn handle_command(&self, user_id: &UserId, command: GameCommand) {
+        if let Some(game) = self.games.get(&command.game_id) {
+            game.handle_command(user_id, command);
         }
     }
 
-    while !env.game_condition().is_ended() {
-        let (left, right) = players.split_at_mut(1);
+    pub fn cleanup(&mut self) {
+        self.games.retain(|_, game| !game.sender.is_closed());
+        self.players.retain(|_, id| self.games.contains_key(id));
+    }
 
-        if available_actions.is_some() {
-            select! {
-                command = left[0].command_receiver.recv() => {
-                    match command {
-                        Ok(Input::SessionCommand(command)) => {
-                            let SessionCommandKind::NextAction { action } = command.kind;
-                            next_actions[0].push_back(action);
-                        }
-                        Err(err) => {
-                            warn!("failed to receive command: {}", err);
-                            next_actions[0].push_front(Action::Concede);
-                        }
-                        _ => {}
-                    }
+    pub fn abandon(&mut self, user_id: &UserId) {
+        if let Some(game_id) = self.players.get(user_id) {
+            if let Some(game) = self.games.get(game_id) {
+                if let Some(player) = game
+                    .players
+                    .iter()
+                    .position(|player| player.user_id == *user_id)
+                {
+                    game.handle_command(
+                        user_id,
+                        GameCommand {
+                            game_id: *game_id,
+                            player: player as u8,
+                            kind: GameCommandKind::NextAction {
+                                action: Action::Concede,
+                            },
+                        },
+                    );
                 }
-                command = right[0].command_receiver.recv() => {
-                    match command {
-                        Ok(Input::SessionCommand(command)) => {
-                            let SessionCommandKind::NextAction { action } = command.kind;
-                            next_actions[1].push_back(action);
-                        }
-                        Err(err) => {
-                            warn!("failed to receive command: {}", err);
-                            next_actions[1].push_front(Action::Concede);
-                        }
-                        _ => {}
-                    }
-                }
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PlayerData {
+    pub user_id: UserId,
+    pub config: PlayerConfig,
+    pub sender: Sender<Output>,
+}
+
+#[derive(Debug)]
+pub struct Game {
+    sender: Sender<GameCommand>,
+    players: Vec<PlayerData>,
+}
+
+impl Game {
+    pub fn new(id: u32, regulation: Regulation, players: Vec<PlayerData>) -> Self {
+        let player_configs = players
+            .iter()
+            .enumerate()
+            .map(|(id, player)| PlayerConfig {
+                id: id as u8,
+                ..player.config.clone()
+            })
+            .collect();
+        let profile = GameProfile {
+            regulation,
+            players: player_configs,
+            ..Default::default()
+        };
+        let (sender, receiver) = mpsc::channel(1);
+        tokio::spawn(Self::start_game(id, profile, players.clone(), receiver));
+        Self { sender, players }
+    }
+
+    pub fn handle_command(&self, user_id: &UserId, command: GameCommand) {
+        if let Some(player) = self.players.get(command.player as usize) {
+            if player.user_id == *user_id {
+                self.sender.try_send(command).unwrap();
+            }
+        }
+    }
+
+    async fn start_game(
+        game_id: u32,
+        profile: GameProfile,
+        players: Vec<PlayerData>,
+        mut receiver: Receiver<GameCommand>,
+    ) {
+        let mut env = Arc::new(Environment::new(profile, &CATALOG));
+        let mut next_actions = vec![VecDeque::<Action>::new(); 2];
+        let mut available_actions: Option<PlayerAvailableActions> = None;
+        let mut player_in_action = env.state.players.player_in_turn().id;
+
+        for player in env.state.players.iter() {
+            let result = players[player.id as usize]
+                .sender
+                .send_timeout(
+                    Output::GameEvent(GameEvent {
+                        game_id,
+                        player: player.id,
+                        event: GameEventKind::Created,
+                    }),
+                    CHANNEL_TIMEOUT,
+                )
+                .await;
+            if let Err(err) = result {
+                warn!("failed to send event: {}", err);
+                next_actions[player.id as usize].push_front(Action::Concede);
             }
         }
 
         while !env.game_condition().is_ended() {
-            let (player, next_action) = if matches!(next_actions[0].front(), Some(Action::Concede))
-            {
-                (0, Some(Action::Concede))
-            } else if matches!(next_actions[1].front(), Some(Action::Concede)) {
-                (1, Some(Action::Concede))
-            } else if let Some(available_actions) = &available_actions {
-                if let Some(action) = next_actions[available_actions.player as usize].pop_front() {
-                    (player_in_action, Some(action))
+            if available_actions.is_some() {
+                let command = receiver.recv().await;
+                if let Some(command) = command {
+                    let GameCommandKind::NextAction { action } = command.kind;
+                    next_actions[command.player as usize].push_back(action);
                 } else {
-                    break;
+                    return;
                 }
-            } else {
-                (player_in_action, None)
-            };
-
-            let report = Arc::make_mut(&mut env).process(player, next_action);
-            available_actions.clone_from(&report.available_actions);
-
-            if let Some(available_actions) = &report.available_actions {
-                player_in_action = available_actions.player;
             }
 
-            for player in env.state.players.iter() {
-                let state = LocalGameState {
-                    env: env.local(player.id),
-                    logs: report.logs.clone(),
-                    available_actions: report
-                        .available_actions
-                        .clone()
-                        .filter(|actions| actions.player == player.id),
-                };
-                let event = SessionEvent {
-                    session: 0,
-                    player: player.id,
-                    event: SessionEventKind::GameUpdated { state },
-                };
-                let result = players[player.id as usize]
-                    .event_sender
-                    .send_timeout(Output::SessionEvent(event), CHANNEL_TIMEOUT)
-                    .await;
-                if let Err(err) = result {
-                    warn!("failed to send event: {}", err);
-                    next_actions[player.id as usize].push_back(Action::Concede);
+            while !env.game_condition().is_ended() {
+                let (player, next_action) =
+                    if matches!(next_actions[0].front(), Some(Action::Concede)) {
+                        (0, Some(Action::Concede))
+                    } else if matches!(next_actions[1].front(), Some(Action::Concede)) {
+                        (1, Some(Action::Concede))
+                    } else if let Some(available_actions) = &available_actions {
+                        if let Some(action) =
+                            next_actions[available_actions.player as usize].pop_front()
+                        {
+                            (player_in_action, Some(action))
+                        } else {
+                            break;
+                        }
+                    } else {
+                        (player_in_action, None)
+                    };
+
+                let report = Arc::make_mut(&mut env).process(player, next_action);
+                available_actions.clone_from(&report.available_actions);
+
+                if let Some(available_actions) = &report.available_actions {
+                    player_in_action = available_actions.player;
+                }
+
+                for player in env.state.players.iter() {
+                    let state = LocalGameState {
+                        env: env.local(player.id),
+                        logs: report.logs.clone(),
+                        available_actions: report
+                            .available_actions
+                            .clone()
+                            .filter(|actions| actions.player == player.id),
+                    };
+                    let event = GameEvent {
+                        game_id,
+                        player: player.id,
+                        event: GameEventKind::StateUpdated { state },
+                    };
+                    let result = players[player.id as usize]
+                        .sender
+                        .send_timeout(Output::GameEvent(event), CHANNEL_TIMEOUT)
+                        .await;
+                    if let Err(err) = result {
+                        warn!("failed to send event: {}", err);
+                        next_actions[player.id as usize].push_back(Action::Concede);
+                    }
                 }
             }
         }

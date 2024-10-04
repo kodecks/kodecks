@@ -1,45 +1,81 @@
+use crate::{room::RoomConfig, user::UserId};
 use bincode::{Decode, Encode};
-use kodecks::{action::Action, deck::DeckList, env::LocalGameState, profile::GameProfile};
+use kodecks::{action::Action, env::LocalGameState, player::PlayerConfig, profile::GameProfile};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Encode, Decode)]
 pub enum Input {
     Command(Command),
-    SessionCommand(SessionCommand),
+    RoomCommand(RoomCommand),
+    GameCommand(GameCommand),
 }
 
 #[derive(Debug, Clone, Encode, Decode)]
 pub enum Command {
-    CreateSession { profile: GameProfile },
-    StartRandomMatch { deck: DeckList },
+    CreateSession {
+        profile: GameProfile,
+    },
+    CreateRoom {
+        config: RoomConfig,
+        host_player: PlayerConfig,
+    },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
+pub struct RoomCommand {
+    pub room_id: String,
+    #[serde(flatten)]
+    pub kind: RoomCommandKind,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
+#[serde(tag = "command", rename_all = "snake_case")]
+pub enum RoomCommandKind {
+    Approve { guest: UserId },
 }
 
 #[derive(Debug, Clone, Encode, Decode)]
-pub struct SessionCommand {
-    pub session: u32,
+pub struct GameCommand {
+    pub game_id: u32,
     pub player: u8,
-    pub kind: SessionCommandKind,
+    pub kind: GameCommandKind,
 }
 
 #[derive(Debug, Clone, Encode, Decode)]
-pub enum SessionCommandKind {
+pub enum GameCommandKind {
     NextAction { action: Action },
 }
 
 #[derive(Debug, Clone, Encode, Decode)]
 pub enum Output {
-    SessionEvent(SessionEvent),
+    GameEvent(GameEvent),
+    RoomEvent(RoomEvent),
 }
 
-#[derive(Debug, Clone, Encode, Decode)]
-pub struct SessionEvent {
-    pub session: u32,
-    pub player: u8,
-    pub event: SessionEventKind,
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
+pub struct RoomEvent {
+    pub room_id: String,
+    #[serde(flatten)]
+    pub event: RoomEventKind,
 }
 
-#[derive(Debug, Clone, Encode, Decode)]
-pub enum SessionEventKind {
+#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
+#[serde(tag = "event", rename_all = "snake_case")]
+pub enum RoomEventKind {
     Created,
-    GameUpdated { state: LocalGameState },
+    GameRequested { guest: UserId },
+}
+
+#[derive(Debug, Clone, Encode, Decode)]
+pub struct GameEvent {
+    pub game_id: u32,
+    pub player: u8,
+    pub event: GameEventKind,
+}
+
+#[derive(Debug, Clone, Encode, Decode)]
+pub enum GameEventKind {
+    Created,
+    StateUpdated { state: LocalGameState },
     PlayerThinking { thinking: u8 },
 }

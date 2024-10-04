@@ -1,5 +1,5 @@
 use crate::{
-    message::{Output, SessionCommand, SessionCommandKind, SessionEvent, SessionEventKind},
+    message::{GameCommand, GameEvent, GameEventKind, Output, GameCommandKind},
     EngineCallback,
 };
 use kodecks::{
@@ -42,10 +42,10 @@ impl Session {
         for player in session.players() {
             let is_bot = session.bots.iter().any(|bot| bot.player == player);
             if !is_bot {
-                (callback)(Output::SessionEvent(SessionEvent {
-                    session: id,
+                (callback)(Output::GameEvent(GameEvent {
+                    game_id: id,
                     player,
-                    event: SessionEventKind::Created,
+                    event: GameEventKind::Created,
                 }));
             }
         }
@@ -54,9 +54,9 @@ impl Session {
         session
     }
 
-    pub fn process_command(&mut self, command: SessionCommand) {
+    pub fn process_command(&mut self, command: GameCommand) {
         match command.kind {
-            SessionCommandKind::NextAction { action } => {
+            GameCommandKind::NextAction { action } => {
                 self.next_actions.insert(command.player, action);
             }
         }
@@ -65,12 +65,12 @@ impl Session {
 
     fn send_player_thinking(&self, thinking: u8) {
         for player in self.players().filter(|&p| p != thinking) {
-            let event = SessionEvent {
-                session: self.id,
+            let event = GameEvent {
+                game_id: self.id,
                 player,
-                event: SessionEventKind::PlayerThinking { thinking },
+                event: GameEventKind::PlayerThinking { thinking },
             };
-            (self.callback)(Output::SessionEvent(event));
+            (self.callback)(Output::GameEvent(event));
         }
     }
 
@@ -123,12 +123,12 @@ impl Session {
                             .clone()
                             .filter(|actions| actions.player == player),
                     };
-                    let event = SessionEvent {
-                        session: self.id,
+                    let event = GameEvent {
+                        game_id: self.id,
                         player,
-                        event: SessionEventKind::GameUpdated { state },
+                        event: GameEventKind::StateUpdated { state },
                     };
-                    (self.callback)(Output::SessionEvent(event));
+                    (self.callback)(Output::GameEvent(event));
                 }
             }
         }

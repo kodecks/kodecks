@@ -6,7 +6,9 @@ use std::{collections::HashMap, sync::Arc};
 pub mod local;
 pub mod login;
 pub mod message;
+pub mod room;
 pub mod session;
+pub mod user;
 pub mod worker;
 
 pub type EngineCallback = dyn Fn(message::Output) + Send + Sync + 'static;
@@ -31,13 +33,11 @@ impl Engine {
 
     pub fn handle_input(&mut self, input: message::Input) {
         match input {
-            Input::Command(command) => {
-                if let Command::CreateSession { profile } = command {
-                    self.create_session(profile);
-                }
+            Input::Command(Command::CreateSession { profile }) => {
+                self.create_session(profile);
             }
-            message::Input::SessionCommand(session_command) => {
-                let id = session_command.session;
+            Input::GameCommand(session_command) => {
+                let id = session_command.game_id;
                 if let Some(session) = self.sessions.get_mut(&id) {
                     session.process_command(session_command);
                     if session.is_ended() {
@@ -45,6 +45,7 @@ impl Engine {
                     }
                 }
             }
+            _ => {}
         }
     }
 
