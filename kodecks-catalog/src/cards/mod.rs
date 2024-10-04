@@ -20,6 +20,7 @@ mod mire_alligator;
 mod moonlit_gecko;
 mod moss_grown_mastodon;
 mod oil_leaking_droid;
+mod poison_tusk_babirusa;
 mod pyrosnail;
 mod quartz_moth;
 mod radio_deer;
@@ -100,4 +101,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "tung" => tungsten_rhino::ARCHETYPE,
     "saltmarsh-moray" => saltmarsh_moray::ARCHETYPE,
     "salt" => saltmarsh_moray::ARCHETYPE,
+    "poison-tusk-babirusa" => poison_tusk_babirusa::ARCHETYPE,
+    "pois" => poison_tusk_babirusa::ARCHETYPE,
 };

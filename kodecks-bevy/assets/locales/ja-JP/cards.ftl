@@ -47,3 +47,4 @@ card-electric-clione = 電子クリオネ
 card-electric-flytrap = 電気蝿取草
 card-tungsten-rhino = タングステン・ライノ
 card-saltmarsh-moray = 塩沼のウツボ
+card-poison-tusk-babirusa = 毒牙のバビルサ
