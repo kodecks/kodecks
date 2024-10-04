@@ -1,7 +1,7 @@
 use crate::deck::DeckList;
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Encode, Decode)]
 pub struct Regulation {
@@ -11,6 +11,7 @@ pub struct Regulation {
     pub initial_hand_size: u8,
     pub initial_life: u32,
     pub max_hand_size: u8,
+    pub action_timeout: Duration,
 }
 
 impl Default for Regulation {
@@ -27,6 +28,7 @@ impl Regulation {
         initial_hand_size: 4,
         initial_life: 2000,
         max_hand_size: 6,
+        action_timeout: Duration::from_secs(30),
     };
 
     pub fn verify(&self, deck: &DeckList) -> bool {

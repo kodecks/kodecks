@@ -1,3 +1,4 @@
+use futures_util::future;
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::{Environment, LocalGameState},
@@ -15,7 +16,11 @@ use std::{
     sync::Arc,
     time::Duration,
 };
-use tokio::sync::mpsc::{self, Receiver, Sender};
+use tokio::{
+    select,
+    sync::mpsc::{self, Receiver, Sender},
+    time::{self, Instant},
+};
 use tracing::warn;
 
 const CHANNEL_TIMEOUT: Duration = Duration::from_secs(1);
@@ -123,6 +128,8 @@ impl Game {
         players: Vec<PlayerData>,
         mut receiver: Receiver<GameCommand>,
     ) {
+        let regulation = profile.regulation.clone();
+
         let mut env = Arc::new(Environment::new(profile, &CATALOG));
         let mut next_actions = vec![VecDeque::<Action>::new(); 2];
         let mut available_actions: Option<PlayerAvailableActions> = None;
@@ -146,14 +153,24 @@ impl Game {
             }
         }
 
+        let mut next_action_timeout = Instant::now() + regulation.action_timeout;
+
         while !env.game_condition().is_ended() {
-            if available_actions.is_some() {
-                let command = receiver.recv().await;
-                if let Some(command) = command {
-                    let GameCommandKind::NextAction { action } = command.kind;
-                    next_actions[command.player as usize].push_back(action);
-                } else {
-                    return;
+            if let Some(available_actions) = &available_actions {
+                let timeout = time::timeout_at(next_action_timeout, future::pending::<()>());
+                select! {
+                    command = receiver.recv() => {
+                        if let Some(command) = command {
+                            let GameCommandKind::NextAction { action } = command.kind;
+                            next_actions[command.player as usize].push_back(action);
+                        } else {
+                            return;
+                        }
+                    }
+                    _ = timeout => {
+                        let action = available_actions.actions.default_action().unwrap_or(Action::Concede);
+                        next_actions[player_in_action as usize].push_back(action);
+                    }
                 }
             }
 
@@ -186,6 +203,7 @@ impl Game {
 
                 if let Some(available_actions) = &report.available_actions {
                     player_in_action = available_actions.player;
+                    next_action_timeout = Instant::now() + regulation.action_timeout;
                 }
 
                 for player in env.state.players.iter() {
