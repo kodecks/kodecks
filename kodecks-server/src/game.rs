@@ -164,9 +164,15 @@ impl Game {
                     } else if matches!(next_actions[1].front(), Some(Action::Concede)) {
                         (1, Some(Action::Concede))
                     } else if let Some(available_actions) = &available_actions {
-                        if let Some(action) =
-                            next_actions[available_actions.player as usize].pop_front()
-                        {
+                        let next_actions = &mut next_actions[available_actions.player as usize];
+                        while let Some(action) = next_actions.front() {
+                            if available_actions.actions.validate(action) {
+                                break;
+                            } else {
+                                next_actions.pop_front();
+                            }
+                        }
+                        if let Some(action) = next_actions.pop_front() {
                             (player_in_action, Some(action))
                         } else {
                             break;
