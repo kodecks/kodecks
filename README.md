@@ -1,12 +1,13 @@
 # Kodecks
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Test Status](https://github.com/kodecks/kodecks/actions/workflows/test.yml/badge.svg)](https://github.com/kodecks/kodecks/actions/workflows/test.yml)
 
-Open-source Non-rogue-lite Digital Card Game
+Open-source Classic-Style Digital Card Game
 
-- Inspired by traditional TCGs such as Mt:G but featuring more streamlined gameplay
+- Inspired by traditional TCGs such as MTG but featuring more streamlined gameplay
 - Play in the browser or on desktop
-- Battle against CPU
+- Battle against CPU or other players
 - Localization support
 
 ## Build from source
@@ -30,3 +31,9 @@ rustup target install wasm32-unknown-unknown
 cargo binstall trunk
 trunk serve
 ```
+
+## License
+
+Source code and assets are licensed under the [MIT License](LICENSE) unless otherwise specified.
+
+[Fonts](https://github.com/kodecks/assets/tree/main/fonts) are licensed under the Open Font License.
