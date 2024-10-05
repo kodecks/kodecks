@@ -1,14 +1,10 @@
-use super::{
-    config::{ConfigPlugin, GlobalConfig},
-    spinner::SpinnerState,
-    translator::Translator,
-    GlobalState,
-};
+use super::{spinner::SpinnerState, translator::Translator, GlobalState};
 use crate::{
     assets::{
         card::RenderedCardPlugin,
         fluent::{FluentAsset, FluentPlugin, DEFAULT_LANG},
     },
+    config::{ConfigPlugin, GlobalConfig},
     scene::lang::find_language,
 };
 use bevy::{asset::LoadState, prelude::*};

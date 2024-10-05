@@ -1,9 +1,9 @@
 use super::{
-    config::GlobalConfig,
     game::mode::{GameMode, GameModeKind},
     translator::{TextPurpose, Translator},
     GlobalState,
 };
+use crate::config::GlobalConfig;
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use kodecks::{deck::DeckList, regulation::Regulation};

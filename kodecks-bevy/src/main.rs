@@ -7,6 +7,7 @@ mod input;
 mod opts;
 mod painter;
 mod save_data;
+mod config;
 mod scene;
 
 fn main() {
