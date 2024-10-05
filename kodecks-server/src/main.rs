@@ -61,6 +61,7 @@ async fn main() -> anyhow::Result<()> {
             "/",
             get(|| async { Redirect::permanent("https://github.com/kodecks/kodecks") }),
         )
+        .route("/status", get(app::status))
         .route("/login", post(login::login))
         .route("/ws", get(socket::ws_handler))
         .merge(authorized)

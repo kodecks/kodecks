@@ -4,6 +4,7 @@ use crate::{
     session::Session,
     token::Token,
 };
+use axum::{extract::State, http::StatusCode, Json};
 use dashmap::{
     mapref::one::{Ref, RefMut},
     DashMap,
@@ -13,7 +14,8 @@ use kodecks_engine::{
     message::{Command, Input, Output, RoomCommand, RoomCommandKind, RoomEvent, RoomEventKind},
     user::UserId,
 };
-use std::sync::Mutex;
+use serde::Serialize;
+use std::sync::{Arc, Mutex};
 
 pub struct AppState {
     sessions: DashMap<UserId, Session>,
@@ -29,6 +31,12 @@ impl AppState {
             tokens: DashMap::new(),
             rooms: Mutex::new(RoomList::default()),
             games: Mutex::new(GameList::default()),
+        }
+    }
+
+    pub fn status(&self) -> Status {
+        Status {
+            sessions: self.sessions.len() as u32,
         }
     }
 
@@ -151,4 +159,13 @@ impl AppState {
             _ => {}
         }
     }
+}
+
+#[derive(Serialize)]
+pub struct Status {
+    sessions: u32,
+}
+
+pub async fn status(State(state): State<Arc<AppState>>) -> (StatusCode, Json<Status>) {
+    (StatusCode::OK, Json(state.status()))
 }
