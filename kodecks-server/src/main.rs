@@ -10,6 +10,7 @@ use http::{
 };
 use std::{net::SocketAddr, sync::Arc};
 use tokio::try_join;
+use tower_governor::{governor::GovernorConfigBuilder, GovernorLayer};
 use tower_http::{
     compression::CompressionLayer,
     cors::{Any, CorsLayer},
@@ -50,6 +51,14 @@ async fn main() -> anyhow::Result<()> {
         .allow_headers([AUTHORIZATION, ACCEPT, CONTENT_TYPE])
         .allow_origin(Any);
 
+    let governor_conf = Arc::new(
+        GovernorConfigBuilder::default()
+            .per_second(1)
+            .burst_size(8)
+            .finish()
+            .unwrap(),
+    );
+
     let state = Arc::new(app::AppState::new());
 
     let authorized = Router::new()
@@ -64,6 +73,9 @@ async fn main() -> anyhow::Result<()> {
         .route("/status", get(app::status))
         .route("/login", post(login::login))
         .route("/ws", get(socket::ws_handler))
+        .layer(GovernorLayer {
+            config: governor_conf,
+        })
         .merge(authorized)
         .layer(cors)
         .layer(CompressionLayer::new())
