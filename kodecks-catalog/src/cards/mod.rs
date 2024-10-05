@@ -16,6 +16,7 @@ mod helium_puffer;
 mod icefall_weasel;
 mod laser_frog;
 mod marshland_moose;
+mod minimum_bear;
 mod mire_alligator;
 mod moonlit_gecko;
 mod moss_grown_mastodon;
@@ -103,4 +104,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "salt" => saltmarsh_moray::ARCHETYPE,
     "poison-tusk-babirusa" => poison_tusk_babirusa::ARCHETYPE,
     "pois" => poison_tusk_babirusa::ARCHETYPE,
+    "minimum-bear" => minimum_bear::ARCHETYPE,
+    "mini" => minimum_bear::ARCHETYPE,
 };

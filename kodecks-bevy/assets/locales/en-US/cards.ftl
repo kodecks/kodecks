@@ -48,3 +48,4 @@ card-electric-flytrap = Electric Flytrap
 card-tungsten-rhino = Tungsten Rhino
 card-saltmarsh-moray = Saltmarsh Moray
 card-poison-tusk-babirusa = Poison-Tusk Babirusa
+card-minimum-bear = Minimum Bear
