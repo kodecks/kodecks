@@ -49,3 +49,4 @@ card-tungsten-rhino = タングステン・ライノ
 card-saltmarsh-moray = 塩沼のウツボ
 card-poison-tusk-babirusa = 毒牙のバビルサ
 card-minimum-bear = ミニマム・ベア
+card-solar-beetle = ソーラー・ビートル

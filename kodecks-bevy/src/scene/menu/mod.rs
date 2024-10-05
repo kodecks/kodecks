@@ -34,14 +34,15 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
         "
     Volcanic Wyrm 2
     Wind-Up Spider 2
-    Pyrosnail 2
+    Pyrosnail 1
     Oil-Leaking Droid 2
     Diamond Porcupine 2
     Bambooster 1
     Coppermine Scorpion 2
-    Laser Frog 3
+    Laser Frog 2
     Graphite Armadillo 2
     Tungsten Rhino 2
+    Solar Beetle 2
     ",
         &CATALOG,
     )

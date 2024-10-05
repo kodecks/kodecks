@@ -27,6 +27,7 @@ mod quartz_moth;
 mod radio_deer;
 mod saltmarsh_moray;
 mod scrapyard_raven;
+mod solar_beetle;
 mod tungsten_rhino;
 mod turbofish;
 mod vigilant_lynx;
@@ -106,4 +107,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "pois" => poison_tusk_babirusa::ARCHETYPE,
     "minimum-bear" => minimum_bear::ARCHETYPE,
     "mini" => minimum_bear::ARCHETYPE,
+    "solar-beetle" => solar_beetle::ARCHETYPE,
+    "sola" => solar_beetle::ARCHETYPE,
 };
