@@ -1,5 +1,3 @@
-use std::hash::{Hash, Hasher};
-
 use super::{
     board, event,
     mode::{GameMode, GameModeKind},
@@ -23,6 +21,8 @@ use kodecks_engine::{
     room::{RoomConfig, RoomType},
     Connection,
 };
+use std::hash::{Hash, Hasher};
+use web_time::{SystemTime, UNIX_EPOCH};
 
 pub struct GameLoadingPlugin;
 
@@ -177,8 +177,13 @@ fn init_game_mode(
                 rng_seed: Some(hasher.finish()),
             };
 
+            let log_id = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map(|d| d.as_secs().to_string())
+                .map(|t| format!("{}-{}", t, nanoid::nanoid!()))
+                .unwrap_or_else(|_| nanoid::nanoid!());
             let mut conn = ServerConnection::new_local();
-            conn.send(Input::Command(Command::CreateSession { profile }));
+            conn.send(Input::Command(Command::CreateSession { log_id, profile }));
             commands.insert_resource(conn);
 
             next_loading_state.set(GameLoadingState::BotMatch);

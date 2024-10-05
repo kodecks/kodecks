@@ -246,7 +246,7 @@ fn recv_events(
     while let Some(event) = server.recv() {
         match event {
             Output::GameEvent(event) => match event.event {
-                message::GameEventKind::Created => {
+                message::GameEventKind::Created { .. } => {
                     commands.insert_resource(Session {
                         id: event.game_id,
                         player: event.player,

@@ -23,13 +23,13 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new(id: u32, profile: GameProfile, callback: Arc<Box<EngineCallback>>) -> Self {
+    pub fn new(log_id: String, profile: GameProfile, callback: Arc<Box<EngineCallback>>) -> Self {
         let bots = profile.bots.clone();
         let env = Arc::new(Environment::new(profile, &CATALOG));
         let player_in_action = env.state.players.player_in_turn().id;
 
         let mut session = Self {
-            id,
+            id: 0,
             env,
             bots,
             next_actions: HashMap::new(),
@@ -43,9 +43,11 @@ impl Session {
             let is_bot = session.bots.iter().any(|bot| bot.player == player);
             if !is_bot {
                 (callback)(Output::GameEvent(GameEvent {
-                    game_id: id,
+                    game_id: 0,
                     player,
-                    event: GameEventKind::Created,
+                    event: GameEventKind::Created {
+                        log_id: log_id.clone(),
+                    },
                 }));
             }
         }

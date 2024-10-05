@@ -15,7 +15,7 @@ use kodecks_engine::{
 use std::{
     collections::{HashMap, VecDeque},
     sync::Arc,
-    time::Duration,
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 use tokio::{
     select,
@@ -111,7 +111,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(id: u32, regulation: Regulation, players: Vec<PlayerData>) -> Self {
+    pub fn new(game_id: u32, regulation: Regulation, players: Vec<PlayerData>) -> Self {
         let player_configs = players
             .iter()
             .enumerate()
@@ -125,8 +125,22 @@ impl Game {
             players: player_configs,
             ..Default::default()
         };
+
+        let log_id = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs().to_string())
+            .map(|t| format!("{}-{}", t, nanoid::nanoid!()))
+            .unwrap_or_else(|_| nanoid::nanoid!());
+
         let (sender, receiver) = mpsc::channel(1);
-        tokio::spawn(Self::start_game(id, profile, players.clone(), receiver));
+        tokio::spawn(Self::start_game(
+            game_id,
+            log_id,
+            profile,
+            players.clone(),
+            receiver,
+        ));
+
         Self { sender, players }
     }
 
@@ -140,6 +154,7 @@ impl Game {
 
     async fn start_game(
         game_id: u32,
+        log_id: String,
         profile: GameProfile,
         mut players: Vec<PlayerData>,
         mut receiver: Receiver<GameCommand>,
@@ -157,7 +172,9 @@ impl Game {
                     Output::GameEvent(GameEvent {
                         game_id,
                         player: player.id,
-                        event: GameEventKind::Created,
+                        event: GameEventKind::Created {
+                            log_id: log_id.clone(),
+                        },
                     }),
                     CHANNEL_TIMEOUT,
                 )

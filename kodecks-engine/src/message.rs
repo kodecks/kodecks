@@ -13,6 +13,7 @@ pub enum Input {
 #[derive(Debug, Clone, Encode, Decode)]
 pub enum Command {
     CreateSession {
+        log_id: String,
         profile: GameProfile,
     },
     CreateRoom {
@@ -75,7 +76,7 @@ pub struct GameEvent {
 
 #[derive(Debug, Clone, Encode, Decode)]
 pub enum GameEventKind {
-    Created,
+    Created { log_id: String },
     StateUpdated { state: LocalGameState },
     PlayerThinking { thinking: u8, timeout: Option<u32> },
 }

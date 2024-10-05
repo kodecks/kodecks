@@ -3764,6 +3764,7 @@ dependencies = [
  "kodecks-engine",
  "leafwing-input-manager",
  "log",
+ "nanoid",
  "rand",
  "reqwest",
  "reqwest-websocket",
@@ -3776,6 +3777,7 @@ dependencies = [
  "tracing",
  "unic-langid",
  "url",
+ "web-time",
 ]
 
 [[package]]
