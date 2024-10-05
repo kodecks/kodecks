@@ -37,7 +37,7 @@ impl Eq for Auth {}
 
 impl Hash for Auth {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.private_key.to_bytes().hash(state);
+        self.private_key.verifying_key().to_bytes().hash(state);
     }
 }
 
