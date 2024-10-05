@@ -14,11 +14,11 @@ pub struct GameProfile {
     pub debug: DebugConfig,
     pub players: Vec<PlayerConfig>,
     pub bots: Vec<BotConfig>,
+    pub rng_seed: Option<u64>,
 }
 
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, Encode, Decode)]
 pub struct DebugConfig {
-    pub rng_seed: Option<u64>,
     pub no_deck_shuffle: bool,
     pub no_player_shuffle: bool,
     pub flags: DebugFlags,

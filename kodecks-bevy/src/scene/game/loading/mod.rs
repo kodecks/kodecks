@@ -1,3 +1,5 @@
+use std::hash::{Hash, Hasher};
+
 use super::{
     board, event,
     mode::{GameMode, GameModeKind},
@@ -153,6 +155,8 @@ fn init_game_mode(
 ) {
     match &mode.kind {
         GameModeKind::BotMatch { bot_deck } => {
+            let mut hasher = fnv::FnvHasher::default();
+            save_data.hash(&mut hasher);
             let profile = GameProfile {
                 regulation: mode.regulation.clone(),
                 debug: DebugConfig {
@@ -170,6 +174,7 @@ fn init_game_mode(
                     },
                 ],
                 bots: vec![BotConfig { player: 2 }],
+                rng_seed: Some(hasher.finish()),
             };
 
             let mut conn = ServerConnection::new_local();

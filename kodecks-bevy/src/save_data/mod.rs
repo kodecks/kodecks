@@ -17,7 +17,7 @@ impl Plugin for SaveDataPlugin {
     }
 }
 
-#[derive(Debug, Clone, Default, Resource, Deref, DerefMut, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, Resource, Deref, DerefMut, PartialEq, Eq, Hash)]
 pub struct SaveData(v1::SaveDataV1);
 
 impl SaveData {

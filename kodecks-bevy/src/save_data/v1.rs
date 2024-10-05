@@ -3,16 +3,16 @@ use base64::{engine::general_purpose::URL_SAFE, Engine as _};
 use k256::schnorr::SigningKey;
 use serde::{Deserialize, Serialize};
 use serde_default::DefaultFromSerde;
-use std::fmt;
+use std::{fmt, hash::Hash};
 
-#[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct SaveDataV1 {
     version: VersionTag<1>,
     pub auth: Auth,
     pub statistics: Statistics,
 }
 
-#[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Statistics {
     pub games: u32,
 }
@@ -34,6 +34,12 @@ impl PartialEq for Auth {
 }
 
 impl Eq for Auth {}
+
+impl Hash for Auth {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.private_key.to_bytes().hash(state);
+    }
+}
 
 impl fmt::Debug for Auth {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

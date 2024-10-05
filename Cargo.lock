@@ -3752,6 +3752,7 @@ dependencies = [
  "fluent-bundle",
  "fluent-syntax",
  "fluent_content",
+ "fnv",
  "futures",
  "futures-util",
  "gloo-storage",

@@ -52,7 +52,6 @@ pub struct Environment {
 impl Environment {
     pub fn new(profile: GameProfile, catalog: &'static Catalog) -> Self {
         let mut rng: SmallRng = profile
-            .debug
             .rng_seed
             .map(SmallRng::seed_from_u64)
             .unwrap_or_else(SmallRng::from_entropy);

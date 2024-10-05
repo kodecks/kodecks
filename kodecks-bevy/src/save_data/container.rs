@@ -7,13 +7,13 @@ use std::io::prelude::*;
 
 const NONCE_LEN: usize = 4;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum SaveData {
     V1(super::v1::SaveDataV1),
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default, Hash, PartialEq, Eq)]
 pub struct VersionTag<const V: u8>;
 
 impl<const V: u8> Serialize for VersionTag<V> {
