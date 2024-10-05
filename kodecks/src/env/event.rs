@@ -39,8 +39,9 @@ impl Environment {
                     .computed()
                     .abilities
                     .contains(&KeywordAbility::Devour);
+                let token = target.is_token();
                 Ok(filter_vec![
-                    if volatile || devour {
+                    if volatile || devour || token {
                         None
                     } else {
                         Some(OpcodeList::new(vec![Opcode::GenerateShards {
