@@ -48,7 +48,9 @@ impl Ord for AvailableAction {
 pub struct PlayerAvailableActions {
     pub player: u8,
     pub actions: AvailableActionList,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub instructions: Option<Message>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub message_dialog: Option<MessageDialog>,
 }
 

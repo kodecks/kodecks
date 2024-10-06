@@ -14,6 +14,7 @@ pub struct GameProfile {
     pub debug: DebugConfig,
     pub players: Vec<PlayerConfig>,
     pub bots: Vec<BotConfig>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rng_seed: Option<u64>,
 }
 

@@ -19,10 +19,13 @@ pub struct ComputedAttribute {
     pub color: Color,
     pub cost: Linear<u8>,
     pub card_type: CardType,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub creature_type: Option<CreatureType>,
     pub abilities: AbilityList<KeywordAbility>,
     pub anon_abilities: AbilityList<AnonymousAbility>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub power: Option<Linear<u32>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub shields: Option<Linear<u8>>,
 }
 

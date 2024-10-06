@@ -62,6 +62,7 @@ impl GameState {
 pub struct LocalGameState {
     pub env: LocalEnvironment,
     pub logs: Vec<LogAction>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub available_actions: Option<PlayerAvailableActions>,
 }
 

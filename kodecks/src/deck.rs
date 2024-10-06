@@ -36,6 +36,7 @@ impl DeckList {
 pub struct DeckItem {
     pub archetype_id: ArchetypeId,
     pub style: u8,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub base_id: Option<ObjectId>,
 }
 

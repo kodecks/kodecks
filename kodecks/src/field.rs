@@ -61,6 +61,7 @@ impl CardList<FieldItem<Card>> {
 pub struct FieldItem<T: CardId> {
     pub card: T,
     pub state: FieldState,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub battle: Option<FieldBattleState>,
 }
 
