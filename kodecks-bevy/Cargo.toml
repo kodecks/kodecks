@@ -18,6 +18,7 @@ bevy_mod_picking = { version = "0.20.1", features = [
 ], default-features = false }
 bincode = "2.0.0-rc.3"
 build-info = "0.0.38"
+chrono = "0.4.38"
 dashmap = "6.0.1"
 flate2 = "1.0.34"
 fluent-bundle = "0.15.3"
@@ -55,7 +56,6 @@ thiserror = "1.0.63"
 tracing = "0.1.40"
 unic-langid = { version = "0.9.5", features = ["macros"] }
 url = { version = "2.5.2", features = ["serde"] }
-web-time = "1.1.0"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 kodecks-bot = { path = "../kodecks-bot", features = ["rayon"] }

@@ -15,7 +15,7 @@ use kodecks_engine::{
 use std::{
     collections::{HashMap, VecDeque},
     sync::Arc,
-    time::{Duration, SystemTime, UNIX_EPOCH},
+    time::Duration,
 };
 use tokio::{
     select,
@@ -126,11 +126,11 @@ impl Game {
             ..Default::default()
         };
 
-        let log_id = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|d| d.as_secs().to_string())
-            .map(|t| format!("{}-{}", t, nanoid::nanoid!()))
-            .unwrap_or_else(|_| nanoid::nanoid!());
+        let log_id = format!(
+            "{}-{}",
+            chrono::Local::now().format("%Y%m%d%H%M%S"),
+            nanoid::nanoid!()
+        );
 
         let (sender, receiver) = mpsc::channel(1);
         tokio::spawn(Self::start_game(
