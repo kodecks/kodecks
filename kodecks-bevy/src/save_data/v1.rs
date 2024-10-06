@@ -1,6 +1,6 @@
-use super::container::VersionTag;
 use base64::{engine::general_purpose::URL_SAFE, Engine as _};
 use k256::schnorr::SigningKey;
+use kodecks_engine::version::VersionTag;
 use serde::{Deserialize, Serialize};
 use serde_default::DefaultFromSerde;
 use std::{fmt, hash::Hash};

@@ -9,6 +9,7 @@ pub mod message;
 pub mod room;
 pub mod session;
 pub mod user;
+pub mod version;
 pub mod worker;
 
 pub type EngineCallback = dyn Fn(message::Output) + Send + Sync + 'static;
