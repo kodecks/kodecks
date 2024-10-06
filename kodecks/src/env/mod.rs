@@ -371,6 +371,7 @@ impl Environment {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+#[serde(rename_all = "snake_case")]
 pub enum EndgameState {
     InProgress,
     Finished {
@@ -401,6 +402,7 @@ impl fmt::Display for EndgameState {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+#[serde(rename_all = "snake_case")]
 pub enum EndgameReason {
     Concede,
     LifeZero,

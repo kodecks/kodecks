@@ -7,6 +7,7 @@ use crate::player::PlayerZone;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode)]
 #[non_exhaustive]
+#[serde(rename_all = "snake_case")]
 pub enum CardEvent {
     Casted {
         from: PlayerZone,

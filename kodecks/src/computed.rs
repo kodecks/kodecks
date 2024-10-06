@@ -21,7 +21,9 @@ pub struct ComputedAttribute {
     pub card_type: CardType,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub creature_type: Option<CreatureType>,
+    #[serde(default, skip_serializing_if = "AbilityList::is_empty")]
     pub abilities: AbilityList<KeywordAbility>,
+    #[serde(default, skip_serializing_if = "AbilityList::is_empty")]
     pub anon_abilities: AbilityList<AnonymousAbility>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub power: Option<Linear<u32>>,

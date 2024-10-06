@@ -9,7 +9,7 @@ use strum::Display;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode)]
 #[non_exhaustive]
-#[serde(untagged)]
+#[serde(untagged, rename_all = "snake_case")]
 pub enum Value {
     Ability(KeywordAbility),
     Integer(i32),

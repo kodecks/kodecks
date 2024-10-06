@@ -122,6 +122,7 @@ where
 #[derive(
     Debug, Clone, Copy, Default, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode,
 )]
+#[serde(rename_all = "snake_case")]
 pub enum FieldState {
     #[default]
     Active,
@@ -129,6 +130,7 @@ pub enum FieldState {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode)]
+#[serde(rename_all = "snake_case")]
 pub enum FieldBattleState {
     Attacking,
     Blocking { attacker: ObjectId },

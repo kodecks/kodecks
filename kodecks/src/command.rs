@@ -15,6 +15,7 @@ use serde::{Deserialize, Serialize};
 use strum::Display;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Display, Encode, Decode)]
+#[serde(rename_all = "snake_case")]
 pub enum ActionCommand {
     InflictDamage {
         target: u8,
