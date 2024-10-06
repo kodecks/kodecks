@@ -14,6 +14,7 @@ use kodecks_engine::{
     message::{Command, Input, Output, RoomCommand, RoomCommandKind, RoomEvent, RoomEventKind},
     user::UserId,
 };
+use semver::VersionReq;
 use serde::Serialize;
 use std::sync::{Arc, Mutex};
 
@@ -36,6 +37,7 @@ impl AppState {
 
     pub fn status(&self) -> Status {
         Status {
+            client_version: "^0.1".parse().unwrap(),
             sessions: self.sessions.len() as u32,
         }
     }
@@ -163,6 +165,7 @@ impl AppState {
 
 #[derive(Serialize)]
 pub struct Status {
+    client_version: VersionReq,
     sessions: u32,
 }
 
