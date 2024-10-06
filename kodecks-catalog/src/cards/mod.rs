@@ -28,6 +28,7 @@ mod radio_deer;
 mod saltmarsh_moray;
 mod scrapyard_raven;
 mod solar_beetle;
+mod soundless_owl;
 mod tungsten_rhino;
 mod turbofish;
 mod vigilant_lynx;
@@ -109,4 +110,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "mini" => minimum_bear::ARCHETYPE,
     "solar-beetle" => solar_beetle::ARCHETYPE,
     "sola" => solar_beetle::ARCHETYPE,
+    "soundless-owl" => soundless_owl::ARCHETYPE,
+    "soun" => soundless_owl::ARCHETYPE,
 };

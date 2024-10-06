@@ -56,11 +56,12 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
     Demilune Nighthawk 2
     Electric Clione 2
     Flash-Bang Jellyfish 1
-    Helium Puffer 2
+    Helium Puffer 1
     Icefall Weasel 1
     Turbofish 2
     Saltmarsh Moray 2
-    Minimum Bear 2
+    Minimum Bear 1
+    Soundless Owl 2
     ",
         &CATALOG,
     )
