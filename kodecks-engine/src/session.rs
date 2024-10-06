@@ -5,6 +5,7 @@ use crate::{
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::{Environment, LocalGameState},
+    player::LocalStateAccess,
     profile::{BotConfig, GameProfile},
 };
 use kodecks_bot::{Bot, DefaultBot};
@@ -121,7 +122,7 @@ impl Session {
                 let is_bot = self.bots.iter().any(|bot| bot.player == player);
                 if !is_bot {
                     let state = LocalGameState {
-                        env: self.env.local(player),
+                        env: self.env.local(player, LocalStateAccess::Player(player)),
                         logs: report.logs.clone(),
                         available_actions: report
                             .available_actions

@@ -297,8 +297,20 @@ impl PlayerItem for LocalPlayerState {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum LocalStateAccess {
+    PublicOnly,
+    Player(u8),
+    Full,
+}
+
 impl LocalPlayerState {
-    pub fn new(state: &PlayerState, private: bool) -> Self {
+    pub fn new(state: &PlayerState, access: LocalStateAccess) -> Self {
+        let private = match access {
+            LocalStateAccess::PublicOnly => false,
+            LocalStateAccess::Player(player) => player == state.id,
+            LocalStateAccess::Full => true,
+        };
         Self {
             id: state.id,
             deck: state.deck.len(),
