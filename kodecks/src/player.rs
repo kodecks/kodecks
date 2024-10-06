@@ -17,7 +17,6 @@ use std::collections::VecDeque;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct PlayerConfig {
-    pub id: u8,
     pub deck: DeckList,
 }
 

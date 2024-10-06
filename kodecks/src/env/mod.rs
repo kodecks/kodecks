@@ -57,14 +57,15 @@ impl Environment {
             .unwrap_or_else(SmallRng::from_entropy);
 
         let mut obj_counter = ObjectIdCounter::default();
-        let mut players = profile
+        let players = profile
             .players
             .into_iter()
-            .map(|player| {
-                let mut state = PlayerState::new(player.id);
+            .enumerate()
+            .map(|(id, player)| {
+                let mut state = PlayerState::new(id as u8);
                 for item in &player.deck.cards {
                     let archetype = &catalog[item.archetype_id];
-                    let card = Card::new(&mut obj_counter, item, archetype, item.style, player.id);
+                    let card = Card::new(&mut obj_counter, item, archetype, item.style, id as u8);
                     state.deck.add_top(card);
                 }
                 if !profile.debug.no_deck_shuffle {
@@ -74,11 +75,11 @@ impl Environment {
             })
             .collect::<Vec<_>>();
 
-        if !profile.debug.no_player_shuffle {
-            players.shuffle(&mut rng);
-        }
-
-        let current_player = players.first().as_ref().unwrap().id;
+        let current_player = if profile.debug.no_player_shuffle {
+            players.first().as_ref().unwrap().id
+        } else {
+            players.choose(&mut rng).unwrap().id
+        };
 
         Environment {
             state: GameState {

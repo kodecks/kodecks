@@ -112,14 +112,7 @@ pub struct Game {
 
 impl Game {
     pub fn new(game_id: u32, regulation: Regulation, players: Vec<PlayerData>) -> Self {
-        let player_configs = players
-            .iter()
-            .enumerate()
-            .map(|(id, player)| PlayerConfig {
-                id: id as u8,
-                ..player.config.clone()
-            })
-            .collect();
+        let player_configs = players.iter().map(|player| player.config.clone()).collect();
         let profile = GameProfile {
             regulation,
             players: player_configs,

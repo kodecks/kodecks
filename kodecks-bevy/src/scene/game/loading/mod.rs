@@ -164,15 +164,13 @@ fn init_game_mode(
                 },
                 players: vec![
                     PlayerConfig {
-                        id: 1,
                         deck: mode.player_deck.clone(),
                     },
                     PlayerConfig {
-                        id: 2,
                         deck: bot_deck.clone(),
                     },
                 ],
-                bots: vec![BotConfig { player: 2 }],
+                bots: vec![BotConfig { player: 1 }],
                 rng_seed: Some(hasher.finish()),
             };
 
@@ -196,7 +194,6 @@ fn init_game_mode(
                     room_type: RoomType::RandomMatch,
                 },
                 host_player: PlayerConfig {
-                    id: 0,
                     deck: mode.player_deck.clone(),
                 },
             }));
