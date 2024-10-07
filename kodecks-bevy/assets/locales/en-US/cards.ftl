@@ -51,3 +51,4 @@ card-poison-tusk-babirusa = Poison-Tusk Babirusa
 card-minimum-bear = Minimum Bear
 card-solar-beetle = Solar Beetle
 card-soundless-owl = Soundless Owl
+card-quicksand-skulker = Quicksand Skulker

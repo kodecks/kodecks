@@ -51,3 +51,4 @@ card-poison-tusk-babirusa = 毒牙のバビルサ
 card-minimum-bear = ミニマム・ベア
 card-solar-beetle = ソーラー・ビートル
 card-soundless-owl = 無音梟
+card-quicksand-skulker = 流砂の潜伏者

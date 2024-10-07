@@ -297,7 +297,7 @@ fn handle_menu_events(
         "
     Vigilant Lynx 2
     Moonlit Gecko 2
-    Scrapyard Raven 3
+    Scrapyard Raven 2
     Radio Deer 1
     Moss-Grown Mastodon 2
     Voracious Anteater 2
@@ -306,6 +306,7 @@ fn handle_menu_events(
     Marshland Moose 2
     Electric Flytrap 1
     Poison-Tusk Babirusa 2
+    Quicksand Skulker 1
     ",
         &CATALOG,
     )

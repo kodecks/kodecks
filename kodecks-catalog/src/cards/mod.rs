@@ -24,6 +24,7 @@ mod oil_leaking_droid;
 mod poison_tusk_babirusa;
 mod pyrosnail;
 mod quartz_moth;
+mod quicksand_skulker;
 mod radio_deer;
 mod saltmarsh_moray;
 mod scrapyard_raven;
@@ -112,4 +113,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "sola" => solar_beetle::ARCHETYPE,
     "soundless-owl" => soundless_owl::ARCHETYPE,
     "soun" => soundless_owl::ARCHETYPE,
+    "quicksand-skulker" => quicksand_skulker::ARCHETYPE,
+    "quic" => quicksand_skulker::ARCHETYPE,
 };
