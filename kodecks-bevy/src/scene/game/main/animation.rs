@@ -340,12 +340,10 @@ fn start_move_animation(
                             } else {
                                 1.0
                             }
+                        } else if *size == CardSize::Large {
+                            1.0
                         } else {
-                            if *size == CardSize::Large {
-                                1.0
-                            } else {
-                                0.0
-                            }
+                            0.0
                         };
                         animation.add_curve_to_target(
                             AnimationTargetId::from_names([root_name.clone(), name.clone()].iter()),
