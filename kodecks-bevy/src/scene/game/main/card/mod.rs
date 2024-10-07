@@ -482,6 +482,7 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
                 parent.spawn((
                     PbrBundle {
                         mesh: handles.frame_small_mesh.clone(),
+                        material: self.materials.add(Color::srgba(0.0, 0.0, 0.0, 0.0)),
                         transform: Transform::from_scale(Vec3::splat(0.0))
                             .with_translation(Vec3::new(0.0, 0.004, 0.0)),
                         ..default()
