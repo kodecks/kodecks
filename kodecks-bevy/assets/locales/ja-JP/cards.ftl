@@ -52,3 +52,4 @@ card-minimum-bear = ミニマム・ベア
 card-solar-beetle = ソーラー・ビートル
 card-soundless-owl = 無音梟
 card-quicksand-skulker = 流砂の潜伏者
+card-wiretap-vine = 盗聴蔓

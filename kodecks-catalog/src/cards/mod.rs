@@ -37,6 +37,7 @@ mod volcanic_wyrm;
 mod voracious_anteater;
 mod wasteland_cobra;
 mod wind_up_spider;
+mod wiretap_vine;
 mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
@@ -115,4 +116,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "soun" => soundless_owl::ARCHETYPE,
     "quicksand-skulker" => quicksand_skulker::ARCHETYPE,
     "quic" => quicksand_skulker::ARCHETYPE,
+    "wiretap-vine" => wiretap_vine::ARCHETYPE,
+    "wire" => wiretap_vine::ARCHETYPE,
 };

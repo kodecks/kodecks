@@ -53,7 +53,7 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
     Deep-Sea Wyrm 2
     Airborne Eagle Ray 2
     Binary Starfish 2
-    Demilune Nighthawk 2
+    Demilune Nighthawk 1
     Electric Clione 2
     Flash-Bang Jellyfish 1
     Helium Puffer 1
@@ -62,6 +62,7 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
     Saltmarsh Moray 2
     Minimum Bear 1
     Soundless Owl 2
+    Wiretap Vine 1
     ",
         &CATALOG,
     )
