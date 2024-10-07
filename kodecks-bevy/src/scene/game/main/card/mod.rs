@@ -435,6 +435,12 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
                     CardImage::Image,
                     CardSize::Small,
                     Name::new("card_image"),
+                    AnimationTarget {
+                        id: AnimationTargetId::from_names(
+                            [Name::new("card"), Name::new("card_image")].iter(),
+                        ),
+                        player: card_entity,
+                    },
                 ));
 
                 parent.spawn((
@@ -591,14 +597,7 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
         image: CardImage,
         archetype: &CardArchetype,
     ) -> Handle<StandardMaterial> {
-        if archetype.id.is_empty() {
-            return self.materials.add(StandardMaterial {
-                base_color_texture: Some(self.asset_server.load("frames/back.png")),
-                alpha_mode: bevy::prelude::AlphaMode::Blend,
-                ..default()
-            });
-        }
-
+        println!("Loading image for archetype {}", archetype.safe_name);
         let image = match image {
             CardImage::Frame => self
                 .asset_server

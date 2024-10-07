@@ -302,7 +302,7 @@ impl Board {
                 transform.translation.x = x;
                 transform.translation.y = y;
                 transform.rotate_local_x(std::f32::consts::PI / 2.0);
-                transform.rotate_local_y(std::f32::consts::PI);
+                transform.rotate_local_y(std::f32::consts::PI * 2.0);
                 return Some(transform);
             }
         } else if zone.zone == Zone::Field {

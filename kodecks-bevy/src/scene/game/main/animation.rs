@@ -334,11 +334,18 @@ fn start_move_animation(
 
                 for child in children.iter_descendants(entity) {
                     if let Ok((name, transform, size)) = size_query.get(child) {
-                        let frame_scale = if (zone.zone == Zone::Field) ^ (*size == CardSize::Large)
-                        {
-                            1.0
+                        let frame_scale = if zone.zone == Zone::Field {
+                            if *size == CardSize::Large {
+                                0.0
+                            } else {
+                                1.0
+                            }
                         } else {
-                            0.0
+                            if *size == CardSize::Large {
+                                1.0
+                            } else {
+                                0.0
+                            }
                         };
                         animation.add_curve_to_target(
                             AnimationTargetId::from_names([root_name.clone(), name.clone()].iter()),
