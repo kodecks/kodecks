@@ -598,7 +598,14 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
         image: CardImage,
         archetype: &CardArchetype,
     ) -> Handle<StandardMaterial> {
-        println!("Loading image for archetype {}", archetype.safe_name);
+        if archetype.id.is_empty() {
+            return self.materials.add(StandardMaterial {
+                base_color_texture: Some(self.asset_server.load("frames/back.png")),
+                alpha_mode: bevy::prelude::AlphaMode::Blend,
+                ..default()
+            });
+        }
+
         let image = match image {
             CardImage::Frame => self
                 .asset_server
