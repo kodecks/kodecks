@@ -21,6 +21,7 @@ mod mire_alligator;
 mod moonlit_gecko;
 mod moss_grown_mastodon;
 mod oil_leaking_droid;
+mod orepecker;
 mod poison_tusk_babirusa;
 mod pyrosnail;
 mod quartz_moth;
@@ -118,4 +119,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "quic" => quicksand_skulker::ARCHETYPE,
     "wiretap-vine" => wiretap_vine::ARCHETYPE,
     "wire" => wiretap_vine::ARCHETYPE,
+    "orepecker" => orepecker::ARCHETYPE,
+    "orep" => orepecker::ARCHETYPE,
 };
