@@ -53,3 +53,4 @@ card-solar-beetle = Solar Beetle
 card-soundless-owl = Soundless Owl
 card-quicksand-skulker = Quicksand Skulker
 card-wiretap-vine = Wiretap Vine
+card-orepecker = Orepecker
