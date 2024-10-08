@@ -3,7 +3,7 @@ use super::{
     translator::{TextPurpose, Translator},
     GlobalState,
 };
-use crate::config::GlobalConfig;
+use crate::{config::GlobalConfig, save_data};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use kodecks::{deck::DeckList, regulation::Regulation};
@@ -277,12 +277,18 @@ fn handle_menu_events(
     mut commands: Commands,
     mut events: EventReader<MenuEvent>,
     mut next_state: ResMut<NextState<GlobalState>>,
+    save_data: Res<save_data::SaveData>,
     config: Res<GlobalConfig>,
 ) {
     let event = if let Some(event) = events.read().next() {
         event
     } else {
         return;
+    };
+
+    let deck = match &event {
+        MenuEvent::StartBotMatch { .. } => save_data.decks.get_default("offline").unwrap(),
+        MenuEvent::StartRandomMatch => save_data.decks.get_default("online").unwrap(),
     };
 
     let kind = match event {
@@ -294,28 +300,9 @@ fn handle_menu_events(
         },
     };
 
-    let deck_list_green = DeckList::parse(
-        "
-    Vigilant Lynx 2
-    Moonlit Gecko 2
-    Scrapyard Raven 2
-    Radio Deer 1
-    Moss-Grown Mastodon 2
-    Voracious Anteater 2
-    Mire Alligator 2
-    Wasteland Cobra 1
-    Marshland Moose 2
-    Electric Flytrap 1
-    Poison-Tusk Babirusa 2
-    Quicksand Skulker 1
-    ",
-        &CATALOG,
-    )
-    .unwrap();
-
     let mode = GameMode {
         regulation: Regulation::STANDARD,
-        player_deck: deck_list_green,
+        player_deck: deck.clone(),
         kind,
     };
 

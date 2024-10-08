@@ -3771,6 +3771,7 @@ dependencies = [
  "dyn-clone",
  "fluent-bundle",
  "idna 1.0.2",
+ "nanoid",
  "num",
  "phf",
  "rand",

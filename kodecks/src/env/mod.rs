@@ -64,8 +64,9 @@ impl Environment {
             .map(|(id, player)| {
                 let mut state = PlayerState::new(id as u8);
                 for item in &player.deck.cards {
-                    let archetype = &catalog[item.archetype_id];
-                    let card = Card::new(&mut obj_counter, item, archetype, item.style, id as u8);
+                    let archetype = &catalog[item.card.archetype_id];
+                    let card =
+                        Card::new(&mut obj_counter, item, archetype, item.card.style, id as u8);
                     state.deck.add_top(card);
                 }
                 if !profile.debug.no_deck_shuffle {

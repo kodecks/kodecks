@@ -1,20 +1,51 @@
 use base64::{engine::general_purpose::URL_SAFE, Engine as _};
 use k256::schnorr::SigningKey;
+use kodecks::card::CardEntry;
+use kodecks::deck::DeckList;
 use kodecks_engine::version::VersionTag;
 use serde::{Deserialize, Serialize};
 use serde_default::DefaultFromSerde;
+use std::collections::BTreeMap;
 use std::{fmt, hash::Hash};
 
 #[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct SaveDataV1 {
     version: VersionTag<1>,
     pub auth: Auth,
+    #[serde(default)]
     pub statistics: Statistics,
+    #[serde(default)]
+    pub decks: Decks,
+    #[serde(default)]
+    pub inventory: Inventory,
 }
 
 #[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Statistics {
     pub games: u32,
+}
+
+#[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct Decks {
+    #[serde(default)]
+    pub list: Vec<DeckList>,
+    #[serde(default)]
+    pub defaults: BTreeMap<String, String>,
+}
+
+impl Decks {
+    pub fn get_default(&self, id: &str) -> Option<&DeckList> {
+        self.defaults
+            .get(id)
+            .and_then(|s| self.list.iter().find(|deck| deck.id == *s))
+            .or_else(|| self.list.first())
+    }
+}
+
+#[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct Inventory {
+    #[serde(default)]
+    pub cards: BTreeMap<CardEntry, usize>,
 }
 
 #[derive(Clone, DefaultFromSerde, Serialize, Deserialize)]

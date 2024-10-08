@@ -18,6 +18,7 @@ use bincode::{
     BorrowDecode, Decode, Encode,
 };
 use core::{fmt, panic};
+use num::Zero;
 use serde::{Deserialize, Serialize};
 use std::{ops::Index, sync::LazyLock};
 use tinystr::TinyAsciiStr;
@@ -345,7 +346,7 @@ impl fmt::Display for CardSnapshot {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ArchetypeId(TinyAsciiStr<8>);
 
@@ -475,4 +476,13 @@ pub enum CreatureType {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CardStyle {
     pub illustration: u8,
+}
+
+#[derive(
+    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Encode, Decode, Hash,
+)]
+pub struct CardEntry {
+    pub archetype_id: ArchetypeId,
+    #[serde(default, skip_serializing_if = "Zero::is_zero")]
+    pub style: u8,
 }

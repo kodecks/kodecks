@@ -38,7 +38,7 @@ impl Regulation {
     pub fn verify(&self, deck: &DeckList) -> bool {
         let mut count = HashMap::new();
         for item in &deck.cards {
-            let entry = count.entry(item.archetype_id).or_insert(0);
+            let entry = count.entry(item.card.archetype_id).or_insert(0);
             *entry += 1;
             if *entry > self.max_same_cards {
                 return false;
