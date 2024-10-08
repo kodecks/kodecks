@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     action::PlayerAvailableActions,
     card::Card,
-    error::Error,
+    error::ActionError,
     id::ObjectId,
     log::LogAction,
     phase::Phase,
@@ -25,23 +25,23 @@ pub struct GameState {
 }
 
 impl GameState {
-    pub fn find_card(&self, card: ObjectId) -> Result<&Card, Error> {
+    pub fn find_card(&self, card: ObjectId) -> Result<&Card, ActionError> {
         self.players
             .iter()
             .filter_map(|player| player.find_card(card))
             .next()
-            .ok_or(Error::CardNotFound { id: card })
+            .ok_or(ActionError::CardNotFound { id: card })
     }
 
-    pub fn find_card_mut(&mut self, card: ObjectId) -> Result<&mut Card, Error> {
+    pub fn find_card_mut(&mut self, card: ObjectId) -> Result<&mut Card, ActionError> {
         self.players
             .iter_mut()
             .filter_map(|player| player.find_card_mut(card))
             .next()
-            .ok_or(Error::CardNotFound { id: card })
+            .ok_or(ActionError::CardNotFound { id: card })
     }
 
-    pub fn find_zone(&self, card: ObjectId) -> Result<PlayerZone, Error> {
+    pub fn find_zone(&self, card: ObjectId) -> Result<PlayerZone, ActionError> {
         for player in self.players.iter() {
             if let Some(zone) = player.find_zone(card) {
                 return Ok(PlayerZone {
@@ -50,7 +50,7 @@ impl GameState {
                 });
             }
         }
-        Err(Error::CardNotFound { id: card })
+        Err(ActionError::CardNotFound { id: card })
     }
 
     pub fn players(&self) -> &PlayerList<PlayerState> {

@@ -2,7 +2,7 @@ use super::Environment;
 use crate::{
     ability::KeywordAbility,
     card::Card,
-    error::Error,
+    error::ActionError,
     event::CardEvent,
     filter_vec,
     opcode::{Opcode, OpcodeList},
@@ -16,7 +16,7 @@ impl Environment {
         event: CardEvent,
         source: &Card,
         target: &Card,
-    ) -> Result<Vec<OpcodeList>, Error> {
+    ) -> Result<Vec<OpcodeList>, ActionError> {
         let trigger = if target.event_filter().contains(event.filter()) {
             Some(Opcode::TriggerEvent {
                 source: source.id(),
@@ -96,7 +96,7 @@ impl Environment {
         &self,
         event: CardEvent,
         source: &Card,
-    ) -> Result<Vec<OpcodeList>, Error> {
+    ) -> Result<Vec<OpcodeList>, ActionError> {
         let mut opcodes = vec![];
         for player in self.state.players.iter() {
             for card in player.field.iter() {

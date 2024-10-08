@@ -4,7 +4,7 @@ use crate::{
     computed::ComputedSequence,
     continuous::ContinuousEffectList,
     effect::EffectTriggerContext,
-    error::Error,
+    error::ActionError,
     filter_vec,
     id::{ObjectId, ObjectIdCounter},
     log::LogAction,
@@ -102,7 +102,7 @@ impl Environment {
         }
     }
 
-    fn compute_effects(&mut self) -> Result<(), Error> {
+    fn compute_effects(&mut self) -> Result<(), ActionError> {
         let sides = self
             .state
             .players

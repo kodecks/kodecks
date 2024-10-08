@@ -5,7 +5,7 @@ use crate::{
 use thiserror::Error;
 
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
-pub enum Error {
+pub enum ActionError {
     #[error("Insufficient shards: {color} {amount}")]
     InsufficientShards { color: Color, amount: u32 },
     #[error("Creature already free-casted")]

@@ -3,7 +3,7 @@ use crate::{
     action::{Action, AvailableActionList, PlayerAvailableActions},
     card::CardSnapshot,
     env::Report,
-    error::Error,
+    error::ActionError,
     field::{FieldItem, FieldState},
     id::ObjectId,
     phase::Phase,
@@ -26,15 +26,15 @@ pub struct LocalEnvironment {
 }
 
 impl LocalEnvironment {
-    pub fn find_card(&self, card: ObjectId) -> Result<&CardSnapshot, Error> {
+    pub fn find_card(&self, card: ObjectId) -> Result<&CardSnapshot, ActionError> {
         self.players
             .iter()
             .filter_map(|player| player.find_card(card))
             .next()
-            .ok_or(Error::CardNotFound { id: card })
+            .ok_or(ActionError::CardNotFound { id: card })
     }
 
-    pub fn find_zone(&self, card: ObjectId) -> Result<PlayerZone, Error> {
+    pub fn find_zone(&self, card: ObjectId) -> Result<PlayerZone, ActionError> {
         for player in self.players.iter() {
             if let Some(zone) = player.find_zone(card) {
                 return Ok(PlayerZone {
@@ -43,7 +43,7 @@ impl LocalEnvironment {
                 });
             }
         }
-        Err(Error::CardNotFound { id: card })
+        Err(ActionError::CardNotFound { id: card })
     }
 
     pub fn cards(&self) -> impl Iterator<Item = &CardSnapshot> {

@@ -1,6 +1,6 @@
 use crate::{
     card::Card,
-    error::Error,
+    error::ActionError,
     id::{CardId, ObjectId, ObjectIdCounter},
     sequence::CardSequence,
     zone::CardZone,
@@ -29,11 +29,11 @@ impl<T> CardList<T>
 where
     T: CardId,
 {
-    pub fn get_item(&self, id: ObjectId) -> Result<&T, Error> {
+    pub fn get_item(&self, id: ObjectId) -> Result<&T, ActionError> {
         self.cards
             .iter()
             .find(|item| item.id() == id)
-            .ok_or(Error::CardNotFound { id })
+            .ok_or(ActionError::CardNotFound { id })
     }
 }
 

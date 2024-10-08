@@ -3,7 +3,7 @@ use crate::{
     ability::KeywordAbility,
     action::Action,
     command::ActionCommand,
-    error::Error,
+    error::ActionError,
     event::{CardEvent, EventReason},
     field::{FieldBattleState, FieldState},
     filter_vec,
@@ -18,7 +18,7 @@ use crate::{
 use std::{iter, vec};
 
 impl Environment {
-    fn initialize(&self) -> Result<Vec<OpcodeList>, Error> {
+    fn initialize(&self) -> Result<Vec<OpcodeList>, ActionError> {
         let initial_life = self.state.regulation.initial_life;
 
         Ok(filter_vec![
@@ -48,7 +48,7 @@ impl Environment {
         &self,
         action: Option<Action>,
         phase: &mut Phase,
-    ) -> Result<Vec<OpcodeList>, Error> {
+    ) -> Result<Vec<OpcodeList>, ActionError> {
         if self.state.turn == 0 {
             return self.initialize();
         }
@@ -130,7 +130,7 @@ impl Environment {
                             item.card.computed().cost.value() as u32
                         };
                         if player_in_turn.shards.get(color) < cost {
-                            return Err(Error::InsufficientShards {
+                            return Err(ActionError::InsufficientShards {
                                 color,
                                 amount: cost,
                             });
@@ -139,7 +139,7 @@ impl Environment {
                             && cost == 0
                             && player_in_turn.counters.free_casted > 0
                         {
-                            return Err(Error::CreatureAlreadyFreeCasted);
+                            return Err(ActionError::CreatureAlreadyFreeCasted);
                         }
                         let from = PlayerZone::new(player_in_turn.id, Zone::Hand);
                         filter_vec![
@@ -236,7 +236,7 @@ impl Environment {
                         item.card.computed().cost.value() as u32
                     };
                     if active_player.shards.get(color) < cost {
-                        return Err(Error::InsufficientShards {
+                        return Err(ActionError::InsufficientShards {
                             color,
                             amount: cost,
                         });
@@ -245,7 +245,7 @@ impl Environment {
                         && cost == 0
                         && active_player.counters.free_casted > 0
                     {
-                        return Err(Error::CreatureAlreadyFreeCasted);
+                        return Err(ActionError::CreatureAlreadyFreeCasted);
                     }
                     let from = PlayerZone::new(active_player.id, Zone::Hand);
                     Ok(filter_vec![

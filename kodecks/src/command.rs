@@ -3,7 +3,7 @@ use crate::{
     card::ArchetypeId,
     color::Color,
     env::Environment,
-    error::Error,
+    error::ActionError,
     event::{CardEvent, EventReason},
     field::FieldState,
     filter_vec,
@@ -64,7 +64,7 @@ pub enum ActionCommand {
 }
 
 impl ActionCommand {
-    pub fn into_opcodes(self, env: &Environment) -> Result<Vec<OpcodeList>, Error> {
+    pub fn into_opcodes(self, env: &Environment) -> Result<Vec<OpcodeList>, ActionError> {
         match self {
             ActionCommand::InflictDamage { target, damage } => {
                 Ok(vec![OpcodeList::new(vec![Opcode::InflictDamage {
@@ -80,7 +80,7 @@ impl ActionCommand {
                 let source = env.state.find_card(source)?;
                 let current_target = env.state.find_card(target.id)?;
                 if current_target.timed_id() != target {
-                    return Err(Error::TargetLost { target });
+                    return Err(ActionError::TargetLost { target });
                 }
                 let piercing = source
                     .computed()
@@ -111,7 +111,7 @@ impl ActionCommand {
                 let source = env.state.find_card(source)?;
                 let current_target = env.state.find_card(target.id)?;
                 if current_target.timed_id() != target {
-                    return Err(Error::TargetLost { target });
+                    return Err(ActionError::TargetLost { target });
                 }
                 env.apply_event(CardEvent::ReturnedToHand { reason }, source, current_target)
             }
@@ -119,7 +119,7 @@ impl ActionCommand {
                 let source = env.state.find_card(source)?;
                 let current_target = env.state.find_card(target.id)?;
                 if current_target.timed_id() != target {
-                    return Err(Error::TargetLost { target });
+                    return Err(ActionError::TargetLost { target });
                 }
                 Ok(filter_vec![
                     env.apply_event(CardEvent::ReturnedToDeck, source, current_target)?,
@@ -131,7 +131,7 @@ impl ActionCommand {
             ActionCommand::SetFieldState { target, state, .. } => {
                 let current_target = env.state.find_card(target.id)?;
                 if current_target.timed_id() != target {
-                    return Err(Error::TargetLost { target });
+                    return Err(ActionError::TargetLost { target });
                 }
                 Ok(vec![OpcodeList::new(vec![Opcode::SetFieldState {
                     card: current_target.id(),
@@ -186,7 +186,7 @@ impl ActionCommand {
             ActionCommand::BreakShield { target } => {
                 let current_target = env.state.find_card(target.id)?;
                 if current_target.timed_id() != target {
-                    return Err(Error::TargetLost { target });
+                    return Err(ActionError::TargetLost { target });
                 }
                 Ok(vec![OpcodeList::new(vec![Opcode::BreakShield {
                     card: current_target.id(),

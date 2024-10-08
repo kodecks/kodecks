@@ -4,7 +4,7 @@ use crate::{
     card::Card,
     condition,
     effect::{EffectActivateContext, EffectTriggerContext},
-    error::Error,
+    error::ActionError,
     field::FieldState,
     log::LogAction,
     opcode::Opcode,
@@ -16,7 +16,7 @@ use crate::{
 use tracing::error;
 
 impl Environment {
-    pub fn execute(&mut self, opcode: Opcode) -> Result<Vec<LogAction>, Error> {
+    pub fn execute(&mut self, opcode: Opcode) -> Result<Vec<LogAction>, ActionError> {
         self.timestamp += 1;
         match opcode {
             Opcode::StartGame => Ok(vec![LogAction::GameStarted]),

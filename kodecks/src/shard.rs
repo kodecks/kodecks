@@ -1,5 +1,5 @@
 use crate::color::Color;
-use crate::error::Error;
+use crate::error::ActionError;
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
@@ -28,7 +28,7 @@ impl ShardList {
             .unwrap_or_else(|| self.0.push((color, amount)));
     }
 
-    pub fn consume(&mut self, color: Color, amount: u32) -> Result<(), Error> {
+    pub fn consume(&mut self, color: Color, amount: u32) -> Result<(), ActionError> {
         let mut insufficient = true;
         if let Some((_, current)) = self.0.iter_mut().find(|(c, _)| *c == color) {
             if *current >= amount {
@@ -41,7 +41,7 @@ impl ShardList {
         self.0.retain(|(_, amount)| *amount > 0);
 
         if insufficient {
-            Err(Error::InsufficientShards { color, amount })
+            Err(ActionError::InsufficientShards { color, amount })
         } else {
             Ok(())
         }

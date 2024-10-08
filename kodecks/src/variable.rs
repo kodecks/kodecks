@@ -1,5 +1,5 @@
 use crate::ability::KeywordAbility;
-use crate::error::Error;
+use crate::error::ActionError;
 use bincode::{Decode, Encode};
 use fluent_bundle::{FluentArgs, FluentValue};
 use serde::{de, ser, Deserialize, Serialize};
@@ -32,23 +32,23 @@ impl Value {
 }
 
 impl TryFrom<Value> for KeywordAbility {
-    type Error = Error;
+    type Error = ActionError;
 
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Ability(ability) => Ok(ability),
-            _ => Err(Error::InvalidValueType),
+            _ => Err(ActionError::InvalidValueType),
         }
     }
 }
 
 impl TryFrom<Value> for i32 {
-    type Error = Error;
+    type Error = ActionError;
 
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Integer(int) => Ok(int),
-            _ => Err(Error::InvalidValueType),
+            _ => Err(ActionError::InvalidValueType),
         }
     }
 }
@@ -94,15 +94,15 @@ impl VariableList {
         self.0.push((key.to_string(), value.into()));
     }
 
-    pub fn get<T>(&self, key: &str) -> Result<T, Error>
+    pub fn get<T>(&self, key: &str) -> Result<T, ActionError>
     where
-        T: TryFrom<Value, Error = Error>,
+        T: TryFrom<Value, Error = ActionError>,
     {
         let (_, value) = self
             .0
             .iter()
             .find(|(k, _)| k.as_str() == key)
-            .ok_or_else(|| Error::KeyNotFound {
+            .ok_or_else(|| ActionError::KeyNotFound {
                 key: key.to_string(),
             })?;
         (*value).try_into()
