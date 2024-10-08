@@ -12,7 +12,7 @@ pub struct DeckPlugin;
 impl Plugin for DeckPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<GraveyardHovered>()
-            .add_systems(OnEnter(GlobalState::GameInit), init)
+            .add_systems(OnEnter(GlobalState::GameLoading), init)
             .add_systems(OnEnter(GlobalState::GameCleanup), cleanup)
             .add_systems(
                 Update,
@@ -102,6 +102,7 @@ fn init(
                 1.0,
                 0.8 / CARD_WIDTH,
             )),
+            visibility: Visibility::Hidden,
             ..default()
         },
         Deck::Player,
@@ -114,6 +115,7 @@ fn init(
             transform: Transform::from_translation(Vec3::new(5.0, 1.0, -1.5))
                 .with_scale(Vec3::new(0.8 / CARD_WIDTH, 1.0, 0.8 / CARD_WIDTH))
                 .with_rotation(Quat::from_rotation_y(std::f32::consts::PI)),
+            visibility: Visibility::Hidden,
             ..default()
         },
         Deck::Opponent,
@@ -128,6 +130,7 @@ fn init(
                 1.0,
                 0.8 / CARD_WIDTH,
             )),
+            visibility: Visibility::Hidden,
             ..default()
         },
         Graveyard::Player,
@@ -145,6 +148,7 @@ fn init(
             transform: Transform::from_translation(Vec3::new(3.9, 1.0, -1.5))
                 .with_scale(Vec3::new(0.8 / CARD_WIDTH, 1.0, 0.8 / CARD_WIDTH))
                 .with_rotation(Quat::from_rotation_y(std::f32::consts::PI)),
+            visibility: Visibility::Hidden,
             ..default()
         },
         Graveyard::Opponent,

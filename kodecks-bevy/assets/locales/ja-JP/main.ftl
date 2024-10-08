@@ -2,6 +2,9 @@ menu-button-cpu-match-1 = CPU対戦1
 menu-button-cpu-match-2 = CPU対戦2
 menu-button-random-match = ランダム対戦
 
+loading-message-finding-player = プレイヤーを探しています...
+loading-button-cancel = キャンセル
+
 your-turn = Your Turn
 opponents-turn = Opponent's Turn
 

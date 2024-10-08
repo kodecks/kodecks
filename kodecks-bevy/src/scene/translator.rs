@@ -122,6 +122,7 @@ where
 #[serde(rename_all = "snake_case")]
 pub enum TextPurpose {
     Title,
+    Loading,
     CardName,
     CardText,
     CardAbility,

@@ -12,6 +12,7 @@ use crate::{
     },
 };
 use bevy::prelude::*;
+use bevy_mod_picking::prelude::*;
 use kodecks::{
     player::PlayerConfig,
     profile::{BotConfig, DebugConfig, DebugFlags, GameProfile},
@@ -32,6 +33,13 @@ impl Plugin for GameLoadingPlugin {
             .add_plugins(board::BoardPlugin)
             .add_plugins(event::EventPlugin)
             .add_systems(OnEnter(GlobalState::GameInit), init_loading_screen)
+            .add_systems(
+                OnTransition {
+                    exited: GlobalState::GameInit,
+                    entered: GlobalState::MenuMain,
+                },
+                cleanup_loading_screen,
+            )
             .add_systems(OnExit(GlobalState::GameLoading), cleanup_loading_screen)
             .add_systems(
                 Update,
@@ -65,6 +73,9 @@ enum GameLoadingState {
 struct UiRoot;
 
 #[derive(Component)]
+struct UiButton;
+
+#[derive(Component)]
 struct LoadingMessage;
 
 fn finish_load(
@@ -92,9 +103,18 @@ fn init_loading_screen(
     mut next_spinner_state: ResMut<NextState<SpinnerState>>,
     mut next_loading_state: ResMut<NextState<GameLoadingState>>,
     translator: Res<Translator>,
+    asset_server: Res<AssetServer>,
 ) {
     next_spinner_state.set(SpinnerState::On);
     next_loading_state.set(GameLoadingState::Idle);
+
+    let slicer = TextureSlicer {
+        border: BorderRect::square(5.0),
+        center_scale_mode: SliceScaleMode::Stretch,
+        sides_scale_mode: SliceScaleMode::Stretch,
+        max_corner_scale: 1.0,
+    };
+    let button = asset_server.load("ui/button-red.png");
 
     commands
         .spawn((
@@ -105,7 +125,7 @@ fn init_loading_screen(
                     justify_content: JustifyContent::Center,
                     align_content: AlignContent::Center,
                     align_items: AlignItems::Center,
-                    padding: UiRect::all(Val::Px(20.)),
+                    flex_direction: FlexDirection::Column,
                     ..default()
                 },
                 background_color: Color::srgba(0.0, 0.0, 0.0, 1.0).into(),
@@ -114,36 +134,116 @@ fn init_loading_screen(
             UiRoot,
         ))
         .with_children(|parent| {
-            parent.spawn((
-                TextBundle {
-                    text: Text {
-                        sections: vec![TextSection {
-                            style: TextStyle {
-                                color: Color::srgba(1.0, 1.0, 1.0, 1.0),
-                                ..translator.style(TextPurpose::Title)
-                            },
-                            ..Default::default()
-                        }],
-                        ..Default::default()
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(75.0),
+                        justify_content: JustifyContent::Center,
+                        align_content: AlignContent::Center,
+                        align_items: AlignItems::Center,
+                        flex_direction: FlexDirection::Column,
+                        ..default()
                     },
                     ..default()
-                },
-                Label,
-                LoadingMessage,
-            ));
+                })
+                .with_children(|parent| {
+                    parent.spawn((
+                        TextBundle {
+                            text: Text {
+                                sections: vec![TextSection {
+                                    style: TextStyle {
+                                        color: Color::srgba(1.0, 1.0, 1.0, 1.0),
+                                        ..translator.style(TextPurpose::Loading)
+                                    },
+                                    ..Default::default()
+                                }],
+                                ..Default::default()
+                            },
+                            ..default()
+                        },
+                        Label,
+                        LoadingMessage,
+                    ));
+                });
+
+            parent
+                .spawn((
+                    NodeBundle {
+                        style: Style {
+                            width: Val::Percent(100.0),
+                            height: Val::Percent(25.0),
+                            justify_content: JustifyContent::Start,
+                            align_content: AlignContent::Center,
+                            align_items: AlignItems::Center,
+                            flex_direction: FlexDirection::Column,
+                            row_gap: Val::Px(20.),
+                            ..default()
+                        },
+                        ..default()
+                    },
+                    UiButton,
+                ))
+                .with_children(|parent| {
+                    parent
+                        .spawn((
+                            ImageBundle {
+                                style: Style {
+                                    width: Val::Px(280.),
+                                    height: Val::Px(50.),
+                                    padding: UiRect::all(Val::Px(15.)),
+                                    justify_content: JustifyContent::Center,
+                                    align_items: AlignItems::Center,
+                                    ..default()
+                                },
+                                image: button.clone().into(),
+                                ..default()
+                            },
+                            ImageScaleMode::Sliced(slicer.clone()),
+                            On::<Pointer<Click>>::commands_mut(move |_, commands| {
+                                commands.add(move |w: &mut World| {
+                                    if let Some(mut next_state) =
+                                        w.get_resource_mut::<NextState<GlobalState>>()
+                                    {
+                                        println!("Go to main menu");
+                                        next_state.set(GlobalState::MenuMain);
+                                    }
+                                });
+                            }),
+                        ))
+                        .with_children(|parent| {
+                            parent.spawn((
+                                TextBundle::from_section(
+                                    translator.get("loading-button-cancel"),
+                                    translator.style(TextPurpose::Button),
+                                ),
+                                Label,
+                            ));
+                        });
+                });
         });
 }
 
 fn update_loading_message(
     mut query: Query<&mut Text, With<LoadingMessage>>,
+    mut button_query: Query<&mut Visibility, With<UiButton>>,
+    translator: Res<Translator>,
     loading_state: Res<State<GameLoadingState>>,
 ) {
     let mut text = query.single_mut();
     let message = match loading_state.get() {
-        GameLoadingState::RandomMatch => "Finding a player...",
-        _ => "",
+        GameLoadingState::RandomMatch => translator.get("loading-message-finding-player"),
+        _ => "".into(),
     };
     text.sections[0].value = message.to_string();
+
+    let visible = match loading_state.get() {
+        GameLoadingState::RandomMatch => Visibility::Visible,
+        _ => Visibility::Hidden,
+    };
+    button_query.iter_mut().for_each(|mut visibility| {
+        *visibility = visible;
+    });
 }
 
 fn init_game_mode(

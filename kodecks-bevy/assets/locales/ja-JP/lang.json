@@ -4,6 +4,10 @@
             "font": "fonts/Jersey20-Regular.ttf",
             "size": 80.0
         },
+        "loading": {
+            "font": "fonts/DotGothic16-Regular.ttf",
+            "size": 60.0
+        },
         "card_name": {
             "font": "fonts/DotGothic16-Regular.ttf",
             "size": 32.0
