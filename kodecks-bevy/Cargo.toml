@@ -2,7 +2,11 @@
 name = "kodecks-bevy"
 version = "0.1.0"
 edition = "2021"
-default-run = "kodecks-bevy"
+default-run = "kodecks"
+
+[[bin]]
+name = "kodecks"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.89"
