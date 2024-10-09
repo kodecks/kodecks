@@ -1,11 +1,13 @@
 use bincode::{Decode, Encode};
 use core::fmt;
 use serde::{Deserialize, Serialize};
+use std::num::NonZeroU64;
 
 const MAX_RESERVED_ID: u64 = 100;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash, Encode, Decode)]
-pub struct ObjectId(u64);
+#[serde(transparent)]
+pub struct ObjectId(NonZeroU64);
 
 impl fmt::Display for ObjectId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -13,9 +15,11 @@ impl fmt::Display for ObjectId {
     }
 }
 
-impl From<u64> for ObjectId {
-    fn from(id: u64) -> Self {
-        Self(id)
+impl TryFrom<u64> for ObjectId {
+    type Error = ();
+
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        NonZeroU64::new(value).map(Self).ok_or(())
     }
 }
 
@@ -34,7 +38,7 @@ impl ObjectIdCounter {
             Some(id) => id,
             _ => {
                 self.0 += 1;
-                ObjectId(self.0)
+                ObjectId(NonZeroU64::new(self.0).unwrap())
             }
         }
     }
