@@ -3770,6 +3770,7 @@ dependencies = [
  "bitflags 2.6.0",
  "dyn-clone",
  "fluent-bundle",
+ "fluent_content",
  "idna 1.0.2",
  "nanoid",
  "num",

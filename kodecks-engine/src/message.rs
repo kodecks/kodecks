@@ -1,6 +1,8 @@
 use crate::{room::RoomConfig, user::UserId};
 use bincode::{Decode, Encode};
-use kodecks::{action::Action, env::LocalGameState, player::PlayerConfig, profile::GameProfile};
+use kodecks::{
+    action::Action, env::LocalGameState, error::Error, player::PlayerConfig, profile::GameProfile,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Encode, Decode)]
@@ -51,6 +53,7 @@ pub enum GameCommandKind {
 pub enum Output {
     GameEvent(GameEvent),
     RoomEvent(RoomEvent),
+    Error(Error),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
