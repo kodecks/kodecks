@@ -54,3 +54,4 @@ card-soundless-owl = 無音梟
 card-quicksand-skulker = 流砂の潜伏者
 card-wiretap-vine = 盗聴蔓
 card-orepecker = イワツツキ
+card-evergreen-flamingo = 常緑のフラミンゴ

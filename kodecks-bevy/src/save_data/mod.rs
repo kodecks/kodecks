@@ -37,10 +37,11 @@ impl SaveData {
         Voracious Anteater 2
         Mire Alligator 2
         Wasteland Cobra 1
-        Marshland Moose 2
+        Marshland Moose 1
         Electric Flytrap 1
         Poison-Tusk Babirusa 2
         Quicksand Skulker 1
+        Evergreen Flamingo 1
         ",
             &CATALOG,
         )

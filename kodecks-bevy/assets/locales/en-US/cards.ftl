@@ -54,3 +54,4 @@ card-soundless-owl = Soundless Owl
 card-quicksand-skulker = Quicksand Skulker
 card-wiretap-vine = Wiretap Vine
 card-orepecker = Orepecker
+card-evergreen-flamingo = Evergreen Flamingo
