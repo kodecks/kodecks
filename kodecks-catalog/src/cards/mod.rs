@@ -10,6 +10,7 @@ mod demilune_nighthawk;
 mod diamond_porcupine;
 mod electric_clione;
 mod electric_flytrap;
+mod evergreen_flamingo;
 mod flash_bang_jellyfish;
 mod graphite_armadillo;
 mod helium_puffer;
@@ -121,4 +122,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "wire" => wiretap_vine::ARCHETYPE,
     "orepecker" => orepecker::ARCHETYPE,
     "orep" => orepecker::ARCHETYPE,
+    "evergreen-flamingo" => evergreen_flamingo::ARCHETYPE,
+    "ever" => evergreen_flamingo::ARCHETYPE,
 };
