@@ -32,6 +32,7 @@ mod saltmarsh_moray;
 mod scrapyard_raven;
 mod solar_beetle;
 mod soundless_owl;
+mod thermite_crab;
 mod tungsten_rhino;
 mod turbofish;
 mod vigilant_lynx;
@@ -124,4 +125,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "orep" => orepecker::ARCHETYPE,
     "evergreen-flamingo" => evergreen_flamingo::ARCHETYPE,
     "ever" => evergreen_flamingo::ARCHETYPE,
+    "thermite-crab" => thermite_crab::ARCHETYPE,
+    "ther" => thermite_crab::ARCHETYPE,
 };
