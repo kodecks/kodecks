@@ -384,7 +384,7 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                 .with_children(|parent| {
                     parent
                         .spawn((
-                            ImageBundle {
+                            NodeBundle {
                                 style: Style {
                                     width: Val::Px(260.),
                                     height: Val::Percent(60.0),
@@ -392,10 +392,8 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                     flex_direction: FlexDirection::Column,
                                     ..default()
                                 },
-                                image: button.clone().into(),
                                 ..default()
                             },
-                            ImageScaleMode::Sliced(slicer.clone()),
                             Pickable::IGNORE,
                         ))
                         .with_children(|parent| {
