@@ -37,3 +37,5 @@ ability-devour = Devour
     .description = Creatures destroyed by this creature do not generate a shard.
 ability-piercing = Piercing
     .description = This card can destroy a creature, regardless of its shield.
+
+error-failed-to-connect-server = Failed to connect to the server.

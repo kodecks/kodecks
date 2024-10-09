@@ -37,3 +37,5 @@ ability-devour = 貪食
     .description = このクリーチャーによって破壊されたクリーチャーはカケラを生成しない。
 ability-piercing = 貫通
     .description = シールドに関係なくクリーチャーを破壊する。
+
+error-failed-to-connect-server = サーバーに接続できませんでした。

@@ -1,7 +1,7 @@
 use super::{
     board, event,
     mode::{GameMode, GameModeKind},
-    server::{self, ServerConnection},
+    server::{self, ServerConnection, ServerError},
 };
 use crate::{
     save_data,
@@ -14,6 +14,7 @@ use crate::{
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use kodecks::{
+    error::Error,
     player::PlayerConfig,
     profile::{BotConfig, DebugConfig, DebugFlags, GameProfile},
 };
@@ -55,18 +56,20 @@ impl Plugin for GameLoadingPlugin {
                     init_game_mode.run_if(in_state(GameLoadingState::Idle)),
                     wait_env.run_if(resource_exists::<board::Environment>),
                     update_loading_message.run_if(state_changed::<GameLoadingState>),
+                    receive_error.run_if(resource_exists_and_changed::<ServerError>),
                 )
                     .run_if(in_state(GlobalState::GameInit)),
             );
     }
 }
 
-#[derive(Debug, Default, States, Copy, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Default, States, Clone, Eq, PartialEq, Hash)]
 enum GameLoadingState {
     #[default]
     Idle,
     BotMatch,
     RandomMatch,
+    Error(Error),
 }
 
 #[derive(Component)]
@@ -77,6 +80,13 @@ struct UiButton;
 
 #[derive(Component)]
 struct LoadingMessage;
+
+fn receive_error(
+    mut next_loading_state: ResMut<NextState<GameLoadingState>>,
+    error: Res<ServerError>,
+) {
+    next_loading_state.set(GameLoadingState::Error(error.0.clone()));
+}
 
 fn finish_load(
     time: Res<Time>,
@@ -233,12 +243,13 @@ fn update_loading_message(
     let mut text = query.single_mut();
     let message = match loading_state.get() {
         GameLoadingState::RandomMatch => translator.get("loading-message-finding-player"),
+        GameLoadingState::Error(error) => translator.get(error.clone()),
         _ => "".into(),
     };
     text.sections[0].value = message.to_string();
 
     let visible = match loading_state.get() {
-        GameLoadingState::RandomMatch => Visibility::Visible,
+        GameLoadingState::RandomMatch | GameLoadingState::Error(_) => Visibility::Visible,
         _ => Visibility::Hidden,
     };
     button_query.iter_mut().for_each(|mut visibility| {

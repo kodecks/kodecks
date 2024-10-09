@@ -9,6 +9,7 @@ bincode = "2.0.0-rc.3"
 bitflags = { version = "2.6.0", features = ["serde"] }
 dyn-clone = "1.0.17"
 fluent-bundle = "0.15.3"
+fluent_content = "0.0.5"
 idna = "1.0.2"
 nanoid = "0.4.0"
 num = "0.4.3"

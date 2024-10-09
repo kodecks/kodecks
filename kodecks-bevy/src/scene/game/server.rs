@@ -9,7 +9,7 @@ use futures::{
 };
 use futures_util::SinkExt;
 use k256::{ecdsa::signature::SignerMut, schnorr::SigningKey};
-use kodecks::{action::Action, env::LocalGameState};
+use kodecks::{action::Action, env::LocalGameState, error::Error};
 use kodecks_engine::{
     login::{LoginRequest, LoginResponse, LoginType},
     message::{self, GameEventKind, Input, Output},
@@ -72,6 +72,9 @@ impl Connection for ServerConnection {
     }
 }
 
+#[derive(Resource, Clone, Deref)]
+pub struct ServerError(pub Error);
+
 pub struct WebSocketEngine {
     command_send: Sender<Input>,
     event_recv: Receiver<Output>,
@@ -82,20 +85,26 @@ pub struct WebSocketEngine {
 
 impl WebSocketEngine {
     pub fn new(server: Url, key: SigningKey) -> Self {
-        let (event_send, event_recv) = mpsc::channel(256);
+        let (mut event_send, event_recv) = mpsc::channel(256);
         let (command_send, command_recv) = mpsc::channel(256);
         let (close_send, close_recv) = oneshot::channel();
 
         let task = bevy::tasks::IoTaskPool::get().spawn(async move {
             #[cfg(target_family = "wasm")]
-            if let Err(err) = connect(server, command_recv, event_send, close_recv, key).await {
+            if let Err(err) =
+                connect(server, command_recv, event_send.clone(), close_recv, key).await
+            {
                 error!("Websocket error: {}", err);
+                let _ = event_send.try_send(Output::Error(Error::FailedToConnectServer));
             }
 
             #[cfg(not(target_family = "wasm"))]
             async_compat::Compat::new(async {
-                if let Err(err) = connect(server, command_recv, event_send, close_recv, key).await {
+                if let Err(err) =
+                    connect(server, command_recv, event_send.clone(), close_recv, key).await
+                {
                     error!("Websocket error: {}", err);
+                    let _ = event_send.try_send(Output::Error(Error::FailedToConnectServer));
                 }
             })
             .await;
@@ -244,6 +253,8 @@ fn recv_events(
     mut next_spinner_state: ResMut<NextState<SpinnerState>>,
 ) {
     while let Some(event) = server.recv() {
+        commands.remove_resource::<ServerError>();
+
         match event {
             Output::GameEvent(event) => match event.event {
                 message::GameEventKind::Created { .. } => {
@@ -275,6 +286,10 @@ fn recv_events(
                     }));
                 }
             },
+            Output::Error(err) => {
+                error!("Error: {}", err);
+                commands.insert_resource(ServerError(err));
+            }
         }
     }
 }
