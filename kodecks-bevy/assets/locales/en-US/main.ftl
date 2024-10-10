@@ -39,3 +39,5 @@ ability-piercing = Piercing
     .description = This card can destroy a creature, regardless of its shield.
 
 error-failed-to-connect-server = Failed to connect to the server.
+error-client-version-outdated = Your client needs to be updated.　Supported client version: { $requirement }
+error-server-version-outdated = The server needs to be updated. Supported client version: { $requirement }

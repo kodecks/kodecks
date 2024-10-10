@@ -16,6 +16,7 @@ use kodecks_engine::{
     Connection,
 };
 use reqwest_websocket::{CloseCode, RequestBuilderExt, WebSocket};
+use semver::Version;
 use std::pin::pin;
 use url::Url;
 
@@ -95,7 +96,12 @@ impl WebSocketEngine {
                 connect(server, command_recv, event_send.clone(), close_recv, key).await
             {
                 error!("Websocket error: {}", err);
-                let _ = event_send.try_send(Output::Error(Error::FailedToConnectServer));
+                let err: Error = if let Some(err) = err.downcast_ref::<Error>() {
+                    err.clone()
+                } else {
+                    Error::FailedToConnectServer
+                };
+                let _ = event_send.try_send(Output::Error(err));
             }
 
             #[cfg(not(target_family = "wasm"))]
@@ -104,7 +110,12 @@ impl WebSocketEngine {
                     connect(server, command_recv, event_send.clone(), close_recv, key).await
                 {
                     error!("Websocket error: {}", err);
-                    let _ = event_send.try_send(Output::Error(Error::FailedToConnectServer));
+                    let err: Error = if let Some(err) = err.downcast_ref::<Error>() {
+                        err.clone()
+                    } else {
+                        Error::FailedToConnectServer
+                    };
+                    let _ = event_send.try_send(Output::Error(err));
                 }
             })
             .await;
@@ -191,19 +202,24 @@ async fn connect(
 async fn connect_websocket(server: Url, key: SigningKey) -> anyhow::Result<WebSocket> {
     let url = server.join("login")?;
 
-    let client_version = env!("CARGO_PKG_VERSION").to_string();
+    let client_version: Version = env!("CARGO_PKG_VERSION").parse().unwrap();
     let pubkey = key.verifying_key();
     let client = reqwest::Client::new();
-    let res: LoginResponse = client
+
+    let res = client
         .post(url.clone())
         .json(&LoginRequest {
             client_version: client_version.clone(),
             ty: LoginType::PubkeyChallenge { pubkey: *pubkey },
         })
         .send()
-        .await?
-        .json()
         .await?;
+    let res: LoginResponse = if res.status().is_success() {
+        res.json().await?
+    } else {
+        let err: Error = res.json().await?;
+        return Err(err.into());
+    };
 
     let challenge = if let LoginResponse::Challenge { challenge } = res {
         challenge
@@ -213,19 +229,24 @@ async fn connect_websocket(server: Url, key: SigningKey) -> anyhow::Result<WebSo
 
     let mut key: SigningKey = key.clone();
     let signature = key.sign(challenge.as_bytes());
-    let res: LoginResponse = client
+    let res = client
         .post(url.clone())
         .json(&LoginRequest {
-            client_version: client_version.clone(),
+            client_version,
             ty: LoginType::PubkeyResponse {
                 pubkey: *pubkey,
                 signature,
             },
         })
         .send()
-        .await?
-        .json()
         .await?;
+
+    let res: LoginResponse = if res.status().is_success() {
+        res.json().await?
+    } else {
+        let err: Error = res.json().await?;
+        return Err(err.into());
+    };
 
     let token = if let LoginResponse::Session { token } = res {
         token

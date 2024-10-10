@@ -1,10 +1,11 @@
 use base64::{engine::general_purpose::URL_SAFE, Engine as _};
 use k256::schnorr::{Signature, VerifyingKey};
+use semver::Version;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LoginRequest {
-    pub client_version: String,
+    pub client_version: Version,
     #[serde(flatten)]
     pub ty: LoginType,
 }
