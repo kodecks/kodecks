@@ -10,13 +10,16 @@ use dashmap::{
     DashMap,
 };
 use k256::schnorr::VerifyingKey;
+use kodecks::error::Error;
 use kodecks_engine::{
     message::{Command, Input, Output, RoomCommand, RoomCommandKind, RoomEvent, RoomEventKind},
     user::UserId,
 };
-use semver::VersionReq;
+use semver::{Version, VersionReq};
 use serde::Serialize;
 use std::sync::{Arc, Mutex};
+
+const CLIENT_VERSION_REQUIREMENT: &str = "^0.1";
 
 pub struct AppState {
     sessions: DashMap<UserId, Session>,
@@ -37,8 +40,28 @@ impl AppState {
 
     pub fn status(&self) -> Status {
         Status {
-            client_version: "^0.1".parse().unwrap(),
+            server_version: env!("CARGO_PKG_VERSION").parse().unwrap(),
+            client_version_requirement: CLIENT_VERSION_REQUIREMENT.parse().unwrap(),
             sessions: self.sessions.len() as u32,
+        }
+    }
+
+    pub fn check_client_version(&self, client_version: &Version) -> Result<(), Error> {
+        let status = self.status();
+        if status.client_version_requirement.matches(client_version) {
+            Ok(())
+        } else if status.server_version >= *client_version {
+            Err(Error::ClientVersionOutdated {
+                server: status.server_version.to_string(),
+                client: client_version.to_string(),
+                requirement: status.client_version_requirement.to_string(),
+            })
+        } else {
+            Err(Error::ServerVersionOutdated {
+                server: status.server_version.to_string(),
+                client: client_version.to_string(),
+                requirement: status.client_version_requirement.to_string(),
+            })
         }
     }
 
@@ -165,7 +188,8 @@ impl AppState {
 
 #[derive(Serialize)]
 pub struct Status {
-    client_version: VersionReq,
+    server_version: Version,
+    client_version_requirement: VersionReq,
     sessions: u32,
 }
 

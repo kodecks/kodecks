@@ -1,13 +1,14 @@
 use axum::{
     middleware,
-    response::Redirect,
+    response::{IntoResponse, Redirect, Response},
     routing::{get, post},
-    Router,
+    Json, Router,
 };
 use http::{
     header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
-    Method,
+    Method, StatusCode,
 };
+use kodecks::error::Error;
 use std::{net::SocketAddr, sync::Arc};
 use tokio::try_join;
 use tower_governor::{governor::GovernorConfigBuilder, GovernorLayer};
@@ -93,4 +94,22 @@ async fn main() -> anyhow::Result<()> {
         background::task(state)
     )?;
     Ok(())
+}
+
+struct AppError(pub Error);
+
+impl From<Error> for AppError {
+    fn from(err: Error) -> Self {
+        Self(err)
+    }
+}
+
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        let status = match self.0 {
+            Error::FailedToConnectServer => StatusCode::UNAUTHORIZED,
+            _ => StatusCode::BAD_REQUEST,
+        };
+        (status, Json(self.0)).into_response()
+    }
 }

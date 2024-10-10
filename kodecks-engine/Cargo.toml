@@ -18,6 +18,7 @@ k256 = { version = "0.13.4", features = [
 kodecks = { path = "../kodecks" }
 kodecks-bot = { path = "../kodecks-bot" }
 kodecks-catalog = { path = "../kodecks-catalog" }
+semver = { version = "1.0.23", features = ["serde"] }
 serde = { version = "1.0.210", features = ["derive"] }
 tracing = "0.1.40"
 

@@ -13,14 +13,53 @@ use thiserror::Error;
 pub enum Error {
     #[error("Failed to connect the server")]
     FailedToConnectServer,
+    #[error("Client version outdated: server: {server} client: {client} req:{requirement}")]
+    ClientVersionOutdated {
+        server: String,
+        client: String,
+        requirement: String,
+    },
+    #[error("Server version outdated: server: {server} client: {client} req:{requirement}")]
+    ServerVersionOutdated {
+        server: String,
+        client: String,
+        requirement: String,
+    },
 }
 
 impl<'a> From<Error> for Request<'a, FluentArgs<'a>> {
-    fn from(_error: Error) -> Request<'a, FluentArgs<'a>> {
+    fn from(error: Error) -> Request<'a, FluentArgs<'a>> {
+        let mut args = FluentArgs::new();
+        let id = match error {
+            Error::FailedToConnectServer => "error-failed-to-connect-server",
+            Error::ClientVersionOutdated { .. } => "error-client-version-outdated",
+            Error::ServerVersionOutdated { .. } => "error-server-version-outdated",
+        };
+        match error {
+            Error::FailedToConnectServer => {}
+            Error::ClientVersionOutdated {
+                server,
+                client,
+                requirement,
+            } => {
+                args.set("server", server.to_string());
+                args.set("client", client.to_string());
+                args.set("requirement", requirement.to_string());
+            }
+            Error::ServerVersionOutdated {
+                server,
+                client,
+                requirement,
+            } => {
+                args.set("server", server.to_string());
+                args.set("client", client.to_string());
+                args.set("requirement", requirement.to_string());
+            }
+        }
         Request {
-            id: "error-failed-to-connect-server",
+            id,
             attr: None,
-            args: None,
+            args: Some(args),
         }
     }
 }
