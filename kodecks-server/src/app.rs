@@ -17,7 +17,10 @@ use kodecks_engine::{
 };
 use semver::{Version, VersionReq};
 use serde::Serialize;
-use std::sync::{Arc, Mutex};
+use std::{
+    cmp::Ordering,
+    sync::{Arc, Mutex},
+};
 
 const CLIENT_VERSION_REQUIREMENT: &str = "^0.1";
 
@@ -50,14 +53,14 @@ impl AppState {
         let status = self.status();
         if status.client_version_requirement.matches(client_version) {
             Ok(())
-        } else if status.server_version >= *client_version {
-            Err(Error::ClientVersionOutdated {
+        } else if status.server_version.cmp_precedence(client_version) == Ordering::Less {
+            Err(Error::ServerVersionOutdated {
                 server: status.server_version.to_string(),
                 client: client_version.to_string(),
                 requirement: status.client_version_requirement.to_string(),
             })
         } else {
-            Err(Error::ServerVersionOutdated {
+            Err(Error::ClientVersionOutdated {
                 server: status.server_version.to_string(),
                 client: client_version.to_string(),
                 requirement: status.client_version_requirement.to_string(),
