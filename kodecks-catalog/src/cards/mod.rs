@@ -1,6 +1,7 @@
 use kodecks::prelude::*;
 
 mod airborne_eagle_ray;
+mod amalgam_rat;
 mod ant;
 mod bambooster;
 mod binary_starfish;
@@ -127,4 +128,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "ever" => evergreen_flamingo::ARCHETYPE,
     "thermite-crab" => thermite_crab::ARCHETYPE,
     "ther" => thermite_crab::ARCHETYPE,
+    "amalgam-rat" => amalgam_rat::ARCHETYPE,
+    "amal" => amalgam_rat::ARCHETYPE,
 };

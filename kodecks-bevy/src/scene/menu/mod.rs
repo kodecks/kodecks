@@ -36,7 +36,7 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
     Wind-Up Spider 2
     Pyrosnail 1
     Oil-Leaking Droid 2
-    Diamond Porcupine 2
+    Diamond Porcupine 1
     Bambooster 1
     Coppermine Scorpion 1
     Laser Frog 1
@@ -45,6 +45,7 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
     Solar Beetle 2
     Orepecker 1
     Thermite Crab 1
+    Amalgam Rat 1
     ",
         &CATALOG,
     )

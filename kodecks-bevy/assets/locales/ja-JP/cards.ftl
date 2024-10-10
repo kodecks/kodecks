@@ -56,3 +56,4 @@ card-wiretap-vine = 盗聴蔓
 card-orepecker = イワツツキ
 card-evergreen-flamingo = 常緑のフラミンゴ
 card-thermite-crab = テルミット・クラブ
+card-amalgam-rat = アマルガム・ラット
