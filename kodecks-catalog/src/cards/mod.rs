@@ -33,6 +33,7 @@ mod saltmarsh_moray;
 mod scrapyard_raven;
 mod solar_beetle;
 mod soundless_owl;
+mod subspace_mole;
 mod thermite_crab;
 mod tungsten_rhino;
 mod turbofish;
@@ -130,4 +131,6 @@ pub static CARDS: CardMap = phf::phf_map! {
     "ther" => thermite_crab::ARCHETYPE,
     "amalgam-rat" => amalgam_rat::ARCHETYPE,
     "amal" => amalgam_rat::ARCHETYPE,
+    "subspace-mole" => subspace_mole::ARCHETYPE,
+    "subs" => subspace_mole::ARCHETYPE,
 };

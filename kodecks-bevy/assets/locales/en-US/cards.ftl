@@ -57,3 +57,4 @@ card-orepecker = Orepecker
 card-evergreen-flamingo = Evergreen Flamingo
 card-thermite-crab = Thermite Crab
 card-amalgam-rat = Amalgam Rat
+card-subspace-mole = Subspace Mole
