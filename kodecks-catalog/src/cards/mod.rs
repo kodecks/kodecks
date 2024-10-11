@@ -1,5 +1,6 @@
 use kodecks::prelude::*;
 
+// card-modules
 mod airborne_eagle_ray;
 mod amalgam_rat;
 mod ant;
@@ -46,6 +47,7 @@ mod wiretap_vine;
 mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
+    // card-entries
     "vigilant-lynx" => vigilant_lynx::ARCHETYPE,
     "vigi" => vigilant_lynx::ARCHETYPE,
     "bambooster" => bambooster::ARCHETYPE,
