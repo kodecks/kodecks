@@ -15,6 +15,7 @@ mod electric_flytrap;
 mod evergreen_flamingo;
 mod flash_bang_jellyfish;
 mod graphite_armadillo;
+mod halo_tapir;
 mod helium_puffer;
 mod icefall_weasel;
 mod laser_frog;
@@ -48,6 +49,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "halo-tapir" => halo_tapir::ARCHETYPE,
+    "halo" => halo_tapir::ARCHETYPE,
     "vigilant-lynx" => vigilant_lynx::ARCHETYPE,
     "vigi" => vigilant_lynx::ARCHETYPE,
     "bambooster" => bambooster::ARCHETYPE,

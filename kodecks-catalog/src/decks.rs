@@ -6,7 +6,7 @@ pub fn starter_deck() -> DeckList {
         "
     # Starter deck
     Vigilant Lynx 2
-    Moonlit Gecko 2
+    Moonlit Gecko 1
     Scrapyard Raven 2
     Radio Deer 1
     Moss-Grown Mastodon 2
@@ -18,6 +18,7 @@ pub fn starter_deck() -> DeckList {
     Poison-Tusk Babirusa 2
     Quicksand Skulker 1
     Evergreen Flamingo 1
+    Halo Tapir 1
     ",
         &CATALOG,
     )
