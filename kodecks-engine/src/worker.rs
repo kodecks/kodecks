@@ -17,17 +17,23 @@ use gloo_worker::{
 use std::borrow::BorrowMut;
 use wasm_bindgen_futures::spawn_local;
 
+const WORKER_LOADER: &str = "/worker_loader.js";
+
 pub struct WebWorkerEngine {
     command_send: Sender<Input>,
     event_recv: Receiver<Output>,
 }
 
 impl WebWorkerEngine {
+    pub fn preload() {
+        EngineReactor::spawner().spawn_with_loader(WORKER_LOADER);
+    }
+
     pub fn new() -> Self {
         let (mut event_send, event_recv) = mpsc::channel(256);
         let (command_send, mut command_recv) = mpsc::channel(256);
         let (mut bridge_sink, mut bridge_stream) = EngineReactor::spawner()
-            .spawn_with_loader("/worker_loader.js")
+            .spawn_with_loader(WORKER_LOADER)
             .split();
         let config = bincode::config::standard();
 

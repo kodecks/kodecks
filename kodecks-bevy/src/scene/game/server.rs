@@ -25,6 +25,7 @@ pub struct ServerPlugin;
 impl Plugin for ServerPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<ServerEvent>()
+            .add_systems(Startup, setup)
             .add_systems(OnEnter(GlobalState::GameCleanup), cleanup)
             .add_systems(
                 Update,
@@ -36,6 +37,11 @@ impl Plugin for ServerPlugin {
 fn cleanup(mut commands: Commands) {
     commands.remove_resource::<Session>();
     commands.remove_resource::<ServerConnection>();
+}
+
+fn setup() {
+    #[cfg(target_family = "wasm")]
+    kodecks_engine::worker::WebWorkerEngine::preload();
 }
 
 #[derive(Resource)]
