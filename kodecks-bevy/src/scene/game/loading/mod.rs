@@ -288,7 +288,7 @@ fn init_game_mode(
                 nanoid::nanoid!()
             );
             let mut conn = ServerConnection::new_local();
-            conn.send(Input::Command(Command::CreateSession { log_id, profile }));
+            conn.send(Input::Command(Command::CreateGame { log_id, profile }));
             commands.insert_resource(conn);
 
             next_loading_state.set(GameLoadingState::BotMatch);

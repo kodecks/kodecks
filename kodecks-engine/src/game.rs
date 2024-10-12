@@ -12,7 +12,7 @@ use kodecks_bot::{Bot, DefaultBot};
 use kodecks_catalog::CATALOG;
 use std::{collections::HashMap, sync::Arc};
 
-pub struct Session {
+pub struct Game {
     id: u32,
     env: Arc<Environment>,
     bots: Vec<BotConfig>,
@@ -23,13 +23,13 @@ pub struct Session {
     callback: Arc<Box<EngineCallback>>,
 }
 
-impl Session {
+impl Game {
     pub fn new(log_id: String, profile: GameProfile, callback: Arc<Box<EngineCallback>>) -> Self {
         let bots = profile.bots.clone();
         let env = Arc::new(Environment::new(profile, &CATALOG));
         let player_in_action = env.state.players.player_in_turn().id;
 
-        let mut session = Self {
+        let mut game = Self {
             id: 0,
             env,
             bots,
@@ -40,8 +40,8 @@ impl Session {
             callback: callback.clone(),
         };
 
-        for player in session.players() {
-            let is_bot = session.bots.iter().any(|bot| bot.player == player);
+        for player in game.players() {
+            let is_bot = game.bots.iter().any(|bot| bot.player == player);
             if !is_bot {
                 (callback)(Output::GameEvent(GameEvent {
                     game_id: 0,
@@ -53,8 +53,8 @@ impl Session {
             }
         }
 
-        session.progress();
-        session
+        game.progress();
+        game
     }
 
     pub fn process_command(&mut self, command: GameCommand) {

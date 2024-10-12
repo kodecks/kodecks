@@ -14,7 +14,7 @@ pub enum Input {
 
 #[derive(Debug, Clone, Encode, Decode)]
 pub enum Command {
-    CreateSession {
+    CreateGame {
         log_id: String,
         profile: GameProfile,
     },
