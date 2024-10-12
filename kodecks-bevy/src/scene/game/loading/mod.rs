@@ -16,7 +16,7 @@ use bevy_mod_picking::prelude::*;
 use kodecks::{
     error::Error,
     player::PlayerConfig,
-    profile::{BotConfig, DebugConfig, DebugFlags, GameProfile},
+    profile::{BotConfig, GameProfile},
 };
 use kodecks_engine::{
     message::{Command, Input},
@@ -269,10 +269,7 @@ fn init_game_mode(
             save_data.hash(&mut hasher);
             let profile = GameProfile {
                 regulation: mode.regulation.clone(),
-                debug: DebugConfig {
-                    flags: DebugFlags::DEBUG_COMMAND,
-                    ..Default::default()
-                },
+                debug: None,
                 players: vec![
                     PlayerConfig {
                         deck: mode.player_deck.clone(),

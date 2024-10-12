@@ -51,6 +51,7 @@ pub struct Environment {
 
 impl Environment {
     pub fn new(profile: GameProfile, catalog: &'static Catalog) -> Self {
+        let debug = profile.debug.unwrap_or_default();
         let mut rng: SmallRng = profile
             .rng_seed
             .map(SmallRng::seed_from_u64)
@@ -69,14 +70,14 @@ impl Environment {
                         Card::new(&mut obj_counter, item, archetype, item.card.style, id as u8);
                     state.deck.add_top(card);
                 }
-                if !profile.debug.no_deck_shuffle {
+                if !debug.no_deck_shuffle {
                     state.deck.shuffle(&mut obj_counter, &mut rng);
                 }
                 state
             })
             .collect::<Vec<_>>();
 
-        let current_player = if profile.debug.no_player_shuffle {
+        let current_player = if debug.no_player_shuffle {
             players.first().as_ref().unwrap().id
         } else {
             players.choose(&mut rng).unwrap().id
@@ -85,7 +86,7 @@ impl Environment {
         Environment {
             state: GameState {
                 regulation: profile.regulation,
-                debug: profile.debug,
+                debug,
                 turn: 0,
                 phase: Phase::Standby,
                 players: PlayerList::new(current_player, players),

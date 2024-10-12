@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct GameProfile {
     pub regulation: Regulation,
-    pub debug: DebugConfig,
+    pub debug: Option<DebugConfig>,
     pub players: Vec<PlayerConfig>,
     pub bots: Vec<BotConfig>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
