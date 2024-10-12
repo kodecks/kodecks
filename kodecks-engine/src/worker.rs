@@ -1,7 +1,8 @@
 #![cfg(target_family = "wasm")]
 
 use crate::{
-    message::{Input, Output},
+    game::start_game,
+    message::{Command, Input, Output},
     Connection,
 };
 use futures::{
@@ -73,7 +74,7 @@ impl Connection for WebWorkerEngine {
 #[reactor]
 pub async fn EngineReactor(mut scope: ReactorScope<Vec<u8>, Vec<u8>>) {
     let (event_send, mut event_recv) = futures::channel::mpsc::channel(256);
-    let mut engine = crate::Engine::new(event_send);
+    let mut sender = None;
     let config = bincode::config::standard();
     loop {
         select! {
@@ -88,7 +89,19 @@ pub async fn EngineReactor(mut scope: ReactorScope<Vec<u8>, Vec<u8>>) {
             input = scope.next() => {
                 if let Some(input) = input {
                     let (input, _) = bincode::decode_from_slice(&input, config).unwrap();
-                    engine.handle_input(input);
+                    match input {
+                        Input::Command(Command::CreateGame { log_id, profile }) => {
+                            let (command_sender, receiver) = mpsc::channel(256);
+                            sender = Some(command_sender);
+                            spawn_local(start_game(log_id, profile, receiver, event_send.clone()));
+                        }
+                        Input::GameCommand(session_command) => {
+                            if let Some(sender) = &mut sender {
+                                sender.send(session_command).await.unwrap();
+                            }
+                        }
+                        _ => {}
+                    }
                 } else {
                     break;
                 }
