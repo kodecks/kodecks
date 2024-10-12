@@ -7,7 +7,7 @@ use crate::{config::GlobalConfig, save_data};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use kodecks::{deck::DeckList, regulation::Regulation};
-use kodecks_catalog::CATALOG;
+use kodecks_catalog::decks::{blue_deck, red_deck};
 
 pub struct MenuPlugin;
 
@@ -30,48 +30,6 @@ enum MenuEvent {
 }
 
 fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<AssetServer>) {
-    let deck_list_red = DeckList::parse(
-        "
-    Volcanic Wyrm 2
-    Wind-Up Spider 2
-    Pyrosnail 1
-    Oil-Leaking Droid 2
-    Diamond Porcupine 1
-    Bambooster 1
-    Coppermine Scorpion 1
-    Laser Frog 1
-    Graphite Armadillo 2
-    Tungsten Rhino 2
-    Solar Beetle 2
-    Orepecker 1
-    Thermite Crab 1
-    Amalgam Rat 1
-    ",
-        &CATALOG,
-    )
-    .unwrap();
-
-    let deck_list_blue = DeckList::parse(
-        "
-    Deep-Sea Wyrm 2
-    Airborne Eagle Ray 2
-    Binary Starfish 2
-    Demilune Nighthawk 1
-    Electric Clione 2
-    Flash-Bang Jellyfish 1
-    Helium Puffer 1
-    Icefall Weasel 1
-    Turbofish 2
-    Saltmarsh Moray 1
-    Minimum Bear 1
-    Soundless Owl 2
-    Wiretap Vine 1
-    Subspace Mole 1
-    ",
-        &CATALOG,
-    )
-    .unwrap();
-
     let slicer = TextureSlicer {
         border: BorderRect::square(5.0),
         center_scale_mode: SliceScaleMode::Stretch,
@@ -157,10 +115,9 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
                             },
                             ImageScaleMode::Sliced(slicer.clone()),
                             On::<Pointer<Click>>::commands_mut(move |_, commands| {
-                                let deck_list_red = deck_list_red.clone();
                                 commands.add(move |w: &mut World| {
                                     w.send_event(MenuEvent::StartBotMatch {
-                                        deck_list: deck_list_red,
+                                        deck_list: red_deck(),
                                     });
                                 });
                             }),
@@ -191,10 +148,9 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
                             },
                             ImageScaleMode::Sliced(slicer.clone()),
                             On::<Pointer<Click>>::commands_mut(move |_, commands| {
-                                let deck_list_blue = deck_list_blue.clone();
                                 commands.add(move |w: &mut World| {
                                     w.send_event(MenuEvent::StartBotMatch {
-                                        deck_list: deck_list_blue,
+                                        deck_list: blue_deck(),
                                     });
                                 });
                             }),

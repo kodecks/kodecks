@@ -1,0 +1,73 @@
+use crate::CATALOG;
+use kodecks::deck::DeckList;
+
+pub fn starter_deck() -> DeckList {
+    DeckList::parse(
+        "
+    # Starter deck
+    Vigilant Lynx 2
+    Moonlit Gecko 2
+    Scrapyard Raven 2
+    Radio Deer 1
+    Moss-Grown Mastodon 2
+    Voracious Anteater 2
+    Mire Alligator 2
+    Wasteland Cobra 1
+    Marshland Moose 1
+    Electric Flytrap 1
+    Poison-Tusk Babirusa 2
+    Quicksand Skulker 1
+    Evergreen Flamingo 1
+    ",
+        &CATALOG,
+    )
+    .unwrap()
+}
+
+pub fn blue_deck() -> DeckList {
+    DeckList::parse(
+        "
+    # Blue deck
+    Deep-Sea Wyrm 2
+    Airborne Eagle Ray 2
+    Binary Starfish 2
+    Demilune Nighthawk 1
+    Electric Clione 2
+    Flash-Bang Jellyfish 1
+    Helium Puffer 1
+    Icefall Weasel 1
+    Turbofish 2
+    Saltmarsh Moray 1
+    Minimum Bear 1
+    Soundless Owl 2
+    Wiretap Vine 1
+    Subspace Mole 1
+    ",
+        &CATALOG,
+    )
+    .unwrap()
+}
+
+pub fn red_deck() -> DeckList {
+    DeckList::parse(
+        "
+    # Red deck
+    Volcanic Wyrm 2
+    Wind-Up Spider 2
+    Pyrosnail 1
+    Oil-Leaking Droid 2
+    Diamond Porcupine 1
+    Bambooster 1
+    Coppermine Scorpion 1
+    Laser Frog 1
+    Graphite Armadillo 2
+    Tungsten Rhino 2
+    Solar Beetle 2
+    Orepecker 1
+    Thermite Crab 1
+    Amalgam Rat 1
+    ",
+        &CATALOG,
+    )
+    .unwrap()
+}

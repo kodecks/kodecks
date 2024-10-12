@@ -4,8 +4,7 @@ use futures::{
     channel::mpsc::{self, Sender},
     StreamExt,
 };
-use kodecks::deck::DeckList;
-use kodecks_catalog::CATALOG;
+use kodecks_catalog::decks::starter_deck;
 
 mod container;
 mod v1;
@@ -25,28 +24,7 @@ pub struct SaveData(v1::SaveDataV1);
 impl SaveData {
     pub fn load(opts: &StartupOptions) -> Self {
         let mut data = io::read_data(opts);
-
-        data.decks.list = vec![DeckList::parse(
-            "
-        # Starter deck
-        Vigilant Lynx 2
-        Moonlit Gecko 2
-        Scrapyard Raven 2
-        Radio Deer 1
-        Moss-Grown Mastodon 2
-        Voracious Anteater 2
-        Mire Alligator 2
-        Wasteland Cobra 1
-        Marshland Moose 1
-        Electric Flytrap 1
-        Poison-Tusk Babirusa 2
-        Quicksand Skulker 1
-        Evergreen Flamingo 1
-        ",
-            &CATALOG,
-        )
-        .unwrap()];
-
+        data.decks.list = vec![starter_deck()];
         data
     }
 }
