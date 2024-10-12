@@ -38,11 +38,7 @@ fn add_card(name: &str, id: Option<String>) {
 
     for lang in &["en-US", "ja-JP"] {
         let file = asset_dir.join("locales").join(lang).join("cards.ftl");
-        let mut file = fs::OpenOptions::new()
-            
-            .append(true)
-            .open(file)
-            .unwrap();
+        let mut file = fs::OpenOptions::new().append(true).open(file).unwrap();
         writeln!(file, "card-{safe_name} = ").unwrap();
     }
 
@@ -82,8 +78,8 @@ impl Effect for CardDef {{}}
             "// card-entries\n",
             &format!(
                 r#"// card-entries
-    "{safe_name}" => vigilant_lynx::ARCHETYPE,
-    "{id}" => vigilant_lynx::ARCHETYPE,
+    "{safe_name}" => {file_name}::ARCHETYPE,
+    "{id}" => {file_name}::ARCHETYPE,
 "#
             ),
         );
