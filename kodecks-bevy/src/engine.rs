@@ -2,11 +2,12 @@
 use bevy::tasks::AsyncComputeTaskPool;
 use futures::{
     channel::mpsc::{self, Receiver, Sender},
-    StreamExt,
+    SinkExt, StreamExt,
 };
 use kodecks_engine::{
-    message::{Input, Output},
-    Connection, Engine,
+    game::start_game,
+    message::{Command, Input, Output},
+    Connection,
 };
 
 pub struct LocalEngine {
@@ -16,19 +17,35 @@ pub struct LocalEngine {
 
 impl Default for LocalEngine {
     fn default() -> Self {
-        let (command_send, mut command_recv) = mpsc::channel(256);
+        let (command_send, command_recv) = mpsc::channel(256);
         let (event_send, event_recv) = mpsc::channel(256);
         AsyncComputeTaskPool::get()
-            .spawn(async move {
-                let mut server = Engine::new(event_send);
-                while let Some(input) = command_recv.next().await {
-                    server.handle_input(input);
-                }
-            })
+            .spawn(start_task(command_recv, event_send))
             .detach();
         Self {
             command_send,
             event_recv,
+        }
+    }
+}
+
+async fn start_task(mut command_recv: Receiver<Input>, event_send: Sender<Output>) {
+    let mut sender = None;
+    while let Some(input) = command_recv.next().await {
+        match input {
+            Input::Command(Command::CreateGame { log_id, profile }) => {
+                let (command_sender, receiver) = mpsc::channel(256);
+                sender = Some(command_sender);
+                AsyncComputeTaskPool::get()
+                    .spawn(start_game(log_id, profile, receiver, event_send.clone()))
+                    .detach();
+            }
+            Input::GameCommand(session_command) => {
+                if let Some(sender) = &mut sender {
+                    sender.send(session_command).await.unwrap();
+                }
+            }
+            _ => {}
         }
     }
 }
