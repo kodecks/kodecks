@@ -58,3 +58,4 @@ card-evergreen-flamingo = 常緑のフラミンゴ
 card-thermite-crab = テルミット・クラブ
 card-amalgam-rat = アマルガム・ラット
 card-subspace-mole = 亜空間土竜
+card-halo-tapir = 光輪獏
