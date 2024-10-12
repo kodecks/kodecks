@@ -1,7 +1,5 @@
-use crate::{
-    message::{GameCommand, GameCommandKind, GameEvent, GameEventKind, Output},
-    EngineCallback,
-};
+use crate::message::{GameCommand, GameCommandKind, GameEvent, GameEventKind, Output};
+use futures::channel::mpsc::Sender;
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::{Environment, LocalGameState},
@@ -10,7 +8,10 @@ use kodecks::{
 };
 use kodecks_bot::{Bot, DefaultBot};
 use kodecks_catalog::CATALOG;
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
 
 pub struct Game {
     id: u32,
@@ -20,11 +21,11 @@ pub struct Game {
     available_actions: Option<PlayerAvailableActions>,
     player_in_action: u8,
     default_bot: DefaultBot,
-    callback: Arc<Box<EngineCallback>>,
+    sender: Mutex<Sender<Output>>,
 }
 
 impl Game {
-    pub fn new(log_id: String, profile: GameProfile, callback: Arc<Box<EngineCallback>>) -> Self {
+    pub fn new(log_id: String, profile: GameProfile, mut sender: Sender<Output>) -> Self {
         let bots = profile.bots.clone();
         let env = Arc::new(Environment::new(profile, &CATALOG));
         let player_in_action = env.state.players.player_in_turn().id;
@@ -37,19 +38,21 @@ impl Game {
             available_actions: None,
             player_in_action,
             default_bot: DefaultBot::builder().build(),
-            callback: callback.clone(),
+            sender: Mutex::new(sender.clone()),
         };
 
         for player in game.players() {
             let is_bot = game.bots.iter().any(|bot| bot.player == player);
             if !is_bot {
-                (callback)(Output::GameEvent(GameEvent {
-                    game_id: 0,
-                    player,
-                    event: GameEventKind::Created {
-                        log_id: log_id.clone(),
-                    },
-                }));
+                sender
+                    .try_send(Output::GameEvent(GameEvent {
+                        game_id: 0,
+                        player,
+                        event: GameEventKind::Created {
+                            log_id: log_id.clone(),
+                        },
+                    }))
+                    .unwrap();
             }
         }
 
@@ -76,7 +79,11 @@ impl Game {
                     timeout: None,
                 },
             };
-            (self.callback)(Output::GameEvent(event));
+            self.sender
+                .lock()
+                .unwrap()
+                .try_send(Output::GameEvent(event))
+                .unwrap();
         }
     }
 
@@ -134,7 +141,12 @@ impl Game {
                         player,
                         event: GameEventKind::StateUpdated { state },
                     };
-                    (self.callback)(Output::GameEvent(event));
+
+                    self.sender
+                        .lock()
+                        .unwrap()
+                        .try_send(Output::GameEvent(event))
+                        .unwrap();
                 }
             }
         }

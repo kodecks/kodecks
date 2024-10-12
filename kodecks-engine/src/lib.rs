@@ -1,10 +1,10 @@
+use futures::channel::mpsc::Sender;
 use game::Game;
 use kodecks::profile::GameProfile;
-use message::{Command, Input};
-use std::{collections::HashMap, sync::Arc};
+use message::{Command, Input, Output};
+use std::collections::HashMap;
 
 pub mod game;
-pub mod local;
 pub mod login;
 pub mod message;
 pub mod room;
@@ -12,23 +12,18 @@ pub mod user;
 pub mod version;
 pub mod worker;
 
-pub type EngineCallback = dyn Fn(message::Output) + Send + Sync + 'static;
-
 pub struct Engine {
     game_counter: u32,
     games: HashMap<u32, Game>,
-    callback: Arc<Box<EngineCallback>>,
+    sender: Sender<Output>,
 }
 
 impl Engine {
-    pub fn new<F>(callback: F) -> Self
-    where
-        F: Fn(message::Output) + Send + Sync + 'static,
-    {
+    pub fn new(sender: Sender<Output>) -> Self {
         Self {
             game_counter: 0,
             games: HashMap::new(),
-            callback: Arc::new(Box::new(callback)),
+            sender,
         }
     }
 
@@ -54,7 +49,7 @@ impl Engine {
         let game_id = self.game_counter;
         self.game_counter += 1;
 
-        let game = Game::new(log_id, profile, self.callback.clone());
+        let game = Game::new(log_id, profile, self.sender.clone());
         self.games.insert(game_id, game);
     }
 }

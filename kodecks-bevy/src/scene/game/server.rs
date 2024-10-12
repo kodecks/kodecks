@@ -41,7 +41,7 @@ fn cleanup(mut commands: Commands) {
 #[derive(Resource)]
 pub enum ServerConnection {
     #[cfg(not(target_family = "wasm"))]
-    Local(kodecks_engine::local::LocalEngine),
+    Local(crate::engine::LocalEngine),
     #[cfg(target_family = "wasm")]
     Local(kodecks_engine::worker::WebWorkerEngine),
     WebSocket(WebSocketEngine),

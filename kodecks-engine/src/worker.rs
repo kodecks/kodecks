@@ -72,10 +72,8 @@ impl Connection for WebWorkerEngine {
 
 #[reactor]
 pub async fn EngineReactor(mut scope: ReactorScope<Vec<u8>, Vec<u8>>) {
-    let (event_send, mut event_recv) = futures::channel::mpsc::unbounded();
-    let mut engine = crate::Engine::new(move |event| {
-        event_send.unbounded_send(event).unwrap();
-    });
+    let (event_send, mut event_recv) = futures::channel::mpsc::channel(256);
+    let mut engine = crate::Engine::new(event_send);
     let config = bincode::config::standard();
     loop {
         select! {

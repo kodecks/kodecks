@@ -3,11 +3,12 @@
 use bevy::{asset::AssetMetaCheck, prelude::*, window::WindowTheme};
 
 mod assets;
+mod config;
+mod engine;
 mod input;
 mod opts;
 mod painter;
 mod save_data;
-mod config;
 mod scene;
 
 fn main() {
