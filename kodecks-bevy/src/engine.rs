@@ -1,24 +1,27 @@
 #![cfg(not(target_family = "wasm"))]
 use bevy::tasks::AsyncComputeTaskPool;
-use futures::channel::mpsc::{self, Receiver};
+use futures::{
+    channel::mpsc::{self, Receiver, Sender},
+    StreamExt,
+};
 use kodecks_engine::{
     message::{Input, Output},
     Connection, Engine,
 };
 
 pub struct LocalEngine {
-    command_send: std::sync::mpsc::Sender<Input>,
+    command_send: Sender<Input>,
     event_recv: Receiver<Output>,
 }
 
 impl Default for LocalEngine {
     fn default() -> Self {
-        let (command_send, command_recv) = std::sync::mpsc::channel();
+        let (command_send, mut command_recv) = mpsc::channel(256);
         let (event_send, event_recv) = mpsc::channel(256);
         AsyncComputeTaskPool::get()
             .spawn(async move {
                 let mut server = Engine::new(event_send);
-                while let Ok(input) = command_recv.recv() {
+                while let Some(input) = command_recv.next().await {
                     server.handle_input(input);
                 }
             })
@@ -32,7 +35,7 @@ impl Default for LocalEngine {
 
 impl Connection for LocalEngine {
     fn send(&mut self, input: Input) {
-        self.command_send.send(input).unwrap();
+        self.command_send.try_send(input).unwrap();
     }
 
     fn recv(&mut self) -> Option<Output> {
