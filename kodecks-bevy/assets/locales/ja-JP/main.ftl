@@ -41,3 +41,4 @@ ability-piercing = 貫通
 error-failed-to-connect-server = サーバーに接続できませんでした。
 error-client-version-outdated = クライアントのアップデートが必要です。対応クライアントバージョン: { $requirement }
 error-server-version-outdated = サーバーのアップデートが必要です。対応クライアントバージョン: { $requirement }
+error-invalid-deck = デッキがレギュレーションに適合していません。

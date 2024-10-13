@@ -11,6 +11,7 @@ use dashmap::{
 };
 use k256::schnorr::VerifyingKey;
 use kodecks::error::Error;
+use kodecks_catalog::CATALOG;
 use kodecks_engine::{
     message::{Command, Input, Output, RoomCommand, RoomCommandKind, RoomEvent, RoomEventKind},
     user::UserId,
@@ -127,6 +128,11 @@ impl AppState {
                 config,
                 host_player,
             }) => {
+                if !config.regulation.verify(&host_player.deck, &CATALOG) {
+                    self.send(user_id, Output::Error(Error::InvalidDeck));
+                    return;
+                }
+
                 let mut rooms = self.rooms.lock().unwrap();
                 let room = rooms.create(user_id.clone(), config.clone(), host_player);
                 self.send(

@@ -41,3 +41,4 @@ ability-piercing = Piercing
 error-failed-to-connect-server = Failed to connect to the server.
 error-client-version-outdated = Your client needs to be updated.　Supported client version: { $requirement }
 error-server-version-outdated = The server needs to be updated. Supported client version: { $requirement }
+error-invalid-deck = Your deck does not meet the regulations.

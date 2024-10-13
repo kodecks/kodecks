@@ -1,4 +1,4 @@
-use crate::deck::DeckList;
+use crate::{card::Catalog, deck::DeckList};
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
@@ -35,9 +35,12 @@ impl Regulation {
         max_consecutive_timeouts: 2,
     };
 
-    pub fn verify(&self, deck: &DeckList) -> bool {
+    pub fn verify(&self, deck: &DeckList, catalog: &Catalog) -> bool {
         let mut count = HashMap::new();
         for item in &deck.cards {
+            if !catalog.contains(item.card.archetype_id.as_str()) {
+                return false;
+            }
             let entry = count.entry(item.card.archetype_id).or_insert(0);
             *entry += 1;
             if *entry > self.max_same_cards {

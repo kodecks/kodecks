@@ -33,6 +33,10 @@ impl Catalog {
     pub fn iter(&self) -> impl Iterator<Item = &'static CardArchetype> {
         self.str_index.values().map(|entry| entry())
     }
+
+    pub fn contains(&self, safe_name: &str) -> bool {
+        self.str_index.contains_key(safe_name)
+    }
 }
 
 impl Index<&str> for Catalog {

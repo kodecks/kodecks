@@ -25,6 +25,8 @@ pub enum Error {
         client: String,
         requirement: String,
     },
+    #[error("Invalid deck")]
+    InvalidDeck,
 }
 
 impl<'a> From<Error> for Request<'a, FluentArgs<'a>> {
@@ -34,9 +36,9 @@ impl<'a> From<Error> for Request<'a, FluentArgs<'a>> {
             Error::FailedToConnectServer => "error-failed-to-connect-server",
             Error::ClientVersionOutdated { .. } => "error-client-version-outdated",
             Error::ServerVersionOutdated { .. } => "error-server-version-outdated",
+            Error::InvalidDeck => "error-invalid-deck",
         };
         match error {
-            Error::FailedToConnectServer => {}
             Error::ClientVersionOutdated {
                 server,
                 client,
@@ -55,6 +57,7 @@ impl<'a> From<Error> for Request<'a, FluentArgs<'a>> {
                 args.set("client", client.to_string());
                 args.set("requirement", requirement.to_string());
             }
+            _ => {}
         }
         Request {
             id,
