@@ -97,6 +97,9 @@ fn show_stat() {
     let mut powers = BTreeMap::new();
 
     CATALOG.iter().for_each(|card| {
+        if card.attribute.is_token {
+            return;
+        }
         if archetypes.contains(&card.id) {
             return;
         }
