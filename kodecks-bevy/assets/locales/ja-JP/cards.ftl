@@ -59,3 +59,4 @@ card-thermite-crab = テルミット・クラブ
 card-amalgam-rat = アマルガム・ラット
 card-subspace-mole = 亜空間土竜
 card-halo-tapir = 光輪獏
+card-badlands-chimera = 荒原のキメラ

@@ -9,7 +9,7 @@ pub fn starter_deck() -> DeckList {
     Moonlit Gecko 1
     Scrapyard Raven 2
     Radio Deer 1
-    Moss-Grown Mastodon 2
+    Moss-Grown Mastodon 1
     Voracious Anteater 2
     Mire Alligator 2
     Wasteland Cobra 1
@@ -19,6 +19,7 @@ pub fn starter_deck() -> DeckList {
     Quicksand Skulker 1
     Evergreen Flamingo 1
     Halo Tapir 1
+    Badlands Chimera 1
     ",
         &CATALOG,
     )
