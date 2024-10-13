@@ -1,12 +1,15 @@
 use crate::scene::{
-    game::event::MessageDialogUpdated,
+    game::{board::AvailableActionList, event::MessageDialogUpdated, server::SendCommand},
     translator::{TextPurpose, Translator},
     GlobalState,
 };
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use fluent_content::Request;
-use kodecks::message::{MessageBox, MessageBoxPosition};
+use kodecks::{
+    action::Action,
+    message::{MessageBox, MessageBoxPosition},
+};
 
 pub struct DialogPlugin;
 
@@ -50,6 +53,7 @@ fn handle_event(mut commands: Commands, mut event: EventReader<MessageDialogUpda
 }
 
 fn update_ui(
+    available_actions: Res<AvailableActionList>,
     messages: Option<Res<DialogMessages>>,
     mut bg_query: Query<(&mut Visibility, &mut Style, &mut Pickable), With<DialogBackground>>,
     mut text_query: Query<&mut Text, With<DialogText>>,
@@ -58,7 +62,7 @@ fn update_ui(
     let (mut visibility, mut style, mut pick) = bg_query.single_mut();
     if let Some(messages) = messages {
         *visibility = Visibility::Visible;
-        if messages.messages.len() > 1 {
+        if messages.messages.len() > 1 || available_actions.can_continue() {
             *pick = Default::default();
         } else {
             *pick = Pickable::IGNORE;
@@ -137,6 +141,8 @@ fn init(mut commands: Commands, asset_server: Res<AssetServer>) {
                     let mut messages = w.resource_mut::<DialogMessages>();
                     if messages.messages.len() > 1 {
                         messages.messages.pop();
+                    } else {
+                        w.commands().add(SendCommand(Action::Continue));
                     }
                 });
             }),

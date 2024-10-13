@@ -23,6 +23,7 @@ pub enum AvailableAction {
         cards: Vec<ObjectId>,
     },
     EndTurn,
+    Continue,
 }
 
 impl PartialOrd for AvailableAction {
@@ -39,6 +40,7 @@ impl Ord for AvailableAction {
             AvailableAction::Block { .. } => 2,
             AvailableAction::CastCard { .. } => 3,
             AvailableAction::EndTurn => 4,
+            AvailableAction::Continue => 5,
         };
         index(self).cmp(&index(other))
     }
@@ -116,6 +118,7 @@ impl AvailableActionList {
                     .any(|action| matches!(action, AvailableAction::Block { blockers } if pairs.iter().all(|(_, b)| blockers.contains(b))))
             }
             Action::EndTurn => self.0.iter().any(|action| matches!(action, AvailableAction::EndTurn)),
+            Action::Continue => self.0.iter().any(|action| matches!(action, AvailableAction::Continue)),
             _ => true,
         }
     }
@@ -179,6 +182,11 @@ impl AvailableActionList {
             .collect()
     }
 
+    pub fn can_continue(&self) -> bool {
+        self.iter()
+            .any(|action| matches!(action, AvailableAction::Continue))
+    }
+
     pub fn default_action(&self) -> Option<Action> {
         for action in self.iter() {
             match action {
@@ -197,6 +205,7 @@ impl AvailableActionList {
                     return Some(Action::Block { pairs: vec![] });
                 }
                 AvailableAction::EndTurn => return Some(Action::EndTurn),
+                AvailableAction::Continue => return Some(Action::Continue),
             }
         }
         None
@@ -235,5 +244,6 @@ pub enum Action {
     Block { pairs: Vec<(ObjectId, ObjectId)> },
     EndTurn,
     Concede,
+    Continue,
     DebugCommand { commands: Vec<ActionCommand> },
 }
