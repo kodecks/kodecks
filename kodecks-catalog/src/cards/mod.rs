@@ -4,6 +4,7 @@ use kodecks::prelude::*;
 mod airborne_eagle_ray;
 mod amalgam_rat;
 mod ant;
+mod badlands_chimera;
 mod bambooster;
 mod binary_starfish;
 mod coppermine_scorpion;
@@ -49,6 +50,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "badlands-chimera" => badlands_chimera::ARCHETYPE,
+    "badl" => badlands_chimera::ARCHETYPE,
     "halo-tapir" => halo_tapir::ARCHETYPE,
     "halo" => halo_tapir::ARCHETYPE,
     "vigilant-lynx" => vigilant_lynx::ARCHETYPE,
