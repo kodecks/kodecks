@@ -15,11 +15,12 @@ pub fn starter_deck() -> DeckList {
     Wasteland Cobra 1
     Marshland Moose 1
     Electric Flytrap 1
-    Poison-Tusk Babirusa 2
+    Poison-Tusk Babirusa 1
     Quicksand Skulker 1
     Evergreen Flamingo 1
     Halo Tapir 1
     Badlands Chimera 1
+    Hostile Coyote 1
     ",
         &CATALOG,
     )
