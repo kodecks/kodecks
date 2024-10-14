@@ -3,7 +3,7 @@ use super::{
     translator::{TextPurpose, Translator},
     GlobalState,
 };
-use crate::{config::GlobalConfig, save_data};
+use crate::{app_version, config::GlobalConfig, save_data};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use kodecks::{deck::DeckList, regulation::Regulation};
@@ -217,7 +217,7 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
         .with_children(|parent| {
             parent.spawn((
                 TextBundle::from_section(
-                    build_info::format!("v{} ({}) {}", $.crate_info.version, $.version_control?.git()?.commit_short_id, $.target.triple),
+                    app_version(),
                     TextStyle {
                         font_size: 20.0,
                         color: Color::linear_rgb(0.5, 0.5, 0.5),

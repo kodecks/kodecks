@@ -1,5 +1,6 @@
 use super::{spinner::SpinnerState, translator::Translator, GlobalState};
 use crate::{
+    app_version,
     assets::{
         card::RenderedCardPlugin,
         fluent::{FluentAsset, FluentPlugin, DEFAULT_LANG},
@@ -10,8 +11,6 @@ use crate::{
 use bevy::{asset::LoadState, prelude::*};
 use std::str::FromStr;
 use unic_langid::LanguageIdentifier;
-
-build_info::build_info!(fn build_info);
 
 pub struct AppLoadingPlugin;
 
@@ -28,7 +27,7 @@ impl Plugin for AppLoadingPlugin {
 }
 
 fn init(mut next_spinner_state: ResMut<NextState<SpinnerState>>) {
-    info!("{}", build_info::format!("{}", $));
+    info!("{}", app_version());
     next_spinner_state.set(SpinnerState::On);
 }
 

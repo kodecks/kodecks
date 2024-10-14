@@ -54,3 +54,20 @@ fn main() {
         ))
         .run();
 }
+
+pub fn app_version() -> String {
+    if let Some(sha) = option_env!("VERGEN_GIT_SHA") {
+        format!(
+            "v{} ({}) {}",
+            env!("CARGO_PKG_VERSION"),
+            sha,
+            env!("VERGEN_CARGO_TARGET_TRIPLE")
+        )
+    } else {
+        format!(
+            "v{} {}",
+            env!("CARGO_PKG_VERSION"),
+            env!("VERGEN_CARGO_TARGET_TRIPLE")
+        )
+    }
+}

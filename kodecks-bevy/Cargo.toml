@@ -21,7 +21,6 @@ bevy_mod_picking = { version = "0.20.1", features = [
     "backend_sprite",
 ], default-features = false }
 bincode = "2.0.0-rc.3"
-build-info = "0.0.38"
 chrono = "0.4.38"
 dashmap = "6.0.1"
 flate2 = "1.0.34"
@@ -72,7 +71,8 @@ gloo-storage = "0.3.0"
 sys-locale = { version = "0.3.1", features = ["js"] }
 
 [build-dependencies]
-build-info-build = "0.0.38"
+anyhow = "1.0.89"
+vergen-git2 = { version = "1.0", features = ["cargo"] }
 
 [features]
 trace_chrome = ["trace", "bevy/trace_chrome"]
