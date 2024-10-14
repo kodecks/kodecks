@@ -16,7 +16,7 @@ use kodecks_engine::{
     message::{Command, Input, Output, RoomCommand, RoomCommandKind, RoomEvent, RoomEventKind},
     user::UserId,
 };
-use semver::{Version, VersionReq};
+use semver::{BuildMetadata, Version, VersionReq};
 use serde::Serialize;
 use std::{
     cmp::Ordering,
@@ -43,8 +43,12 @@ impl AppState {
     }
 
     pub fn status(&self) -> Status {
+        let mut server_version: Version = env!("CARGO_PKG_VERSION").parse().unwrap();
+        if let Some(sha) = option_env!("VERGEN_GIT_SHA") {
+            server_version.build = BuildMetadata::new(sha).unwrap();
+        }
         Status {
-            server_version: env!("CARGO_PKG_VERSION").parse().unwrap(),
+            server_version,
             client_version_requirement: CLIENT_VERSION_REQUIREMENT.parse().unwrap(),
             sessions: self.sessions.len() as u32,
         }
