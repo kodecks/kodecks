@@ -1,4 +1,4 @@
-trunk-version = ">=0.19.0"
+trunk-version = ">=0.21.0"
 
 [build]
 target = "web/index.html"
