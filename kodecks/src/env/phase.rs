@@ -109,7 +109,7 @@ impl Environment {
                 ])
             }
             Phase::Draw => {
-                if player_in_turn.counters.draw == 0 {
+                if player_in_turn.counters.draw == 0 && self.state.turn > 1 {
                     Ok(vec![OpcodeList::new(vec![Opcode::DrawCard {
                         player: player_in_turn.id,
                     }])])
