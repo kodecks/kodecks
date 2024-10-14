@@ -3,6 +3,7 @@ use kodecks::prelude::*;
 // card-modules
 mod airborne_eagle_ray;
 mod amalgam_rat;
+mod amethyst_mantis;
 mod ant;
 mod badlands_chimera;
 mod bambooster;
@@ -51,6 +52,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "amethyst-mantis" => amethyst_mantis::ARCHETYPE,
+    "amet" => amethyst_mantis::ARCHETYPE,
     "hostile-coyote" => hostile_coyote::ARCHETYPE,
     "host" => hostile_coyote::ARCHETYPE,
     "badlands-chimera" => badlands_chimera::ARCHETYPE,
