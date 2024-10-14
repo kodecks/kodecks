@@ -16,7 +16,7 @@ use kodecks_engine::{
     Connection,
 };
 use reqwest_websocket::{CloseCode, RequestBuilderExt, WebSocket};
-use semver::Version;
+use semver::{BuildMetadata, Version};
 use std::pin::pin;
 use url::Url;
 
@@ -208,7 +208,10 @@ async fn connect(
 async fn connect_websocket(server: Url, key: SigningKey) -> anyhow::Result<WebSocket> {
     let url = server.join("login")?;
 
-    let client_version: Version = env!("CARGO_PKG_VERSION").parse().unwrap();
+    let mut client_version: Version = env!("CARGO_PKG_VERSION").parse().unwrap();
+    if let Some(sha) = option_env!("VERGEN_GIT_SHA") {
+        client_version.build = BuildMetadata::new(sha).unwrap();
+    }
     let pubkey = key.verifying_key();
     let client = reqwest::Client::new();
 
