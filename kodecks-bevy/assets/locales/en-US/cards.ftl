@@ -60,3 +60,4 @@ card-amalgam-rat = Amalgam Rat
 card-subspace-mole = Subspace Mole
 card-halo-tapir = Halo Tapir
 card-badlands-chimera = Badlands Chimera
+card-hostile-coyote = Hostile Coyote

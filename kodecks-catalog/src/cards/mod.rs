@@ -18,6 +18,7 @@ mod flash_bang_jellyfish;
 mod graphite_armadillo;
 mod halo_tapir;
 mod helium_puffer;
+mod hostile_coyote;
 mod icefall_weasel;
 mod laser_frog;
 mod marshland_moose;
@@ -50,6 +51,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "hostile-coyote" => hostile_coyote::ARCHETYPE,
+    "host" => hostile_coyote::ARCHETYPE,
     "badlands-chimera" => badlands_chimera::ARCHETYPE,
     "badl" => badlands_chimera::ARCHETYPE,
     "halo-tapir" => halo_tapir::ARCHETYPE,
