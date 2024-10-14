@@ -63,12 +63,13 @@ pub fn red_deck() -> DeckList {
     Bambooster 1
     Coppermine Scorpion 1
     Laser Frog 1
-    Graphite Armadillo 2
+    Graphite Armadillo 1
     Tungsten Rhino 2
     Solar Beetle 2
     Orepecker 1
     Thermite Crab 1
     Amalgam Rat 1
+    Amethyst Mantis 1
     ",
         &CATALOG,
     )
