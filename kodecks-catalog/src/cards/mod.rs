@@ -5,6 +5,7 @@ mod airborne_eagle_ray;
 mod amalgam_rat;
 mod amethyst_mantis;
 mod ant;
+mod auto_parrot;
 mod badlands_chimera;
 mod bambooster;
 mod binary_starfish;
@@ -52,6 +53,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "auto-parrot" => auto_parrot::ARCHETYPE,
+    "auto" => auto_parrot::ARCHETYPE,
     "amethyst-mantis" => amethyst_mantis::ARCHETYPE,
     "amet" => amethyst_mantis::ARCHETYPE,
     "hostile-coyote" => hostile_coyote::ARCHETYPE,

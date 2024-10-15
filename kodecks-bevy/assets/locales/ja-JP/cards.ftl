@@ -62,3 +62,4 @@ card-halo-tapir = 光輪獏
 card-badlands-chimera = 荒原のキメラ
 card-hostile-coyote = 敵対的なコヨーテ
 card-amethyst-mantis = 紫水晶のマンティス
+card-auto-parrot = オート・パロット
