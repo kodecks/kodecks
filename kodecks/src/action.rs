@@ -1,5 +1,6 @@
 use crate::{
     command::ActionCommand,
+    env::Environment,
     id::ObjectId,
     message::{Message, MessageDialog},
 };
@@ -187,12 +188,17 @@ impl AvailableActionList {
             .any(|action| matches!(action, AvailableAction::Continue))
     }
 
-    pub fn default_action(&self) -> Option<Action> {
+    pub fn default_action(&self, env: &Environment) -> Option<Action> {
         for action in self.iter() {
             match action {
                 AvailableAction::SelectCard { cards, .. } => {
-                    if !cards.is_empty() {
-                        return Some(Action::SelectCard { card: cards[0] });
+                    let oldest_card = cards
+                        .iter()
+                        .filter_map(|card| env.state.find_card(*card).ok())
+                        .min_by_key(|card| card.timestamp())
+                        .map(|card| card.id());
+                    if let Some(card) = oldest_card {
+                        return Some(Action::SelectCard { card });
                     }
                 }
                 AvailableAction::CastCard { .. } => {

@@ -158,7 +158,7 @@ impl Bot for DefaultBot {
 
         actions
             .actions
-            .default_action()
+            .default_action(&env)
             .map(|action| {
                 (
                     action,

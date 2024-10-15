@@ -41,7 +41,7 @@ fn evaluate_cast(mut ctx: BotContext, action: Option<Action>) -> i32 {
 
     if next_action.is_none() {
         if let Some(actions) = env.last_available_actions() {
-            next_action = actions.actions.default_action();
+            next_action = actions.actions.default_action(&env);
             current_player = actions.player;
         }
     }
@@ -55,7 +55,7 @@ fn evaluate_cast(mut ctx: BotContext, action: Option<Action>) -> i32 {
         if let Some(available_actions) = &report.available_actions {
             current_player = available_actions.player;
             if current_player == ctx.player {
-                next_action = available_actions.actions.default_action();
+                next_action = available_actions.actions.default_action(&env);
             } else {
                 next_action =
                     SimpleBot.compute_best_action(Arc::new(env.clone()), available_actions);

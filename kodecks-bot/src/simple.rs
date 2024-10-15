@@ -165,7 +165,7 @@ impl Bot for SimpleBot {
 
         actions
             .actions
-            .default_action()
+            .default_action(&env)
             .map(|action| (action, ComputedScore::default()))
             .into_iter()
             .collect()

@@ -207,7 +207,7 @@ impl Game {
                         let action = if player.consecutive_timeouts >= regulation.max_consecutive_timeouts {
                             Action::Concede
                         } else {
-                            available_actions.actions.default_action().unwrap_or(Action::Concede)
+                            available_actions.actions.default_action(&env).unwrap_or(Action::Concede)
                         };
                         player.next_actions.push_back(action);
                     }
