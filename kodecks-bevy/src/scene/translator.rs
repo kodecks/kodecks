@@ -44,11 +44,16 @@ impl Translator {
 
     pub fn get<'a, T, U>(&self, request: T) -> Cow<'a, str>
     where
-        T: Clone + Into<Request<'a, U>>,
+        T: Into<Request<'a, U>>,
         U: Borrow<FluentArgs<'a>>,
     {
-        let req: Request<'a, U> = request.clone().into();
-        self.content(request)
+        let req: Request<'a, U> = request.into();
+        let req = Request {
+            id: req.id,
+            attr: req.attr,
+            args: req.args.as_ref().map(|arg| arg.borrow()),
+        };
+        self.content(req)
             .map(|s| Cow::Owned(s.replace(['\u{2068}', '\u{2069}'], "")))
             .unwrap_or(if req.attr.is_some() {
                 Cow::Borrowed("")
@@ -59,15 +64,20 @@ impl Translator {
 
     pub fn get_default_lang<'a, T, U>(&self, request: T) -> Cow<'a, str>
     where
-        T: Clone + Into<Request<'a, U>>,
+        T: Into<Request<'a, U>>,
         U: Borrow<FluentArgs<'a>>,
     {
-        let req: Request<'a, U> = request.clone().into();
+        let req: Request<'a, U> = request.into();
+        let req = Request {
+            id: req.id,
+            attr: req.attr,
+            args: req.args.as_ref().map(|arg| arg.borrow()),
+        };
 
         self.bundles
             .iter()
             .filter(|bundle| bundle.locales.contains(&DEFAULT_LANG))
-            .find_map(|bundle| bundle.content(request.clone()))
+            .find_map(|bundle| bundle.content(req.clone()))
             .map(|s| Cow::Owned(s.replace(['\u{2068}', '\u{2069}'], "")))
             .unwrap_or(if req.attr.is_some() {
                 Cow::Borrowed("")
