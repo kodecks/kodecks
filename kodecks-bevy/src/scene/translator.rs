@@ -77,7 +77,7 @@ impl Translator {
         self.bundles
             .iter()
             .filter(|bundle| bundle.locales.contains(&DEFAULT_LANG))
-            .find_map(|bundle| bundle.content(req.clone()))
+            .find_map(|bundle| bundle.content(req))
             .map(|s| Cow::Owned(s.replace(['\u{2068}', '\u{2069}'], "")))
             .unwrap_or(if req.attr.is_some() {
                 Cow::Borrowed("")

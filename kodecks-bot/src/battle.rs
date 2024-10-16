@@ -152,7 +152,7 @@ fn evaluate_battle(env: &Environment, player: u8, action: Option<Action>) -> i32
 
     if next_action.is_none() {
         if let Some(actions) = env.last_available_actions() {
-            next_action = actions.actions.default_action(&env);
+            next_action = actions.actions.default_action(env);
             current_player = actions.player;
         }
     }

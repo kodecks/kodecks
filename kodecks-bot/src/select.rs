@@ -40,7 +40,7 @@ fn evaluate_select(mut ctx: BotContext, action: Option<Action>) -> ComputedScore
 
     if next_action.is_none() {
         if let Some(actions) = env.last_available_actions() {
-            next_action = actions.actions.default_action(&env);
+            next_action = actions.actions.default_action(env);
             player = actions.player;
         }
     }
