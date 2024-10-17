@@ -105,8 +105,20 @@ struct PreloadedAssets {
     loading: HashMap<ArchetypeId, Vec<Handle<Image>>>,
 }
 
-fn queue_events(mut queue: ResMut<EventQueue>, mut events: EventReader<ServerEvent>) {
+fn queue_events(
+    mut queue: ResMut<EventQueue>,
+    mut events: EventReader<ServerEvent>,
+    translator: Res<Translator>,
+    env: Option<Res<Environment>>,
+) {
     for event in events.read() {
+        if let Some(env) = &env {
+            for log in &event.logs {
+                if let Some(req) = log.request(env) {
+                    info!("{}", translator.get(req));
+                }
+            }
+        }
         queue.queue.push_back(event.clone());
     }
 }
@@ -251,10 +263,6 @@ fn recv_server_events(
     }
 
     if let Some(event) = events.server.queue.pop_front() {
-        for list in &event.logs {
-            info!("{}", list);
-        }
-
         let next_action = if let Some(actions) = &event.available_actions {
             match actions.actions.as_ref() {
                 [AvailableAction::SelectCard { cards, .. }] if cards.len() == 1 => {
@@ -314,13 +322,10 @@ fn recv_server_events(
                         delta: 0,
                     });
                 }
-                LogAction::DamageTaken {
-                    player,
-                    amount: damage,
-                } => {
+                LogAction::DamageTaken { player, amount } => {
                     events.life.send(LifeUpdated {
                         player: *player,
-                        delta: -(*damage as i32),
+                        delta: -(*amount as i32),
                     });
                 }
                 LogAction::TurnChanged { player, .. } => {

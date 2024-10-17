@@ -49,3 +49,21 @@ error-failed-to-connect-server = Failed to connect to the server.
 error-client-version-outdated = Your client needs to be updated.　Supported client version: { $requirement }
 error-server-version-outdated = The server needs to be updated. Supported client version: { $requirement }
 error-invalid-deck = Your deck does not meet the regulations.
+
+log-life-changed = {$player ->
+    [you] Your life is {$life}.
+    [opponent] Your opponent's life is {$life}.
+   *[other] {$player}'s life is {$life}.
+}
+
+log-damage-taken = {$player ->
+    [you] You take {$amount} damage.
+    [opponent] Your opponent takes {$amount} damage.
+    *[other] {$player} takes {$amount} damage.
+}
+
+log-deck-shuffled = {$player ->
+    [you] Your deck has been shuffled.
+    [opponent] Your opponent's deck has been shuffled.
+    *[other] {$player}'s deck has been shuffled.
+}
