@@ -1,12 +1,16 @@
+use std::borrow::Cow;
+
+use crate::scene::translator::Translator;
 use fluent_bundle::FluentArgs;
 use fluent_content::Request;
 use kodecks::{card::Catalog, env::LocalEnvironment, log::LogAction};
 
-pub fn get_request<'a>(
+pub fn translate_log<'a>(
     action: &LogAction,
     env: &LocalEnvironment,
     catalog: &Catalog,
-) -> Option<Request<'a, FluentArgs<'a>>> {
+    translator: &Translator,
+) -> Option<Cow<'a, str>> {
     let mut args = FluentArgs::new();
     let id = match action {
         LogAction::LifeChanged { player, life } => {
@@ -46,15 +50,18 @@ pub fn get_request<'a>(
         }
         LogAction::EffectActivated { source, .. } => {
             if let Ok(card) = env.find_card(*source) {
-                args.set("source", catalog[card.archetype_id].name);
+                let source = translator
+                    .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
+                    .to_string();
+                args.set("source", source);
             }
             "log-effect-activated"
         }
         _ => return None,
     };
-    Some(Request {
+    Some(translator.get(Request {
         id,
         attr: None,
         args: Some(args),
-    })
+    }))
 }
