@@ -219,7 +219,7 @@ impl Environment {
                 let (continuous, stack) = ctx.into_inner();
                 let log = stack
                     .iter()
-                    .map(|id| LogAction::EffectTriggered {
+                    .map(|id| LogAction::EffectActivated {
                         source: target.id(),
                         id: *id,
                     })
