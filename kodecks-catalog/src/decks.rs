@@ -5,7 +5,7 @@ pub fn starter_deck() -> DeckList {
     DeckList::parse(
         "
     # Starter deck
-    Vigilant Lynx 2
+    Vigilant Lynx 1
     Moonlit Gecko 1
     Scrapyard Raven 2
     Radio Deer 1
@@ -21,6 +21,7 @@ pub fn starter_deck() -> DeckList {
     Halo Tapir 1
     Badlands Chimera 1
     Hostile Coyote 1
+    Quagmire Trilobite 1
     ",
         &CATALOG,
     )
