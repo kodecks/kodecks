@@ -8,6 +8,13 @@ loading-button-cancel = キャンセル
 your-turn = Your Turn
 opponents-turn = Opponent's Turn
 
+phase-standby = スタンバイフェイズ
+phase-draw = ドローフェイズ
+phase-main = メインフェイズ
+phase-block = ブロックフェイズ
+phase-battle = バトルフェイズ
+phase-end = エンドフェイズ
+
 all-attack-button = 総攻撃
 attack-button = { $attackers }体で攻撃
 block-button = { $blockers }体でブロック

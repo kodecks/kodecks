@@ -14,6 +14,13 @@ end-turn-button = End Turn
 your-turn = Your Turn
 opponents-turn = Opponent's Turn
 
+phase-standby = Standby Phase
+phase-draw = Draw Phase
+phase-main = Main Phase
+phase-block = Block Phase
+phase-battle = Battle Phase
+phase-end = End Phase
+
 result-victory = Victory!
     .reason-concede = Your opponent has conceded.
     .reason-deck-empty = Your opponent's deck is empty.
