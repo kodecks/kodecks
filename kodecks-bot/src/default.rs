@@ -8,7 +8,7 @@ use kodecks::{
 };
 use rand::{rngs::SmallRng, SeedableRng};
 use std::sync::Arc;
-use tracing::info;
+use tracing::*;
 
 #[derive(Debug, Clone)]
 pub struct DefaultBot {
@@ -73,7 +73,7 @@ impl Bot for DefaultBot {
                 .ok()
                 .map(|card| card.archetype().name)
                 .unwrap_or_default();
-            info!("Select: {} score: {:?}", name, score);
+            debug!("Select: {} score: {:?}", name, score);
         }
         let select = select
             .into_iter()
@@ -89,7 +89,7 @@ impl Bot for DefaultBot {
                 .ok()
                 .map(|card| card.archetype().name)
                 .unwrap_or_default();
-            info!("Cast: {} score: {:?}", name, score);
+            debug!("Cast: {} score: {:?}", name, score);
         }
         let cast = cast
             .into_iter()
@@ -105,7 +105,7 @@ impl Bot for DefaultBot {
                 .map(|card| card.archetype().name)
                 .collect::<Vec<_>>()
                 .join(", ");
-            info!("Battle: {} score: {:?}", attackers, score);
+            debug!("Battle: {} score: {:?}", attackers, score);
         }
 
         let battle = battle
@@ -149,7 +149,7 @@ impl Bot for DefaultBot {
                 })
                 .collect::<Vec<_>>()
                 .join(", ");
-            info!("Block: {} score: {:?}", attackers, score);
+            debug!("Block: {} score: {:?}", attackers, score);
         }
         let block = block
             .into_iter()
