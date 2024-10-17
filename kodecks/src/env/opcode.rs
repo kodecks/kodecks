@@ -33,16 +33,12 @@ impl Environment {
                 });
                 Ok(vec![
                     LogAction::TurnChanged { turn, player },
-                    LogAction::PhaseChanged {
-                        phase,
-                    },
+                    LogAction::PhaseChanged { phase },
                 ])
             }
             Opcode::ChangePhase { phase } => {
                 self.state.phase = phase;
-                Ok(vec![LogAction::PhaseChanged {
-                    phase,
-                }])
+                Ok(vec![LogAction::PhaseChanged { phase }])
             }
             Opcode::SetLife { player, life } => {
                 self.state.players.get_mut(player).stats.life = life;
@@ -122,11 +118,13 @@ impl Environment {
                     let id = card.id();
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Hand);
+                    let controller = card.controller();
                     card.set_timestamp(self.timestamp);
                     card.set_zone(to);
                     player.hand.push(card);
                     player.counters.draw += 1;
                     return Ok(vec![LogAction::CardMoved {
+                        player: controller,
                         card: id,
                         from,
                         to,
@@ -145,6 +143,7 @@ impl Environment {
                     let id = card.id();
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Field);
+                    let controller = card.controller();
                     card.set_timestamp(self.timestamp);
                     card.set_zone(to);
                     player.field.push(card);
@@ -152,6 +151,7 @@ impl Environment {
                         player.counters.free_casted += 1;
                     }
                     return Ok(vec![LogAction::CardMoved {
+                        player: controller,
                         card: id,
                         from,
                         to,
@@ -176,6 +176,7 @@ impl Environment {
                 };
                 if let Some(mut card) = card {
                     let id = card.id();
+                    let controller = card.controller();
                     if card.is_token() && to.zone != Zone::Field {
                         return Ok(vec![LogAction::CardTokenRemoved { card: id }]);
                     }
@@ -191,6 +192,7 @@ impl Environment {
                         _ => (),
                     }
                     return Ok(vec![LogAction::CardMoved {
+                        player: controller,
                         card: id,
                         from,
                         to,

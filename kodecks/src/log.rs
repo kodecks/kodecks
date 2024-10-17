@@ -37,6 +37,7 @@ pub enum LogAction {
     },
     #[strum(to_string = "Card {card} moved from {from:?} to {to:?} due to {reason:?}")]
     CardMoved {
+        player: u8,
         card: ObjectId,
         from: PlayerZone,
         to: PlayerZone,
