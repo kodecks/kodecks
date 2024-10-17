@@ -87,10 +87,30 @@ log-deck-shuffled = {$player ->
 log-effect-activated = <<{$source}>>'s effect is activated.
 
 log-card-moved = {$card ->
-    [none] {$controller ->
+    [none] {$player ->
         [you] Your card
         [opponent] Your opponent's card
-        *[other] {$controller}'s card
+        *[other] {$player}'s card
     }
     *[other] <<{$card}>>
-}
+} is moved from {$from-player ->
+    [you] your
+    [opponent] your opponent's
+    *[other] {$from-player}'s
+} {$from-zone ->
+    [deck] deck
+    [hand] hand
+    [field] field
+    [graveyard] graveyard
+    *[other] {$from-zone}
+} to {$to-player ->
+    [you] your
+    [opponent] your opponent's
+    *[other] {$to-player}'s
+} {$to-zone ->
+    [deck] deck
+    [hand] hand
+    [field] field
+    [graveyard] graveyard
+    *[other] {$to-zone}
+}.

@@ -73,21 +73,32 @@ pub fn translate_log<'a>(
             }
             "log-effect-activated"
         }
-        LogAction::CardMoved { card, from, to, .. } => {
-            args.set("card", "none");
-            if let Ok(card) = env.find_card(*card) {
-                args.set(
-                    "controller",
-                    if card.controller == env.player {
-                        "you"
-                    } else {
-                        "opponent"
-                    },
-                );
+        LogAction::CardMoved {
+            player,
+            card,
+            from,
+            to,
+            ..
+        } => {
+            args.set(
+                "player",
+                if *player == env.player {
+                    "you"
+                } else {
+                    "opponent"
+                },
+            );
+            if let Some(card) = env
+                .find_card(*card)
+                .ok()
+                .filter(|card| !card.archetype_id.is_empty())
+            {
                 let card = translator
                     .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
                     .to_string();
                 args.set("card", card);
+            } else {
+                args.set("card", "none");
             }
             args.set(
                 "from-player",

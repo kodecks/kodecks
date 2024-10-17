@@ -253,14 +253,6 @@ fn recv_server_events(
     }
 
     if let Some(event) = events.server.queue.pop_front() {
-        if let Some(env) = &env {
-            for log in &event.logs {
-                if let Some(log) = translate_log(log, env, &CATALOG, &events.translator) {
-                    info!("{}", log);
-                }
-            }
-        }
-
         let next_action = if let Some(actions) = &event.available_actions {
             match actions.actions.as_ref() {
                 [AvailableAction::SelectCard { cards, .. }] if cards.len() == 1 => {
@@ -348,6 +340,12 @@ fn recv_server_events(
                     .unwrap_or_default(),
                 env.timestamp,
             ));
+        }
+
+        for log in &event.logs {
+            if let Some(log) = translate_log(log, &env, &CATALOG, &events.translator) {
+                info!("{}", log);
+            }
         }
 
         board.update(&env);

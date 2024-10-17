@@ -85,3 +85,32 @@ log-deck-shuffled = {$player ->
 }
 
 log-effect-activated = <<{$source}>>の効果が発動しました。
+
+log-card-moved = {$card ->
+    [none] {$player ->
+        [you] あなたのカード
+        [opponent] 対戦相手のカード
+        *[other] {$player}のカード
+    }
+    *[other] <<{$card}>>
+}は{$from-player ->
+    [you] あなたの
+    [opponent] 対戦相手の
+    *[other] {$from-player}の
+}{$from-zone ->
+    [deck] デッキ
+    [hand] 手札
+    [field] フィールド
+    [graveyard] 墓地
+    *[other] {$from-zone}
+}から{$to-player ->
+    [you] あなたの
+    [opponent] 対戦相手の
+    *[other] {$to-player}の
+}{$to-zone ->
+    [deck] デッキ
+    [hand] 手札
+    [field] フィールド
+    [graveyard] 墓地
+    *[other] {$to-zone}
+}に移動しました。
