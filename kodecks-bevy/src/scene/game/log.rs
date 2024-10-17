@@ -73,6 +73,34 @@ pub fn translate_log<'a>(
             }
             "log-effect-activated"
         }
+        LogAction::CardMoved { card, from, to, .. } => {
+            args.set("card", "-");
+            if let Ok(card) = env.find_card(*card) {
+                let card = translator
+                    .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
+                    .to_string();
+                args.set("card", card);
+            }
+            args.set(
+                "from-player",
+                if from.player == env.player {
+                    "you"
+                } else {
+                    "opponent"
+                },
+            );
+            args.set("from-zone", from.zone.to_string().to_ascii_lowercase());
+            args.set(
+                "to-player",
+                if to.player == env.player {
+                    "you"
+                } else {
+                    "opponent"
+                },
+            );
+            args.set("to-zone", to.zone.to_string().to_ascii_lowercase());
+            "log-card-moved"
+        }
         _ => return None,
     };
     Some(translator.get(Request {
