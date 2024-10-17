@@ -105,20 +105,8 @@ struct PreloadedAssets {
     loading: HashMap<ArchetypeId, Vec<Handle<Image>>>,
 }
 
-fn queue_events(
-    mut queue: ResMut<EventQueue>,
-    mut events: EventReader<ServerEvent>,
-    translator: Res<Translator>,
-    env: Option<Res<Environment>>,
-) {
+fn queue_events(mut queue: ResMut<EventQueue>, mut events: EventReader<ServerEvent>) {
     for event in events.read() {
-        if let Some(env) = &env {
-            for log in &event.logs {
-                if let Some(req) = log.request(env) {
-                    info!("{}", translator.get(req));
-                }
-            }
-        }
         queue.queue.push_back(event.clone());
     }
 }
@@ -228,6 +216,7 @@ pub struct ServerEvents<'w> {
     shard: EventWriter<'w, ShardUpdated>,
     turn: EventWriter<'w, TurnChanged>,
     list: Res<'w, AvailableActionList>,
+    translator: Res<'w, Translator>,
 }
 
 fn recv_server_events(
@@ -249,7 +238,7 @@ fn recv_server_events(
             return;
         }
     } else if *state == GlobalState::GameLoading {
-        if let Some(env) = env {
+        if let Some(env) = &env {
             if env.turn > 0 {
                 return;
             }
@@ -263,6 +252,14 @@ fn recv_server_events(
     }
 
     if let Some(event) = events.server.queue.pop_front() {
+        if let Some(env) = &env {
+            for log in &event.logs {
+                if let Some(req) = log.request(env) {
+                    info!("{}", events.translator.get(req));
+                }
+            }
+        }
+
         let next_action = if let Some(actions) = &event.available_actions {
             match actions.actions.as_ref() {
                 [AvailableAction::SelectCard { cards, .. }] if cards.len() == 1 => {
