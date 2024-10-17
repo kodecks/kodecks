@@ -29,7 +29,7 @@ impl Effect for CardDef {
                 let commands = if power > 0 {
                     vec![ActionCommand::InflictDamage {
                         target,
-                        damage: power,
+                        amount: power,
                     }]
                 } else {
                     vec![]

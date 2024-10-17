@@ -314,7 +314,10 @@ fn recv_server_events(
                         delta: 0,
                     });
                 }
-                LogAction::DamageInflicted { player, damage } => {
+                LogAction::DamageTaken {
+                    player,
+                    amount: damage,
+                } => {
                     events.life.send(LifeUpdated {
                         player: *player,
                         delta: -(*damage as i32),

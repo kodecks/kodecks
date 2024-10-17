@@ -265,12 +265,12 @@ impl Environment {
             Opcode::Attack { attacker, target } => {
                 Ok(vec![LogAction::Attacked { attacker, target }])
             }
-            Opcode::InflictDamage { player, damage } => {
+            Opcode::InflictDamage { player, amount } => {
                 let player = self.state.players.get_mut(player);
-                player.stats.life = player.stats.life.saturating_sub(damage);
-                Ok(vec![LogAction::DamageInflicted {
+                player.stats.life = player.stats.life.saturating_sub(amount);
+                Ok(vec![LogAction::DamageTaken {
                     player: player.id,
-                    damage,
+                    amount,
                 }])
             }
         }

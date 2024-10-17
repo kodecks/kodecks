@@ -19,7 +19,7 @@ use strum::Display;
 pub enum ActionCommand {
     InflictDamage {
         target: u8,
-        damage: u32,
+        amount: u32,
     },
     DestroyCard {
         source: ObjectId,
@@ -66,10 +66,10 @@ pub enum ActionCommand {
 impl ActionCommand {
     pub fn into_opcodes(self, env: &Environment) -> Result<Vec<OpcodeList>, ActionError> {
         match self {
-            ActionCommand::InflictDamage { target, damage } => {
+            ActionCommand::InflictDamage { target, amount } => {
                 Ok(vec![OpcodeList::new(vec![Opcode::InflictDamage {
                     player: target,
-                    damage,
+                    amount,
                 }])])
             }
             ActionCommand::DestroyCard {

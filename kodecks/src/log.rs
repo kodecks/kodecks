@@ -19,8 +19,8 @@ pub enum LogAction {
     Attacked { attacker: ObjectId, target: Target },
     #[strum(to_string = "Life changed for {player}: {life}")]
     LifeChanged { player: u8, life: u32 },
-    #[strum(to_string = "Damage {damage} inflicted to {player}")]
-    DamageInflicted { player: u8, damage: u32 },
+    #[strum(to_string = "Damage {amount} inflicted to {player}")]
+    DamageTaken { player: u8, amount: u32 },
     #[strum(to_string = "Shards generated to {player} in {color} color: {amount}")]
     ShardsGenerated {
         player: u8,

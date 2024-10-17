@@ -333,7 +333,7 @@ impl Environment {
                     if blocker.is_none() && attacker_power > 0 {
                         logs.push(OpcodeList::new(vec![Opcode::InflictDamage {
                             player: target.id,
-                            damage: attacker_power,
+                            amount: attacker_power,
                         }]));
 
                         if let Ok(log) = self.apply_event(

@@ -24,7 +24,7 @@ impl Effect for CardDef {
                 let target = ctx.state().players.next_id(ctx.source().controller());
                 let commands = vec![ActionCommand::InflictDamage {
                     target,
-                    damage: 100,
+                    amount: 100,
                 }];
                 Ok(EffectReport::default().with_commands(commands))
             });
