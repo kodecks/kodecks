@@ -13,6 +13,18 @@ pub fn translate_log<'a>(
 ) -> Option<Cow<'a, str>> {
     let mut args = FluentArgs::new();
     let id = match action {
+        LogAction::TurnChanged { player, turn } => {
+            args.set(
+                "player",
+                if *player == env.player {
+                    "you"
+                } else {
+                    "opponent"
+                },
+            );
+            args.set("turn", turn);
+            "log-turn-changed"
+        }
         LogAction::LifeChanged { player, life } => {
             args.set(
                 "player",

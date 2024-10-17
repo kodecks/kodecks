@@ -50,6 +50,12 @@ error-client-version-outdated = Your client needs to be updated.　Supported cli
 error-server-version-outdated = The server needs to be updated. Supported client version: { $requirement }
 error-invalid-deck = Your deck does not meet the regulations.
 
+log-turn-changed = {$player ->
+    [you] Your turn. (Turn {$turn})
+    [opponent] Opponent's turn. (Turn {$turn})
+   *[other] {$player}'s turn. (Turn {$turn})
+}
+
 log-life-changed = {$player ->
     [you] Your life is {$life}.
     [opponent] Your opponent's life is {$life}.

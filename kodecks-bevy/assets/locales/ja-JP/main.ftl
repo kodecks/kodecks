@@ -50,6 +50,12 @@ error-client-version-outdated = クライアントのアップデートが必要
 error-server-version-outdated = サーバーのアップデートが必要です。対応クライアントバージョン: { $requirement }
 error-invalid-deck = デッキがレギュレーションに適合していません。
 
+log-turn-changed = {$player ->
+    [you] あなたのターンです。(ターン{$turn})
+    [opponent] 相手のターンです。(ターン{$turn})
+   *[other] {$player}のターンです。(ターン{$turn})
+}
+
 log-life-changed = {$player ->
     [you] あなたのライフは{$life}です。
     [opponent] 相手のライフは{$life}です。
