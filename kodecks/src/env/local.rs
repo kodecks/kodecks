@@ -98,7 +98,7 @@ impl Environment {
             player,
             turn: self.state.turn,
             players,
-            phase: self.state.phase.clone(),
+            phase: self.state.phase,
             stack,
             endgame: self.endgame,
             timestamp: self.timestamp,

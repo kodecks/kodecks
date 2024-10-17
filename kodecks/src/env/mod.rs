@@ -247,8 +247,7 @@ impl Environment {
                 }
             }
         } else if self.opcodes.is_empty() {
-            let mut phase = self.state.phase.clone();
-            let opcodes = match self.process_player_phase(action, &mut phase) {
+            let opcodes = match self.process_player_phase(action) {
                 Ok(opcodes) => opcodes,
                 Err(err) => {
                     error!("Error processing player phase: {:?}", err);
@@ -257,7 +256,6 @@ impl Environment {
             };
             self.opcodes
                 .extend(opcodes.into_iter().filter(|item| !item.is_empty()));
-            self.state.phase = phase;
         }
 
         let next = self.opcodes.pop_front();

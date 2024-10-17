@@ -27,21 +27,21 @@ impl Environment {
             } => {
                 self.state.turn = turn;
                 self.state.players.set_player_in_turn(player);
-                self.state.phase = phase.clone();
+                self.state.phase = phase;
                 self.state.players.iter_mut().for_each(|player| {
                     player.reset_counters();
                 });
                 Ok(vec![
                     LogAction::TurnChanged { turn, player },
                     LogAction::PhaseChanged {
-                        phase: phase.clone(),
+                        phase,
                     },
                 ])
             }
             Opcode::ChangePhase { phase } => {
-                self.state.phase = phase.clone();
+                self.state.phase = phase;
                 Ok(vec![LogAction::PhaseChanged {
-                    phase: phase.clone(),
+                    phase,
                 }])
             }
             Opcode::SetLife { player, life } => {

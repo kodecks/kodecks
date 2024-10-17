@@ -52,7 +52,7 @@ impl Environment {
             Some(OpcodeList::new(vec![Opcode::ChangeTurn {
                 turn: 1,
                 player: self.state.players.player_in_turn().id,
-                phase: self.state.phase.clone(),
+                phase: self.state.phase,
             },],)),
         ])
     }
@@ -60,7 +60,6 @@ impl Environment {
     pub fn process_player_phase(
         &self,
         action: Option<Action>,
-        phase: &mut Phase,
     ) -> Result<Vec<OpcodeList>, ActionError> {
         if self.state.turn == 0 {
             return self.initialize();
@@ -105,7 +104,7 @@ impl Environment {
             .state
             .players
             .get(self.state.players.player_in_turn().id);
-        match phase {
+        match self.state.phase {
             Phase::Standby => {
                 let next_phase = Phase::Draw;
                 Ok(filter_vec![
