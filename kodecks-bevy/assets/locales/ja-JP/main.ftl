@@ -56,6 +56,16 @@ log-turn-changed = {$player ->
    *[other] {$player}のターンです。(ターン{$turn})
 }
 
+log-phase-changed = {$phase ->
+    [standby] スタンバイフェイズを開始します。
+    [draw] ドローフェイズを開始します。
+    [main] メインフェイズを開始します。
+    [block] ブロックフェイズを開始します。
+    [battle] バトルフェイズを開始します。
+    [end] エンドフェイズを開始します。
+    *[other] {$phase}を開始します。
+}
+
 log-life-changed = {$player ->
     [you] あなたのライフは{$life}です。
     [opponent] 相手のライフは{$life}です。

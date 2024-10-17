@@ -56,6 +56,16 @@ log-turn-changed = {$player ->
    *[other] {$player}'s turn. (Turn {$turn})
 }
 
+log-phase-changed = {$phase ->
+    [standby] Standby Phase started.
+    [draw] Draw Phase started.
+    [main] Main Phase started.
+    [block] Block Phase started.
+    [battle] Battle Phase started.
+    [end] End Phase started.
+    *[other] {$phase} started.
+}
+
 log-life-changed = {$player ->
     [you] Your life is {$life}.
     [opponent] Your opponent's life is {$life}.

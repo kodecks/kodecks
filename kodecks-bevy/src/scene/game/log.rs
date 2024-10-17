@@ -26,8 +26,7 @@ pub fn translate_log<'a>(
             "log-turn-changed"
         }
         LogAction::PhaseChanged { phase } => {
-            let phase = translator.get(*phase).to_string();
-            args.set("phase", phase);
+            args.set("phase", phase.to_string().to_ascii_lowercase());
             "log-phase-changed"
         }
         LogAction::LifeChanged { player, life } => {
