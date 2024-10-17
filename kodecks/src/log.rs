@@ -1,6 +1,6 @@
 use crate::{
-    color::Color, effect::EffectId, env::LocalEnvironment, id::ObjectId, phase::Phase,
-    player::PlayerZone, target::Target, zone::MoveReason,
+    card::Catalog, color::Color, effect::EffectId, env::LocalEnvironment, id::ObjectId,
+    phase::Phase, player::PlayerZone, target::Target, zone::MoveReason,
 };
 use bincode::{Decode, Encode};
 use fluent_bundle::FluentArgs;
@@ -63,7 +63,11 @@ pub enum LogAction {
 }
 
 impl LogAction {
-    pub fn request<'a>(&self, env: &LocalEnvironment) -> Option<Request<'a, FluentArgs<'a>>> {
+    pub fn request<'a>(
+        &self,
+        env: &LocalEnvironment,
+        catalog: &Catalog,
+    ) -> Option<Request<'a, FluentArgs<'a>>> {
         let mut args = FluentArgs::new();
         let id = match self {
             Self::LifeChanged { player, life } => {
@@ -100,6 +104,12 @@ impl LogAction {
                     },
                 );
                 "log-deck-shuffled"
+            }
+            Self::EffectActivated { source, .. } => {
+                if let Ok(card) = env.find_card(*source) {
+                    args.set("source", catalog[card.archetype_id].name);
+                }
+                "log-effect-activated"
             }
             _ => return None,
         };

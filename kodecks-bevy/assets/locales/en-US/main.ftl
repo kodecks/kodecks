@@ -67,3 +67,5 @@ log-deck-shuffled = {$player ->
     [opponent] Your opponent's deck has been shuffled.
     *[other] {$player}'s deck has been shuffled.
 }
+
+log-effect-activated = <<{$source}>>'s effect is activated.

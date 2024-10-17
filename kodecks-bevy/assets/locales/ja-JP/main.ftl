@@ -67,3 +67,5 @@ log-deck-shuffled = {$player ->
     [opponent] 相手のデッキがシャッフルされました。
     *[other] {$player}のデッキがシャッフルされました。
 }
+
+log-effect-activated = <<{$source}>>の効果が発動しました。

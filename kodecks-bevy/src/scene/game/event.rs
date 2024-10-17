@@ -254,7 +254,7 @@ fn recv_server_events(
     if let Some(event) = events.server.queue.pop_front() {
         if let Some(env) = &env {
             for log in &event.logs {
-                if let Some(req) = log.request(env) {
+                if let Some(req) = log.request(env, &CATALOG) {
                     info!("{}", events.translator.get(req));
                 }
             }
