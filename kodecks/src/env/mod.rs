@@ -70,9 +70,6 @@ impl Environment {
                         Card::new(&mut obj_counter, item, archetype, item.card.style, id as u8);
                     state.deck.add_top(card);
                 }
-                if !debug.no_deck_shuffle {
-                    state.deck.shuffle(&mut obj_counter, &mut rng);
-                }
                 state
             })
             .collect::<Vec<_>>();

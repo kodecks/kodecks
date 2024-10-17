@@ -29,6 +29,19 @@ impl Environment {
                     life: initial_life,
                 }])),]
             }),
+            if self.state.debug.no_deck_shuffle {
+                vec![]
+            } else {
+                self.state
+                    .players
+                    .iter()
+                    .flat_map(|player| {
+                        filter_vec![Some(OpcodeList::new(vec![Opcode::ShuffleDeck {
+                            player: player.id,
+                        }])),]
+                    })
+                    .collect::<Vec<_>>()
+            },
             self.state.players.iter().flat_map(|player| {
                 let opcodes = iter::repeat(OpcodeList::new(vec![Opcode::DrawCard {
                     player: player.id,
