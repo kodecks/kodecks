@@ -120,7 +120,7 @@ where
 }
 
 #[derive(
-    Debug, Clone, Copy, Default, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode,
+    Debug, Clone, Copy, Default, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode,
 )]
 #[serde(rename_all = "snake_case")]
 pub enum FieldState {

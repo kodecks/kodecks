@@ -1,8 +1,11 @@
 use crate::id::{CardId, ObjectId};
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
+use strum::Display;
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+#[derive(
+    Debug, Clone, Copy, Default, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum MoveReason {
     #[default]
@@ -13,7 +16,7 @@ pub enum MoveReason {
     Discarded,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+#[derive(Debug, Clone, Copy, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
 pub enum Zone {
     Deck,

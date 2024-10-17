@@ -23,6 +23,7 @@ use rand::seq::SliceRandom;
 use rand::SeedableRng;
 use serde::{Deserialize, Serialize};
 use std::{collections::VecDeque, fmt};
+use strum::Display;
 use tracing::{error, warn};
 
 mod action;
@@ -398,7 +399,7 @@ impl fmt::Display for EndgameState {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+#[derive(Debug, Clone, Copy, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
 pub enum EndgameReason {
     Concede,

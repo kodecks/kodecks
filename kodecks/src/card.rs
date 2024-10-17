@@ -21,6 +21,7 @@ use core::{fmt, panic};
 use num::Zero;
 use serde::{Deserialize, Serialize};
 use std::{ops::Index, sync::LazyLock};
+use strum::Display;
 use tinystr::TinyAsciiStr;
 
 pub type CardMap = phf::Map<&'static str, fn() -> &'static CardArchetype>;
@@ -460,14 +461,16 @@ impl Default for CardAttribute {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+#[derive(Debug, Clone, Copy, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
 pub enum CardType {
     Creature,
     Hex,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash, Encode, Decode)]
+#[derive(
+    Debug, Clone, Copy, Display, PartialEq, Eq, Serialize, Deserialize, Hash, Encode, Decode,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum CreatureType {
     Mutant,

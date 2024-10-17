@@ -62,7 +62,7 @@ bitflags! {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+#[derive(Debug, Clone, Copy, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
 pub enum EventReason {
     Battle,
