@@ -74,8 +74,16 @@ pub fn translate_log<'a>(
             "log-effect-activated"
         }
         LogAction::CardMoved { card, from, to, .. } => {
-            args.set("card", "-");
+            args.set("card", "none");
             if let Ok(card) = env.find_card(*card) {
+                args.set(
+                    "controller",
+                    if card.controller == env.player {
+                        "you"
+                    } else {
+                        "opponent"
+                    },
+                );
                 let card = translator
                     .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
                     .to_string();
