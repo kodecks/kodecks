@@ -31,11 +31,12 @@ impl Environment {
                 self.state.players.iter_mut().for_each(|player| {
                     player.reset_counters();
                 });
-                Ok(vec![LogAction::TurnChanged {
-                    turn,
-                    player,
-                    phase: phase.clone(),
-                }])
+                Ok(vec![
+                    LogAction::TurnChanged { turn, player },
+                    LogAction::PhaseChanged {
+                        phase: phase.clone(),
+                    },
+                ])
             }
             Opcode::ChangePhase { phase } => {
                 self.state.phase = phase.clone();

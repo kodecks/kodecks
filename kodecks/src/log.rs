@@ -11,8 +11,8 @@ use strum::Display;
 pub enum LogAction {
     #[strum(to_string = "Game started")]
     GameStarted,
-    #[strum(to_string = "Turn {turn} started for {player} in {phase} phase")]
-    TurnChanged { turn: u32, player: u8, phase: Phase },
+    #[strum(to_string = "Turn {turn} started for {player}")]
+    TurnChanged { turn: u32, player: u8 },
     #[strum(to_string = "Phase changed to {phase}")]
     PhaseChanged { phase: Phase },
     #[strum(to_string = "{attacker} attacks {target:?}")]
