@@ -32,6 +32,7 @@ mod oil_leaking_droid;
 mod orepecker;
 mod poison_tusk_babirusa;
 mod pyrosnail;
+mod quagmire_trilobite;
 mod quartz_moth;
 mod quicksand_skulker;
 mod radio_deer;
@@ -53,6 +54,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "quagmire-trilobite" => quagmire_trilobite::ARCHETYPE,
+    "quag" => quagmire_trilobite::ARCHETYPE,
     "auto-parrot" => auto_parrot::ARCHETYPE,
     "auto" => auto_parrot::ARCHETYPE,
     "amethyst-mantis" => amethyst_mantis::ARCHETYPE,

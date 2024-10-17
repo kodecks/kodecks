@@ -63,3 +63,4 @@ card-badlands-chimera = Badlands Chimera
 card-hostile-coyote = Hostile Coyote
 card-amethyst-mantis = Amethyst Mantis
 card-auto-parrot = Auto Parrot
+card-quagmire-trilobite = Quagmire Trilobite

@@ -63,3 +63,4 @@ card-badlands-chimera = 荒原のキメラ
 card-hostile-coyote = 敵対的なコヨーテ
 card-amethyst-mantis = 紫水晶のマンティス
 card-auto-parrot = オート・パロット
+card-quagmire-trilobite = ぬかるみの三葉虫
