@@ -1,10 +1,8 @@
 use crate::{
-    card::Catalog, color::Color, effect::EffectId, env::LocalEnvironment, id::ObjectId,
-    phase::Phase, player::PlayerZone, target::Target, zone::MoveReason,
+    color::Color, effect::EffectId, id::ObjectId, phase::Phase, player::PlayerZone, target::Target,
+    zone::MoveReason,
 };
 use bincode::{Decode, Encode};
-use fluent_bundle::FluentArgs;
-use fluent_content::Request;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
@@ -60,63 +58,4 @@ pub enum LogAction {
     },
     #[strum(to_string = "Shield broken for {card}")]
     ShieldBroken { card: ObjectId },
-}
-
-impl LogAction {
-    pub fn request<'a>(
-        &self,
-        env: &LocalEnvironment,
-        catalog: &Catalog,
-    ) -> Option<Request<'a, FluentArgs<'a>>> {
-        let mut args = FluentArgs::new();
-        let id = match self {
-            Self::LifeChanged { player, life } => {
-                args.set(
-                    "player",
-                    if *player == env.player {
-                        "you"
-                    } else {
-                        "opponent"
-                    },
-                );
-                args.set("life", life);
-                "log-life-changed"
-            }
-            Self::DamageTaken { player, amount } => {
-                args.set(
-                    "player",
-                    if *player == env.player {
-                        "you"
-                    } else {
-                        "opponent"
-                    },
-                );
-                args.set("amount", amount);
-                "log-damage-taken"
-            }
-            Self::DeckShuffled { player } => {
-                args.set(
-                    "player",
-                    if *player == env.player {
-                        "you"
-                    } else {
-                        "opponent"
-                    },
-                );
-                "log-deck-shuffled"
-            }
-            Self::EffectActivated { source, .. } => {
-                if let Ok(card) = env.find_card(*source) {
-                    args.set("source", catalog[card.archetype_id].name);
-                }
-                "log-effect-activated"
-            }
-            _ => return None,
-        };
-        Some(Request {
-            id,
-            attr: None,
-            args: Some(args),
-        })
-    }
 }

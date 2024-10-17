@@ -1,5 +1,6 @@
 use super::{
     board::{AvailableActionList, Board, Environment},
+    log::get_request,
     main::AnimationState,
     server::{SendCommand, ServerEvent},
 };
@@ -254,7 +255,7 @@ fn recv_server_events(
     if let Some(event) = events.server.queue.pop_front() {
         if let Some(env) = &env {
             for log in &event.logs {
-                if let Some(req) = log.request(env, &CATALOG) {
+                if let Some(req) = get_request(log, env, &CATALOG) {
                     info!("{}", events.translator.get(req));
                 }
             }
