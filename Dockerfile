@@ -14,7 +14,7 @@ COPY kodecks-engine kodecks-engine
 COPY kodecks-server kodecks-server
 
 # Build the Rust project
-RUN cargo build --distribution --bin kodecks-server
+RUN cargo build --profile distribution --bin kodecks-server
 
 # Prepare the final image
 FROM debian:bookworm-slim AS runtime
