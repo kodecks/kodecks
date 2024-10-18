@@ -51,11 +51,8 @@ pub enum LogAction {
     DeckShuffled { player: u8 },
     #[strum(to_string = "Effect {id} triggered by {source}")]
     EffectActivated { source: ObjectId, id: EffectId },
-    #[strum(to_string = "Card {targets:?} targeted by {source}")]
-    CardsTargeted {
-        source: ObjectId,
-        targets: Vec<ObjectId>,
-    },
+    #[strum(to_string = "Card {target} targeted by {source}")]
+    CardTargeted { source: ObjectId, target: ObjectId },
     #[strum(to_string = "Shield broken for {card}")]
     ShieldBroken { card: ObjectId },
 }

@@ -184,9 +184,9 @@ impl Environment {
             let mut ctx = EffectTriggerContext::new(&self.state, &mut self.obj_counter, card);
 
             let targeted = match &action {
-                Some(Action::SelectCard { card }) => Some(LogAction::CardsTargeted {
+                Some(Action::SelectCard { card }) => Some(LogAction::CardTargeted {
                     source: item.source,
-                    targets: vec![*card],
+                    target: *card,
                 }),
                 _ => None,
             };
