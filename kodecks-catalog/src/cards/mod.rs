@@ -10,6 +10,7 @@ mod badlands_chimera;
 mod bambooster;
 mod binary_starfish;
 mod coppermine_scorpion;
+mod cyanide_spitter;
 mod deep_sea_wyrm;
 mod demilune_nighthawk;
 mod diamond_porcupine;
@@ -54,6 +55,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "cyanide-spitter" => cyanide_spitter::ARCHETYPE,
+    "cyan" => cyanide_spitter::ARCHETYPE,
     "quagmire-trilobite" => quagmire_trilobite::ARCHETYPE,
     "quag" => quagmire_trilobite::ARCHETYPE,
     "auto-parrot" => auto_parrot::ARCHETYPE,
