@@ -297,20 +297,8 @@ impl PlayerItem for LocalPlayerState {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum LocalStateAccess {
-    PublicOnly,
-    Player(u8),
-    Full,
-}
-
 impl LocalPlayerState {
-    pub fn new(state: &PlayerState, access: LocalStateAccess) -> Self {
-        let private = match access {
-            LocalStateAccess::PublicOnly => false,
-            LocalStateAccess::Player(player) => player == state.id,
-            LocalStateAccess::Full => true,
-        };
+    pub fn new(state: &PlayerState, viewer: u8) -> Self {
         Self {
             id: state.id,
             deck: state.deck.len(),
@@ -318,23 +306,21 @@ impl LocalPlayerState {
                 .hand
                 .items()
                 .map(|item| {
-                    let revealed = item.card.revealed().contains(state.id);
-                    let card = item.card.snapshot();
-                    let card = if private || revealed {
-                        card
-                    } else {
-                        card.redacted()
-                    };
+                    let card = item.card.snapshot().redacted(viewer);
                     (card, item.cost_delta)
                 })
                 .map(|(card, cost_delta)| HandItem { card, cost_delta })
                 .collect(),
-            graveyard: state.graveyard.iter().map(|card| card.snapshot()).collect(),
+            graveyard: state
+                .graveyard
+                .iter()
+                .map(|card| card.snapshot().redacted(viewer))
+                .collect(),
             field: state
                 .field
                 .items()
                 .map(|item| FieldItem {
-                    card: item.card.snapshot(),
+                    card: item.card.snapshot().redacted(viewer),
                     state: item.state,
                     battle: item.battle,
                 })
@@ -508,7 +494,7 @@ impl PlayerMask {
         self.0 & (1 << player) != 0
     }
 
-    pub fn iter(self) -> impl Iterator<Item = u8> {
-        (0..8).filter(move |&player| self.contains(player))
+    pub fn set_all(&mut self, value: bool) {
+        self.0 = if value { 0xff } else { 0 };
     }
 }

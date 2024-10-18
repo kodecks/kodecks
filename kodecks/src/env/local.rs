@@ -7,7 +7,7 @@ use crate::{
     field::{FieldItem, FieldState},
     id::ObjectId,
     phase::Phase,
-    player::{LocalPlayerState, LocalStateAccess, PlayerList, PlayerZone},
+    player::{LocalPlayerState, PlayerList, PlayerZone},
     stack::{LocalStackItem, Stack},
     zone::CardZone,
 };
@@ -85,17 +85,17 @@ impl LocalEnvironment {
 }
 
 impl Environment {
-    pub fn local(&self, player: u8, access: LocalStateAccess) -> LocalEnvironment {
+    pub fn local(&self, viewer: u8) -> LocalEnvironment {
         let players = PlayerList::new(
             self.state.players.player_in_turn().id,
             self.state
                 .players
                 .iter()
-                .map(|player| LocalPlayerState::new(player, access)),
+                .map(|player| LocalPlayerState::new(player, viewer)),
         );
         let stack = self.stack.iter().map(|item| item.clone().into()).collect();
         LocalEnvironment {
-            player,
+            player: viewer,
             turn: self.state.turn,
             players,
             phase: self.state.phase,

@@ -148,6 +148,15 @@ impl Card {
 
     pub fn set_zone(&mut self, zone: PlayerZone) {
         self.zone = zone;
+        match zone.zone {
+            Zone::Hand => {
+                self.revealed.set(zone.player, true);
+            }
+            Zone::Field | Zone::Graveyard => {
+                self.revealed.set_all(true);
+            }
+            _ => (),
+        }
     }
 
     pub fn archetype(&self) -> &'static CardArchetype {
@@ -189,12 +198,6 @@ impl Card {
         self.revealed
     }
 
-    pub fn reveal(&mut self, players: impl IntoIterator<Item = u8>) {
-        for player in players {
-            self.revealed.set(player, true);
-        }
-    }
-
     pub fn set_effect(&mut self, effect: Box<dyn Effect>) {
         self.effect = effect;
     }
@@ -218,6 +221,7 @@ impl Card {
             style: self.style,
             controller: self.controller,
             owner: self.owner,
+            revealed: self.revealed,
             computed: Some(self.computed.clone()),
             timestamp: self.timestamp,
             is_token: self.is_token,
@@ -226,6 +230,7 @@ impl Card {
 
     pub fn renew_id(&mut self, counter: &mut ObjectIdCounter) {
         self.id = counter.allocate(Some(self.id));
+        self.revealed.set_all(false);
     }
 }
 
@@ -300,6 +305,7 @@ pub struct CardSnapshot {
     pub style: u8,
     pub controller: u8,
     pub owner: u8,
+    pub revealed: PlayerMask,
     pub computed: Option<ComputedAttribute>,
     pub timestamp: u64,
     pub is_token: bool,
@@ -319,12 +325,16 @@ impl CardId for CardSnapshot {
 }
 
 impl CardSnapshot {
-    pub fn redacted(self) -> Self {
-        Self {
-            archetype_id: ArchetypeId::new(""),
-            computed: None,
-            timestamp: 0,
-            ..self
+    pub fn redacted(self, viewer: u8) -> Self {
+        if self.revealed.contains(viewer) {
+            self
+        } else {
+            Self {
+                archetype_id: ArchetypeId::new(""),
+                computed: None,
+                timestamp: 0,
+                ..self
+            }
         }
     }
 

@@ -3,7 +3,7 @@ use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::{Environment, LocalGameState},
     log::LogAction,
-    player::{LocalStateAccess, PlayerConfig},
+    player::PlayerConfig,
     profile::GameProfile,
     regulation::Regulation,
 };
@@ -279,7 +279,7 @@ impl Game {
 
                 for player in env.state.players.iter() {
                     let state = LocalGameState {
-                        env: env.local(player.id, LocalStateAccess::Player(player.id)),
+                        env: env.local(player.id),
                         logs: report.logs.clone(),
                         available_actions: report
                             .available_actions

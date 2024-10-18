@@ -6,7 +6,6 @@ use futures::{
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::{Environment, LocalGameState},
-    player::LocalStateAccess,
     profile::GameProfile,
 };
 use kodecks_bot::{Bot, DefaultBot};
@@ -100,7 +99,7 @@ pub async fn start_game(
             for player in &players {
                 if player.bot.is_none() {
                     let state = LocalGameState {
-                        env: env.local(player.id, LocalStateAccess::Player(player.id)),
+                        env: env.local(player.id),
                         logs: report.logs.clone(),
                         available_actions: report
                             .available_actions

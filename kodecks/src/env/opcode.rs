@@ -179,15 +179,6 @@ impl Environment {
                     if card.is_token() && to.zone != Zone::Field {
                         return Ok(vec![LogAction::CardTokenDestroyed { card: id }]);
                     }
-                    match to.zone {
-                        Zone::Hand => {
-                            card.reveal(Some(to.player));
-                        }
-                        Zone::Field | Zone::Graveyard => {
-                            card.reveal(self.state.players.iter().map(|p| p.id));
-                        }
-                        _ => (),
-                    }
                     card.set_timestamp(self.timestamp);
                     card.set_zone(to);
                     card.reset_computed();
