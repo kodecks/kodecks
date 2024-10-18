@@ -178,7 +178,7 @@ impl Environment {
                     let id = card.id();
                     let controller = card.controller();
                     if card.is_token() && to.zone != Zone::Field {
-                        return Ok(vec![LogAction::CardTokenRemoved { card: id }]);
+                        return Ok(vec![LogAction::CardTokenDestroyed { card: id }]);
                     }
                     card.set_timestamp(self.timestamp);
                     card.set_zone(to);
