@@ -289,7 +289,9 @@ impl Game {
                     let event = GameEvent {
                         game_id,
                         player: player.id,
-                        event: GameEventKind::StateUpdated { state },
+                        event: GameEventKind::StateUpdated {
+                            state: Box::new(state),
+                        },
                     };
                     let result = players[player.id as usize]
                         .sender

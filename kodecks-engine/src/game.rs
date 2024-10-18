@@ -110,7 +110,9 @@ pub async fn start_game(
                     let event = GameEvent {
                         game_id: 0,
                         player: player.id,
-                        event: GameEventKind::StateUpdated { state },
+                        event: GameEventKind::StateUpdated {
+                            state: Box::new(state),
+                        },
                     };
 
                     sender.send(Output::GameEvent(event)).await.unwrap();

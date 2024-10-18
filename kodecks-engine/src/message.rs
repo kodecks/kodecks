@@ -80,6 +80,6 @@ pub struct GameEvent {
 #[derive(Debug, Clone, Encode, Decode)]
 pub enum GameEventKind {
     Created { log_id: String },
-    StateUpdated { state: LocalGameState },
+    StateUpdated { state: Box<LocalGameState> },
     PlayerThinking { thinking: u8, timeout: Option<u32> },
 }

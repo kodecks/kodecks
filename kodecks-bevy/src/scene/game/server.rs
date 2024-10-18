@@ -343,4 +343,4 @@ impl Command for SendCommand {
 }
 
 #[derive(Event, Clone, Deref)]
-pub struct ServerEvent(LocalGameState);
+pub struct ServerEvent(Box<LocalGameState>);
