@@ -318,8 +318,13 @@ impl LocalPlayerState {
                 .hand
                 .items()
                 .map(|item| {
+                    let revealed = item.card.revealed().contains(state.id);
                     let card = item.card.snapshot();
-                    let card = if private { card } else { card.redacted() };
+                    let card = if private || revealed {
+                        card
+                    } else {
+                        card.redacted()
+                    };
                     (card, item.cost_delta)
                 })
                 .map(|(card, cost_delta)| HandItem { card, cost_delta })
@@ -479,5 +484,31 @@ impl CardZone for Vec<HandItem<CardSnapshot>> {
         (self as &mut [HandItem<CardSnapshot>])
             .iter_mut()
             .map(|item| &mut item.card)
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+#[serde(transparent)]
+pub struct PlayerMask(u8);
+
+impl PlayerMask {
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn set(&mut self, player: u8, value: bool) {
+        if value {
+            self.0 |= 1 << player;
+        } else {
+            self.0 &= !(1 << player);
+        }
+    }
+
+    pub fn contains(&self, player: u8) -> bool {
+        self.0 & (1 << player) != 0
+    }
+
+    pub fn iter(self) -> impl Iterator<Item = u8> {
+        (0..8).filter(move |&player| self.contains(player))
     }
 }

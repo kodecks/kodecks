@@ -7,7 +7,7 @@ use crate::{
     event::EventFilter,
     id::{CardId, ObjectId, ObjectIdCounter, TimedObjectId},
     linear::Linear,
-    player::PlayerZone,
+    player::{PlayerMask, PlayerZone},
     score::Score,
     zone::Zone,
 };
@@ -74,6 +74,7 @@ pub struct Card {
     flags: ComputedFlags,
     event_filter: EventFilter,
     effect: Box<dyn Effect>,
+    revealed: PlayerMask,
     timestamp: u64,
     is_token: bool,
 }
@@ -104,6 +105,7 @@ impl Card {
             flags: ComputedFlags::empty(),
             event_filter: effect.event_filter(),
             effect,
+            revealed: PlayerMask::default(),
             timestamp: 0,
             is_token: false,
         }
@@ -121,6 +123,7 @@ impl Card {
             computed: archetype.into(),
             flags: ComputedFlags::empty(),
             event_filter: effect.event_filter(),
+            revealed: PlayerMask::default(),
             effect,
             timestamp: 0,
             is_token: true,
@@ -182,6 +185,16 @@ impl Card {
         dyn_clone::clone_box(&**&self.effect)
     }
 
+    pub fn revealed(&self) -> PlayerMask {
+        self.revealed
+    }
+
+    pub fn reveal(&mut self, players: impl IntoIterator<Item = u8>) {
+        for player in players {
+            self.revealed.set(player, true);
+        }
+    }
+
     pub fn set_effect(&mut self, effect: Box<dyn Effect>) {
         self.effect = effect;
     }
@@ -229,6 +242,7 @@ impl Clone for Card {
             flags: self.flags,
             event_filter: self.event_filter,
             effect: self.effect(),
+            revealed: self.revealed,
             timestamp: self.timestamp,
             is_token: self.is_token,
         }
