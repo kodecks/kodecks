@@ -5,7 +5,7 @@ use kodecks::{
     score::Score,
 };
 use std::sync::Arc;
-use tracing::info;
+use tracing::debug;
 
 pub struct SimpleBot;
 
@@ -119,7 +119,7 @@ impl Bot for SimpleBot {
                         .map(|power| power.value())
                         .unwrap_or_default();
 
-                    info!(
+                    debug!(
                         "attacker_power_sum: {} {}",
                         attackers_power_sum, player.stats.life
                     );
