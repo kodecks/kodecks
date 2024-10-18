@@ -172,7 +172,6 @@ impl Environment {
                     Zone::Hand => player.hand.remove(card),
                     Zone::Field => player.field.remove(card),
                     Zone::Graveyard => player.graveyard.remove(card),
-                    _ => None,
                 };
                 if let Some(mut card) = card {
                     let id = card.id();
@@ -198,7 +197,6 @@ impl Environment {
                         Zone::Hand => player.hand.push(card),
                         Zone::Field => player.field.push(card),
                         Zone::Graveyard => player.graveyard.push(card),
-                        _ => (),
                     }
                     return Ok(vec![LogAction::CardMoved {
                         player: controller,

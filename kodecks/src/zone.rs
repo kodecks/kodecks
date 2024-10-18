@@ -21,7 +21,6 @@ pub enum MoveReason {
 pub enum Zone {
     Deck,
     Hand,
-    Queue,
     Field,
     Graveyard,
 }
