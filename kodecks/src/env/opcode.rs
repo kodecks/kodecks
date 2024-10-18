@@ -133,7 +133,7 @@ impl Environment {
                 } else {
                     player
                         .endgame
-                        .get_or_insert(PlayerEndgameState::Lose(EndgameReason::DeckEmpty));
+                        .get_or_insert(PlayerEndgameState::Lose(EndgameReason::DeckOut));
                 }
                 Ok(vec![])
             }

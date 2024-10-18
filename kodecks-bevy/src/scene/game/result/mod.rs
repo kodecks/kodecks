@@ -42,7 +42,7 @@ fn init(
         EndgameState::Finished { winner, reason } => {
             let attr = match reason {
                 EndgameReason::Concede => "reason-concede",
-                EndgameReason::DeckEmpty => "reason-deck-empty",
+                EndgameReason::DeckOut => "reason-deck-out",
                 EndgameReason::LifeZero => "reason-life-zero",
                 EndgameReason::SimultaneousEnd => "reason-simultaneous-end",
             };

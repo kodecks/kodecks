@@ -23,11 +23,11 @@ end-turn-button = ターン終了
 
 result-victory = Victory!
     .reason-concede = 相手が降参しました。
-    .reason-deck-empty = 相手のデッキが空になりました。
-    .reason-life-zero = 相手のライフが0になりました。
+    .reason-deck-out = 相手がデッキからカードを引けなくなりました。
+    .reason-life-out = 相手のライフが0になりました。
 result-defeat = Defeat...
     .reason-concede = あなたが降参しました。
-    .reason-deck-empty = あなたのデッキが空になりました。
+    .reason-deck-out = あなたがデッキからカードを引けなくなりました。
     .reason-life-zero = あなたのライフが0になりました。
 result-draw = Draw
     .reason-simultaneous-end = 両プレイヤーが同時に勝利条件または敗北条件を満たしました。

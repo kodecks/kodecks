@@ -23,11 +23,11 @@ phase-end = End Phase
 
 result-victory = Victory!
     .reason-concede = Your opponent has conceded.
-    .reason-deck-empty = Your opponent's deck is empty.
+    .reason-deck-out = Your opponent could not draw a card from their deck.
     .reason-life-zero = Your opponent's life is zero.
 result-defeat = Defeat...
     .reason-concede = You have conceded.
-    .reason-deck-empty = Your deck is empty.
+    .reason-deck-out = You could not draw a card from your deck.
     .reason-life-zero = Your life is zero.
 result-draw = Draw
     .reason-simultaneous-end = Both players fulfill the winning or losing condition at the same time.

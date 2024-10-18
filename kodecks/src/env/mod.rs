@@ -404,7 +404,7 @@ impl fmt::Display for EndgameState {
 pub enum EndgameReason {
     Concede,
     LifeZero,
-    DeckEmpty,
+    DeckOut,
     SimultaneousEnd,
 }
 
