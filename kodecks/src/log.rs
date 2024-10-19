@@ -29,7 +29,7 @@ pub enum LogAction {
         amount: u32,
     },
     #[strum(to_string = "Shards removed from {player} in {color} color: {amount}")]
-    ShardsConsumed {
+    ShardsSpent {
         player: u8,
         source: ObjectId,
         color: Color,

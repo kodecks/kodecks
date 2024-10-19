@@ -303,7 +303,7 @@ fn recv_server_events(
         for log in &event.logs {
             if matches!(
                 log,
-                LogAction::ShardsEarned { .. } | LogAction::ShardsConsumed { .. }
+                LogAction::ShardsEarned { .. } | LogAction::ShardsSpent { .. }
             ) {
                 events.shard.send(ShardUpdated);
             }

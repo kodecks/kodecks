@@ -90,7 +90,7 @@ impl Environment {
             } => {
                 let player = self.state.players.get_mut(player);
                 player.shards.consume(color, amount)?;
-                Ok(vec![LogAction::ShardsConsumed {
+                Ok(vec![LogAction::ShardsSpent {
                     player: player.id,
                     source,
                     color,
