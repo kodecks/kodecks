@@ -250,10 +250,8 @@ impl Environment {
             Opcode::SetBattleState { card, state } => {
                 let mut logs = Vec::new();
                 for player in self.state.players.iter_mut() {
-                    if player.field.set_card_battle_state(card, state) {
-                        if state == Some(FieldBattleState::Attacking) {
-                            logs.push(LogAction::AttackDeclared { attacker: card });
-                        }
+                    if player.field.set_card_battle_state(card, state) && state == Some(FieldBattleState::Attacking) {
+                        logs.push(LogAction::AttackDeclared { attacker: card });
                     }
                 }
                 Ok(logs)
