@@ -34,7 +34,7 @@ pub fn blue_deck() -> DeckList {
     # Blue deck
     Deep-Sea Wyrm 2
     Airborne Eagle Ray 1
-    Binary Starfish 2
+    Binary Starfish 1
     Demilune Nighthawk 1
     Electric Clione 2
     Flash-Bang Jellyfish 1
@@ -47,6 +47,7 @@ pub fn blue_deck() -> DeckList {
     Wiretap Vine 1
     Subspace Mole 1
     Auto Parrot 1
+    Awkward Auk 1
     ",
         &CATALOG,
     )
