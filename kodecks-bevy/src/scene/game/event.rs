@@ -1,5 +1,6 @@
 use super::{
     board::{AvailableActionList, Board, Environment},
+    log::translate_log,
     main::AnimationState,
     server::{SendCommand, ServerEvent},
 };
@@ -216,6 +217,7 @@ pub struct ServerEvents<'w> {
     shard: EventWriter<'w, ShardUpdated>,
     turn: EventWriter<'w, TurnChanged>,
     list: Res<'w, AvailableActionList>,
+    translator: Res<'w, Translator>,
 }
 
 fn recv_server_events(
@@ -237,7 +239,7 @@ fn recv_server_events(
             return;
         }
     } else if *state == GlobalState::GameLoading {
-        if let Some(env) = env {
+        if let Some(env) = &env {
             if env.turn > 0 {
                 return;
             }
@@ -251,10 +253,6 @@ fn recv_server_events(
     }
 
     if let Some(event) = events.server.queue.pop_front() {
-        for list in &event.logs {
-            info!("{}", list);
-        }
-
         let next_action = if let Some(actions) = &event.available_actions {
             match actions.actions.as_ref() {
                 [AvailableAction::SelectCard { cards, .. }] if cards.len() == 1 => {
@@ -318,13 +316,10 @@ fn recv_server_events(
                         delta: 0,
                     });
                 }
-                LogAction::DamageTaken {
-                    player,
-                    amount: damage,
-                } => {
+                LogAction::DamageTaken { player, amount } => {
                     events.life.send(LifeUpdated {
                         player: *player,
-                        delta: -(*damage as i32),
+                        delta: -(*amount as i32),
                     });
                 }
                 LogAction::TurnChanged { player, .. } => {
@@ -349,6 +344,12 @@ fn recv_server_events(
                     .unwrap_or_default(),
                 env.timestamp,
             ));
+        }
+
+        for log in &event.logs {
+            if let Some(log) = translate_log(log, &env, &CATALOG, &events.translator) {
+                info!("{}", log);
+            }
         }
 
         board.update(&env);
