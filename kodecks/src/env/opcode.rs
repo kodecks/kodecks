@@ -75,7 +75,7 @@ impl Environment {
                 let amount = ((amount as i32) + propagate).max(0) as u32;
                 let player = self.state.players.get_mut(player);
                 player.shards.add(color, amount);
-                Ok(vec![LogAction::ShardsGenerated {
+                Ok(vec![LogAction::ShardsEarned {
                     player: player.id,
                     source,
                     color,
