@@ -6,6 +6,7 @@ mod amalgam_rat;
 mod amethyst_mantis;
 mod ant;
 mod auto_parrot;
+mod awkward_auk;
 mod badlands_chimera;
 mod bambooster;
 mod binary_starfish;
@@ -55,6 +56,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "awkward-auk" => awkward_auk::ARCHETYPE,
+    "awkw" => awkward_auk::ARCHETYPE,
     "cyanide-spitter" => cyanide_spitter::ARCHETYPE,
     "cyan" => cyanide_spitter::ARCHETYPE,
     "quagmire-trilobite" => quagmire_trilobite::ARCHETYPE,
