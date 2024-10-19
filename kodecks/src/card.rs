@@ -17,7 +17,7 @@ use bincode::{
     error::{DecodeError, EncodeError},
     BorrowDecode, Decode, Encode,
 };
-use core::{fmt, panic};
+use core::fmt;
 use num::Zero;
 use serde::{Deserialize, Serialize};
 use std::{ops::Index, sync::LazyLock};
@@ -35,6 +35,10 @@ impl Catalog {
         self.str_index.values().map(|entry| entry())
     }
 
+    pub fn get(&self, safe_name: &str) -> Option<&'static CardArchetype> {
+        self.str_index.get(safe_name).map(|entry| entry())
+    }
+
     pub fn contains(&self, safe_name: &str) -> bool {
         self.str_index.contains_key(safe_name)
     }
@@ -44,14 +48,7 @@ impl Index<&str> for Catalog {
     type Output = CardArchetype;
 
     fn index(&self, safe_name: &str) -> &Self::Output {
-        if safe_name.is_empty() {
-            return CardArchetype::NONE();
-        }
-        if let Some(entry) = self.str_index.get(safe_name) {
-            entry()
-        } else {
-            panic!("Card not found: {}", safe_name)
-        }
+        self.get(safe_name).unwrap_or(CardArchetype::NONE())
     }
 }
 
