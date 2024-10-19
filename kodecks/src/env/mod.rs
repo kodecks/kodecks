@@ -7,7 +7,7 @@ use crate::{
     error::ActionError,
     filter_vec,
     id::{ObjectId, ObjectIdCounter},
-    log::LogAction,
+    log::GameLog,
     opcode::OpcodeList,
     phase::Phase,
     player::{PlayerEndgameState, PlayerList, PlayerState, PlayerZone},
@@ -184,7 +184,7 @@ impl Environment {
             let mut ctx = EffectTriggerContext::new(&self.state, &mut self.obj_counter, card);
 
             let targeted = match &action {
-                Some(Action::SelectCard { card }) => Some(LogAction::CardTargeted {
+                Some(Action::SelectCard { card }) => Some(GameLog::CardTargeted {
                     source: item.source,
                     target: *card,
                 }),
@@ -228,7 +228,7 @@ impl Environment {
 
                     if self.check_game_condition() {
                         if let EndgameState::Finished { winner, reason } = self.endgame {
-                            logs.push(LogAction::GameEnded { winner, reason });
+                            logs.push(GameLog::GameEnded { winner, reason });
                         }
                     }
 
@@ -285,7 +285,7 @@ impl Environment {
 
         if self.check_game_condition() {
             if let EndgameState::Finished { winner, reason } = self.endgame {
-                logs.push(LogAction::GameEnded { winner, reason });
+                logs.push(GameLog::GameEnded { winner, reason });
             }
         }
 
@@ -425,7 +425,7 @@ pub enum EndgameReason {
 #[derive(Debug, Clone)]
 pub struct Report {
     pub available_actions: Option<PlayerAvailableActions>,
-    pub logs: Vec<LogAction>,
+    pub logs: Vec<GameLog>,
     pub endgame: EndgameState,
     pub timestamp: u64,
 }

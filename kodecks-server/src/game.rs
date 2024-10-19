@@ -2,7 +2,7 @@ use futures_util::future;
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::{Environment, LocalGameState},
-    log::LogAction,
+    log::GameLog,
     player::PlayerConfig,
     profile::GameProfile,
     regulation::Regulation,
@@ -272,7 +272,7 @@ impl Game {
                 let phase_changed = report
                     .logs
                     .iter()
-                    .any(|logs| matches!(logs, LogAction::PhaseChanged { .. }));
+                    .any(|logs| matches!(logs, GameLog::PhaseChanged { .. }));
                 if phase_changed {
                     next_phase_deadline = Instant::now() + regulation.phase_timeout;
                 }

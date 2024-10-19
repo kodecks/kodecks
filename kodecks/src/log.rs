@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
-pub enum LogAction {
+pub enum GameLog {
     GameStarted,
     GameEnded {
         winner: Option<u8>,

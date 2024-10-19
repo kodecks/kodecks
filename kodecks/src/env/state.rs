@@ -6,7 +6,7 @@ use crate::{
     card::Card,
     error::ActionError,
     id::ObjectId,
-    log::LogAction,
+    log::GameLog,
     phase::Phase,
     player::{PlayerList, PlayerState, PlayerZone},
     profile::DebugConfig,
@@ -61,7 +61,7 @@ impl GameState {
 #[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct LocalGameState {
     pub env: LocalEnvironment,
-    pub logs: Vec<LogAction>,
+    pub logs: Vec<GameLog>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub available_actions: Option<PlayerAvailableActions>,
 }
@@ -111,7 +111,7 @@ mod tests {
                 .collect(),
                 endgame: EndgameState::InProgress,
             },
-            logs: vec![LogAction::LifeChanged { player, life: 100 }],
+            logs: vec![GameLog::LifeChanged { player, life: 100 }],
             available_actions: Some(PlayerAvailableActions::new(player)),
         };
 

@@ -6,7 +6,7 @@ use crate::{
     effect::{EffectActivateContext, EffectTriggerContext},
     error::ActionError,
     field::{FieldBattleState, FieldState},
-    log::LogAction,
+    log::GameLog,
     opcode::Opcode,
     player::{PlayerEndgameState, PlayerZone},
     prelude::{ComputedAttribute, ContinuousEffect, ContinuousItem},
@@ -17,10 +17,10 @@ use crate::{
 use tracing::error;
 
 impl Environment {
-    pub fn execute(&mut self, opcode: Opcode) -> Result<Vec<LogAction>, ActionError> {
+    pub fn execute(&mut self, opcode: Opcode) -> Result<Vec<GameLog>, ActionError> {
         self.timestamp += 1;
         match opcode {
-            Opcode::StartGame => Ok(vec![LogAction::GameStarted]),
+            Opcode::StartGame => Ok(vec![GameLog::GameStarted]),
             Opcode::ChangeTurn {
                 turn,
                 player,
@@ -33,17 +33,17 @@ impl Environment {
                     player.reset_counters();
                 });
                 Ok(vec![
-                    LogAction::TurnChanged { turn, player },
-                    LogAction::PhaseChanged { phase },
+                    GameLog::TurnChanged { turn, player },
+                    GameLog::PhaseChanged { phase },
                 ])
             }
             Opcode::ChangePhase { phase } => {
                 self.state.phase = phase;
-                Ok(vec![LogAction::PhaseChanged { phase }])
+                Ok(vec![GameLog::PhaseChanged { phase }])
             }
             Opcode::SetLife { player, life } => {
                 self.state.players.get_mut(player).stats.life = life;
-                Ok(vec![LogAction::LifeChanged { player, life }])
+                Ok(vec![GameLog::LifeChanged { player, life }])
             }
             Opcode::ReduceCost { player } => {
                 self.state
@@ -76,7 +76,7 @@ impl Environment {
                 let amount = ((amount as i32) + propagate).max(0) as u32;
                 let player = self.state.players.get_mut(player);
                 player.shards.add(color, amount);
-                Ok(vec![LogAction::ShardsEarned {
+                Ok(vec![GameLog::ShardsEarned {
                     player: player.id,
                     source,
                     color,
@@ -91,7 +91,7 @@ impl Environment {
             } => {
                 let player = self.state.players.get_mut(player);
                 player.shards.consume(color, amount)?;
-                Ok(vec![LogAction::ShardsSpent {
+                Ok(vec![GameLog::ShardsSpent {
                     player: player.id,
                     source,
                     color,
@@ -105,13 +105,13 @@ impl Environment {
                     ShieldBroken,
                     condition::OnField(card.id()),
                 ));
-                Ok(vec![LogAction::ShieldBroken { card: card.id() }])
+                Ok(vec![GameLog::ShieldBroken { card: card.id() }])
             }
             Opcode::GenerateCardToken { card } => {
                 let id = card.id();
                 let player = self.state.players.get_mut(card.controller());
                 player.field.push(card);
-                Ok(vec![LogAction::CardTokenGenerated { card: id }])
+                Ok(vec![GameLog::CardTokenGenerated { card: id }])
             }
             Opcode::DrawCard { player } => {
                 let player = self.state.players.get_mut(player);
@@ -124,7 +124,7 @@ impl Environment {
                     card.set_zone(to);
                     player.hand.push(card);
                     player.counters.draw += 1;
-                    return Ok(vec![LogAction::CardMoved {
+                    return Ok(vec![GameLog::CardMoved {
                         player: controller,
                         card: id,
                         from,
@@ -151,7 +151,7 @@ impl Environment {
                     if cost == 0 {
                         player.counters.free_casted += 1;
                     }
-                    return Ok(vec![LogAction::CardMoved {
+                    return Ok(vec![GameLog::CardMoved {
                         player: controller,
                         card: id,
                         from,
@@ -178,7 +178,7 @@ impl Environment {
                     let id = card.id();
                     let controller = card.controller();
                     if card.is_token() && to.zone != Zone::Field {
-                        return Ok(vec![LogAction::CardTokenDestroyed { card: id }]);
+                        return Ok(vec![GameLog::CardTokenDestroyed { card: id }]);
                     }
                     card.set_timestamp(self.timestamp);
                     card.set_zone(to);
@@ -190,7 +190,7 @@ impl Environment {
                         Zone::Field => player.field.push(card),
                         Zone::Graveyard => player.graveyard.push(card),
                     }
-                    return Ok(vec![LogAction::CardMoved {
+                    return Ok(vec![GameLog::CardMoved {
                         player: controller,
                         card: id,
                         from,
@@ -203,7 +203,7 @@ impl Environment {
             Opcode::ShuffleDeck { player } => {
                 let player = self.state.players.get_mut(player);
                 player.deck.shuffle(&mut self.obj_counter, &mut self.rng);
-                Ok(vec![LogAction::DeckShuffled { player: player.id }])
+                Ok(vec![GameLog::DeckShuffled { player: player.id }])
             }
             Opcode::TriggerEvent {
                 source,
@@ -221,7 +221,7 @@ impl Environment {
                 let (continuous, stack) = ctx.into_inner();
                 let log = stack
                     .iter()
-                    .map(|id| LogAction::EffectActivated {
+                    .map(|id| GameLog::EffectActivated {
                         source: target.id(),
                         id: *id,
                     })
@@ -250,8 +250,10 @@ impl Environment {
             Opcode::SetBattleState { card, state } => {
                 let mut logs = Vec::new();
                 for player in self.state.players.iter_mut() {
-                    if player.field.set_card_battle_state(card, state) && state == Some(FieldBattleState::Attacking) {
-                        logs.push(LogAction::AttackDeclared { attacker: card });
+                    if player.field.set_card_battle_state(card, state)
+                        && state == Some(FieldBattleState::Attacking)
+                    {
+                        logs.push(GameLog::AttackDeclared { attacker: card });
                     }
                 }
                 Ok(logs)
@@ -268,11 +270,11 @@ impl Environment {
                 Ok(vec![])
             }
             Opcode::Attack { attacker, target } => Ok(vec![match target {
-                Target::Card(target) => LogAction::CreatureAttackedCreature {
+                Target::Card(target) => GameLog::CreatureAttackedCreature {
                     attacker,
                     blocker: target,
                 },
-                Target::Player(target) => LogAction::CreatureAttackedPlayer {
+                Target::Player(target) => GameLog::CreatureAttackedPlayer {
                     attacker,
                     player: target,
                 },
@@ -281,11 +283,11 @@ impl Environment {
                 let player = self.state.players.get_mut(player);
                 player.stats.life = player.stats.life.saturating_sub(amount);
                 Ok(vec![
-                    LogAction::DamageTaken {
+                    GameLog::DamageTaken {
                         player: player.id,
                         amount,
                     },
-                    LogAction::LifeChanged {
+                    GameLog::LifeChanged {
                         player: player.id,
                         life: player.stats.life,
                     },

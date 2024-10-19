@@ -16,7 +16,7 @@ use kodecks::{
     action::{Action, AvailableAction},
     card::ArchetypeId,
     id::ObjectId,
-    log::LogAction,
+    log::GameLog,
     message::MessageDialog,
     prelude::Message,
     target::Target,
@@ -269,15 +269,15 @@ fn recv_server_events(
         };
 
         let log_events = event.logs.iter().filter_map(|log| match log {
-            LogAction::CreatureAttackedCreature { attacker, blocker } => Some(LogEvent::Attack {
+            GameLog::CreatureAttackedCreature { attacker, blocker } => Some(LogEvent::Attack {
                 attacker: *attacker,
                 target: Target::Card(*blocker),
             }),
-            LogAction::CreatureAttackedPlayer { attacker, player } => Some(LogEvent::Attack {
+            GameLog::CreatureAttackedPlayer { attacker, player } => Some(LogEvent::Attack {
                 attacker: *attacker,
                 target: Target::Player(*player),
             }),
-            LogAction::CardMoved { card, .. } => Some(LogEvent::Moved { card: *card }),
+            GameLog::CardMoved { card, .. } => Some(LogEvent::Moved { card: *card }),
             _ => None,
         });
 
@@ -305,24 +305,24 @@ fn recv_server_events(
         for log in &event.logs {
             if matches!(
                 log,
-                LogAction::ShardsEarned { .. } | LogAction::ShardsSpent { .. }
+                GameLog::ShardsEarned { .. } | GameLog::ShardsSpent { .. }
             ) {
                 events.shard.send(ShardUpdated);
             }
             match log {
-                LogAction::LifeChanged { player, .. } => {
+                GameLog::LifeChanged { player, .. } => {
                     events.life.send(LifeUpdated {
                         player: *player,
                         delta: 0,
                     });
                 }
-                LogAction::DamageTaken { player, amount } => {
+                GameLog::DamageTaken { player, amount } => {
                     events.life.send(LifeUpdated {
                         player: *player,
                         delta: -(*amount as i32),
                     });
                 }
-                LogAction::TurnChanged { player, .. } => {
+                GameLog::TurnChanged { player, .. } => {
                     events.turn.send(TurnChanged(*player));
                 }
                 _ => (),

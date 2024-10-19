@@ -4,21 +4,21 @@ use fluent_content::Request;
 use kodecks::{
     card::Catalog,
     env::LocalEnvironment,
-    log::LogAction,
+    log::GameLog,
     zone::{MoveReason, Zone},
 };
 use std::borrow::Cow;
 
 pub fn translate_log<'a>(
-    action: &LogAction,
+    action: &GameLog,
     env: &LocalEnvironment,
     catalog: &Catalog,
     translator: &Translator,
 ) -> Option<Cow<'a, str>> {
     let mut args = FluentArgs::new();
     let id = match action {
-        LogAction::GameStarted => "log-game-started",
-        LogAction::GameEnded { winner, .. } => {
+        GameLog::GameStarted => "log-game-started",
+        GameLog::GameEnded { winner, .. } => {
             if let Some(winner) = winner {
                 args.set(
                     "winner",
@@ -33,7 +33,7 @@ pub fn translate_log<'a>(
                 "log-game-ended-draw"
             }
         }
-        LogAction::TurnChanged { player, turn } => {
+        GameLog::TurnChanged { player, turn } => {
             args.set(
                 "player",
                 if *player == env.player {
@@ -45,11 +45,11 @@ pub fn translate_log<'a>(
             args.set("turn", turn);
             "log-turn-changed"
         }
-        LogAction::PhaseChanged { phase } => {
+        GameLog::PhaseChanged { phase } => {
             args.set("phase", phase.to_string().to_ascii_lowercase());
             "log-phase-changed"
         }
-        LogAction::LifeChanged { player, life } => {
+        GameLog::LifeChanged { player, life } => {
             args.set(
                 "player",
                 if *player == env.player {
@@ -61,7 +61,7 @@ pub fn translate_log<'a>(
             args.set("life", life);
             "log-life-changed"
         }
-        LogAction::DamageTaken { player, amount } => {
+        GameLog::DamageTaken { player, amount } => {
             args.set(
                 "player",
                 if *player == env.player {
@@ -73,7 +73,7 @@ pub fn translate_log<'a>(
             args.set("amount", amount);
             "log-damage-taken"
         }
-        LogAction::DeckShuffled { player } => {
+        GameLog::DeckShuffled { player } => {
             args.set(
                 "player",
                 if *player == env.player {
@@ -84,7 +84,7 @@ pub fn translate_log<'a>(
             );
             "log-deck-shuffled"
         }
-        LogAction::EffectActivated { source, .. } => {
+        GameLog::EffectActivated { source, .. } => {
             if let Ok(card) = env.find_card(*source) {
                 let source = translator
                     .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
@@ -93,7 +93,7 @@ pub fn translate_log<'a>(
             }
             "log-effect-activated"
         }
-        LogAction::CardMoved {
+        GameLog::CardMoved {
             player,
             card,
             from,
@@ -150,7 +150,7 @@ pub fn translate_log<'a>(
                 }
             }
         }
-        LogAction::CardTargeted { source, target } => {
+        GameLog::CardTargeted { source, target } => {
             if let Ok(card) = env.find_card(*source) {
                 let source = translator
                     .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
@@ -169,7 +169,7 @@ pub fn translate_log<'a>(
             }
             "log-card-targeted"
         }
-        LogAction::ShardsEarned {
+        GameLog::ShardsEarned {
             player,
             color,
             amount,
@@ -187,7 +187,7 @@ pub fn translate_log<'a>(
             args.set("amount", amount);
             "log-shards-earned"
         }
-        LogAction::ShardsSpent {
+        GameLog::ShardsSpent {
             player,
             color,
             amount,
@@ -205,7 +205,7 @@ pub fn translate_log<'a>(
             args.set("amount", amount);
             "log-shards-spent"
         }
-        LogAction::CardTokenGenerated { card } => {
+        GameLog::CardTokenGenerated { card } => {
             if let Ok(card) = env.find_card(*card) {
                 let card = translator
                     .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
@@ -216,7 +216,7 @@ pub fn translate_log<'a>(
             }
             "log-card-token-generated"
         }
-        LogAction::CardTokenDestroyed { card } => {
+        GameLog::CardTokenDestroyed { card } => {
             if let Ok(card) = env.find_card(*card) {
                 let card = translator
                     .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
@@ -227,7 +227,7 @@ pub fn translate_log<'a>(
             }
             "log-card-token-destroyed"
         }
-        LogAction::AttackDeclared { attacker } => {
+        GameLog::AttackDeclared { attacker } => {
             if let Ok(attacker) = env.find_card(*attacker) {
                 let attacker = translator
                     .get(&format!(
@@ -241,7 +241,7 @@ pub fn translate_log<'a>(
             }
             "log-attack-declared"
         }
-        LogAction::CreatureAttackedCreature { attacker, blocker } => {
+        GameLog::CreatureAttackedCreature { attacker, blocker } => {
             if let Ok(attacker) = env.find_card(*attacker) {
                 let attacker = translator
                     .get(&format!(
@@ -263,7 +263,7 @@ pub fn translate_log<'a>(
             }
             "log-creature-attacked-creature"
         }
-        LogAction::CreatureAttackedPlayer { attacker, player } => {
+        GameLog::CreatureAttackedPlayer { attacker, player } => {
             if let Ok(attacker) = env.find_card(*attacker) {
                 let attacker = translator
                     .get(&format!(
