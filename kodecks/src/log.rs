@@ -1,5 +1,5 @@
 use crate::{
-    color::Color, effect::EffectId, id::ObjectId, phase::Phase, player::PlayerZone, target::Target,
+    color::Color, effect::EffectId, id::ObjectId, phase::Phase, player::PlayerZone,
     zone::MoveReason,
 };
 use bincode::{Decode, Encode};
@@ -15,8 +15,13 @@ pub enum LogAction {
     TurnChanged { turn: u32, player: u8 },
     #[strum(to_string = "Phase changed to {phase}")]
     PhaseChanged { phase: Phase },
-    #[strum(to_string = "{attacker} attacks {target:?}")]
-    Attacked { attacker: ObjectId, target: Target },
+    #[strum(to_string = "{attacker} attacks {blocker}")]
+    CreatureAttackedCreature {
+        attacker: ObjectId,
+        blocker: ObjectId,
+    },
+    #[strum(to_string = "{attacker} attacks {player}")]
+    CreatureAttackedPlayer { attacker: ObjectId, player: u8 },
     #[strum(to_string = "Life changed for {player}: {life}")]
     LifeChanged { player: u8, life: u32 },
     #[strum(to_string = "Damage {amount} inflicted to {player}")]

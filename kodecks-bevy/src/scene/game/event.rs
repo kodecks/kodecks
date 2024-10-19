@@ -271,9 +271,13 @@ fn recv_server_events(
         };
 
         let log_events = event.logs.iter().filter_map(|log| match log {
-            LogAction::Attacked { attacker, target } => Some(LogEvent::Attack {
+            LogAction::CreatureAttackedCreature { attacker, blocker } => Some(LogEvent::Attack {
                 attacker: *attacker,
-                target: *target,
+                target: Target::Card(*blocker),
+            }),
+            LogAction::CreatureAttackedPlayer { attacker, player } => Some(LogEvent::Attack {
+                attacker: *attacker,
+                target: Target::Player(*player),
             }),
             LogAction::CardMoved { card, .. } => Some(LogEvent::Moved { card: *card }),
             _ => None,

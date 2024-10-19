@@ -11,6 +11,7 @@ use crate::{
     player::{PlayerEndgameState, PlayerZone},
     prelude::{ComputedAttribute, ContinuousEffect, ContinuousItem},
     sequence::CardSequence,
+    target::Target,
     zone::{CardZone, MoveReason, Zone},
 };
 use tracing::error;
@@ -263,9 +264,16 @@ impl Environment {
                 }
                 Ok(vec![])
             }
-            Opcode::Attack { attacker, target } => {
-                Ok(vec![LogAction::Attacked { attacker, target }])
-            }
+            Opcode::Attack { attacker, target } => Ok(vec![match target {
+                Target::Card(target) => LogAction::CreatureAttackedCreature {
+                    attacker,
+                    blocker: target,
+                },
+                Target::Player(target) => LogAction::CreatureAttackedPlayer {
+                    attacker,
+                    player: target,
+                },
+            }]),
             Opcode::InflictDamage { player, amount } => {
                 let player = self.state.players.get_mut(player);
                 player.stats.life = player.stats.life.saturating_sub(amount);
