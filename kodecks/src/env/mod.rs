@@ -226,7 +226,11 @@ impl Environment {
                         error!("Error computing effects: {:?}", err);
                     }
 
-                    self.check_game_condition();
+                    if self.check_game_condition() {
+                        if let EndgameState::Finished { winner, reason } = self.endgame {
+                            logs.push(LogAction::GameEnded { winner, reason });
+                        }
+                    }
 
                     if !report
                         .available_actions
@@ -279,7 +283,11 @@ impl Environment {
             error!("Error computing effects: {:?}", err);
         }
 
-        self.check_game_condition();
+        if self.check_game_condition() {
+            if let EndgameState::Finished { winner, reason } = self.endgame {
+                logs.push(LogAction::GameEnded { winner, reason });
+            }
+        }
 
         let available_actions = if next_empty {
             self.available_actions()
@@ -303,9 +311,9 @@ impl Environment {
         self.endgame
     }
 
-    pub fn check_game_condition(&mut self) {
+    pub fn check_game_condition(&mut self) -> bool {
         if self.endgame.is_ended() {
-            return;
+            return false;
         }
 
         for player in self
@@ -339,7 +347,7 @@ impl Environment {
             })
             .collect::<Vec<_>>();
 
-        self.endgame = if won_players.is_empty() && lost_players.is_empty() {
+        let new_condition = if won_players.is_empty() && lost_players.is_empty() {
             EndgameState::InProgress
         } else if let [(won, reason)] = won_players.as_slice() {
             EndgameState::Finished {
@@ -357,6 +365,12 @@ impl Environment {
                 reason: EndgameReason::SimultaneousEnd,
             }
         };
+        if self.endgame != new_condition {
+            self.endgame = new_condition;
+            true
+        } else {
+            false
+        }
     }
 
     pub fn generate_card_token(&self, player: u8, token: ObjectId, archetype: ArchetypeId) -> Card {

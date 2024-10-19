@@ -1,6 +1,6 @@
 use crate::{
-    color::Color, effect::EffectId, id::ObjectId, phase::Phase, player::PlayerZone,
-    zone::MoveReason,
+    color::Color, effect::EffectId, env::EndgameReason, id::ObjectId, phase::Phase,
+    player::PlayerZone, zone::MoveReason,
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
@@ -11,6 +11,11 @@ use strum::Display;
 pub enum LogAction {
     #[strum(to_string = "Game started")]
     GameStarted,
+    #[strum(to_string = "Game ended with {reason}")]
+    GameEnded {
+        winner: Option<u8>,
+        reason: EndgameReason,
+    },
     #[strum(to_string = "Turn {turn} started for {player}")]
     TurnChanged { turn: u32, player: u8 },
     #[strum(to_string = "Phase changed to {phase}")]
