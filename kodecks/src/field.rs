@@ -47,13 +47,17 @@ impl CardList<FieldItem<Card>> {
         }
     }
 
-    pub fn set_card_battle_state(&mut self, id: ObjectId, state: Option<FieldBattleState>) {
+    pub fn set_card_battle_state(&mut self, id: ObjectId, state: Option<FieldBattleState>) -> bool {
         if let Some(field_card) = self
             .items_mut()
             .find(|field_card| field_card.card.id() == id)
         {
-            field_card.battle = state;
+            if field_card.battle != state {
+                field_card.battle = state;
+                return true;
+            }
         }
+        false
     }
 }
 

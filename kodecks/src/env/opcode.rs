@@ -5,7 +5,7 @@ use crate::{
     condition,
     effect::{EffectActivateContext, EffectTriggerContext},
     error::ActionError,
-    field::FieldState,
+    field::{FieldBattleState, FieldState},
     log::LogAction,
     opcode::Opcode,
     player::{PlayerEndgameState, PlayerZone},
@@ -248,10 +248,15 @@ impl Environment {
                 Ok(vec![])
             }
             Opcode::SetBattleState { card, state } => {
+                let mut logs = Vec::new();
                 for player in self.state.players.iter_mut() {
-                    player.field.set_card_battle_state(card, state);
+                    if player.field.set_card_battle_state(card, state) {
+                        if state == Some(FieldBattleState::Attacking) {
+                            logs.push(LogAction::AttackDeclared { attacker: card });
+                        }
+                    }
                 }
-                Ok(vec![])
+                Ok(logs)
             }
             Opcode::ResetBattleState => {
                 for player in self.state.players.iter_mut() {

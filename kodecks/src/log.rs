@@ -15,6 +15,8 @@ pub enum LogAction {
     TurnChanged { turn: u32, player: u8 },
     #[strum(to_string = "Phase changed to {phase}")]
     PhaseChanged { phase: Phase },
+    #[strum(to_string = "Attack declared by {attacker}")]
+    AttackDeclared { attacker: ObjectId },
     #[strum(to_string = "{attacker} attacks {blocker}")]
     CreatureAttackedCreature {
         attacker: ObjectId,
