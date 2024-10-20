@@ -35,8 +35,11 @@ impl Catalog {
         self.str_index.values().map(|entry| entry())
     }
 
-    pub fn get(&self, safe_name: &str) -> Option<&'static CardArchetype> {
-        self.str_index.get(safe_name).map(|entry| entry())
+    pub fn get<S>(&self, id: S) -> Option<&'static CardArchetype>
+    where
+        S: AsRef<str>,
+    {
+        self.str_index.get(id.as_ref()).map(|entry| entry())
     }
 
     pub fn contains(&self, safe_name: &str) -> bool {
@@ -418,6 +421,12 @@ impl ArchetypeId {
 
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
+    }
+}
+
+impl AsRef<str> for ArchetypeId {
+    fn as_ref(&self) -> &str {
+        self.0.as_str()
     }
 }
 
