@@ -11,7 +11,7 @@ pub fn starter_deck() -> DeckList {
     Radio Deer 1
     Moss-Grown Mastodon 1
     Voracious Anteater 2
-    Mire Alligator 2
+    Mire Alligator 1
     Wasteland Cobra 1
     Marshland Moose 1
     Electric Flytrap 1
@@ -22,6 +22,7 @@ pub fn starter_deck() -> DeckList {
     Badlands Chimera 1
     Hostile Coyote 1
     Quagmire Trilobite 1
+    Cenote Otter 1
     ",
         &CATALOG,
     )
