@@ -10,6 +10,7 @@ mod awkward_auk;
 mod badlands_chimera;
 mod bambooster;
 mod binary_starfish;
+mod cenote_otter;
 mod coppermine_scorpion;
 mod cyanide_spitter;
 mod deep_sea_wyrm;
@@ -56,6 +57,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "cenote-otter" => cenote_otter::ARCHETYPE,
+    "ceno" => cenote_otter::ARCHETYPE,
     "awkward-auk" => awkward_auk::ARCHETYPE,
     "awkw" => awkward_auk::ARCHETYPE,
     "cyanide-spitter" => cyanide_spitter::ARCHETYPE,
