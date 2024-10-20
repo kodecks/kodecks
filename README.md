@@ -5,6 +5,8 @@
 
 Open-source Classic-Style Digital Card Game
 
+![Screenshot](images/screenshot.webp)
+
 - Inspired by traditional TCGs such as MTG but featuring more streamlined gameplay
 - Play in the browser or on desktop
 - Battle against CPU or other players
