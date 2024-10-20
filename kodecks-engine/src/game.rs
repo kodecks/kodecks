@@ -100,7 +100,11 @@ pub async fn start_game(
                 if player.bot.is_none() {
                     let state = LocalGameState {
                         env: env.local(player.id),
-                        logs: report.logs.clone(),
+                        logs: report
+                            .logs
+                            .iter()
+                            .map(|log| log.clone().redacted(player.id))
+                            .collect(),
                         available_actions: report
                             .available_actions
                             .clone()

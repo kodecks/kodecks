@@ -1,5 +1,5 @@
 use crate::{
-    color::Color, effect::EffectId, env::EndgameReason, id::ObjectId, phase::Phase,
+    card::CardSnapshot, color::Color, effect::EffectId, env::EndgameReason, phase::Phase,
     player::PlayerZone, zone::MoveReason,
 };
 use bincode::{Decode, Encode};
@@ -21,14 +21,14 @@ pub enum GameLog {
         phase: Phase,
     },
     AttackDeclared {
-        attacker: ObjectId,
+        attacker: CardSnapshot,
     },
     CreatureAttackedCreature {
-        attacker: ObjectId,
-        blocker: ObjectId,
+        attacker: CardSnapshot,
+        blocker: CardSnapshot,
     },
     CreatureAttackedPlayer {
-        attacker: ObjectId,
+        attacker: CardSnapshot,
         player: u8,
     },
     LifeChanged {
@@ -41,41 +41,114 @@ pub enum GameLog {
     },
     ShardsEarned {
         player: u8,
-        source: ObjectId,
+        source: CardSnapshot,
         color: Color,
         amount: u32,
     },
     ShardsSpent {
         player: u8,
-        source: ObjectId,
+        source: CardSnapshot,
         color: Color,
         amount: u32,
     },
     CardMoved {
         player: u8,
-        card: ObjectId,
+        card: CardSnapshot,
         from: PlayerZone,
         to: PlayerZone,
         reason: MoveReason,
     },
     CardTokenGenerated {
-        card: ObjectId,
+        card: CardSnapshot,
     },
     CardTokenDestroyed {
-        card: ObjectId,
+        card: CardSnapshot,
     },
     DeckShuffled {
         player: u8,
     },
     EffectActivated {
-        source: ObjectId,
+        source: CardSnapshot,
         id: EffectId,
     },
     CardTargeted {
-        source: ObjectId,
-        target: ObjectId,
+        source: CardSnapshot,
+        target: CardSnapshot,
     },
     ShieldBroken {
-        card: ObjectId,
+        card: CardSnapshot,
     },
+}
+
+impl GameLog {
+    pub fn redacted(self, viewer: u8) -> Self {
+        match self {
+            Self::AttackDeclared { attacker } => Self::AttackDeclared {
+                attacker: attacker.redacted(viewer),
+            },
+            Self::CreatureAttackedCreature { attacker, blocker } => {
+                Self::CreatureAttackedCreature {
+                    attacker: attacker.redacted(viewer),
+                    blocker: blocker.redacted(viewer),
+                }
+            }
+            Self::CreatureAttackedPlayer { attacker, player } => Self::CreatureAttackedPlayer {
+                attacker: attacker.redacted(viewer),
+                player,
+            },
+            Self::ShardsEarned {
+                player,
+                source,
+                color,
+                amount,
+            } => Self::ShardsEarned {
+                player,
+                source: source.redacted(viewer),
+                color,
+                amount,
+            },
+            Self::ShardsSpent {
+                player,
+                source,
+                color,
+                amount,
+            } => Self::ShardsSpent {
+                player,
+                source: source.redacted(viewer),
+                color,
+                amount,
+            },
+            Self::CardMoved {
+                player,
+                card,
+                from,
+                to,
+                reason,
+            } => Self::CardMoved {
+                player,
+                card: card.redacted(viewer),
+                from,
+                to,
+                reason,
+            },
+            Self::CardTokenGenerated { card } => Self::CardTokenGenerated {
+                card: card.redacted(viewer),
+            },
+            Self::CardTokenDestroyed { card } => Self::CardTokenDestroyed {
+                card: card.redacted(viewer),
+            },
+            Self::EffectActivated { source, id } => Self::EffectActivated {
+                source: source.redacted(viewer),
+                id,
+            },
+            Self::CardTargeted { source, target } => Self::CardTargeted {
+                source: source.redacted(viewer),
+                target: target.redacted(viewer),
+            },
+            Self::ShieldBroken { card } => Self::ShieldBroken {
+                card: card.redacted(viewer),
+            },
+            _ => self,
+        }
+    }
 }

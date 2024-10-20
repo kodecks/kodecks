@@ -270,14 +270,14 @@ fn recv_server_events(
 
         let log_events = event.logs.iter().filter_map(|log| match log {
             GameLog::CreatureAttackedCreature { attacker, blocker } => Some(LogEvent::Attack {
-                attacker: *attacker,
-                target: Target::Card(*blocker),
+                attacker: attacker.id,
+                target: Target::Card(blocker.id),
             }),
             GameLog::CreatureAttackedPlayer { attacker, player } => Some(LogEvent::Attack {
-                attacker: *attacker,
+                attacker: attacker.id,
                 target: Target::Player(*player),
             }),
-            GameLog::CardMoved { card, .. } => Some(LogEvent::Moved { card: *card }),
+            GameLog::CardMoved { card, .. } => Some(LogEvent::Moved { card: card.id }),
             _ => None,
         });
 

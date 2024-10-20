@@ -85,9 +85,9 @@ pub fn translate_log<'a>(
             "log-deck-shuffled"
         }
         GameLog::EffectActivated { source, .. } => {
-            if let Ok(card) = env.find_card(*source) {
+            if let Some(archetype) = catalog.get(source.archetype_id) {
                 let source = translator
-                    .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
+                    .get(&format!("card-{}", archetype.safe_name))
                     .to_string();
                 args.set("source", source);
             }
@@ -108,13 +108,9 @@ pub fn translate_log<'a>(
                     "opponent"
                 },
             );
-            if let Some(card) = env
-                .find_card(*card)
-                .ok()
-                .filter(|card| !card.archetype_id.is_empty())
-            {
+            if let Some(archetype) = catalog.get(card.archetype_id) {
                 let card = translator
-                    .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
+                    .get(&format!("card-{}", archetype.safe_name))
                     .to_string();
                 args.set("card", card);
             } else {
@@ -151,17 +147,17 @@ pub fn translate_log<'a>(
             }
         }
         GameLog::CardTargeted { source, target } => {
-            if let Ok(card) = env.find_card(*source) {
+            if let Some(card) = catalog.get(source.archetype_id) {
                 let source = translator
-                    .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
+                    .get(&format!("card-{}", card.safe_name))
                     .to_string();
                 args.set("source", source);
             } else {
                 args.set("source", "unknown");
             }
-            if let Ok(card) = env.find_card(*target) {
+            if let Some(card) = catalog.get(target.archetype_id) {
                 let target = translator
-                    .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
+                    .get(&format!("card-{}", card.safe_name))
                     .to_string();
                 args.set("target", target);
             } else {
@@ -206,9 +202,9 @@ pub fn translate_log<'a>(
             "log-shards-spent"
         }
         GameLog::CardTokenGenerated { card } => {
-            if let Ok(card) = env.find_card(*card) {
+            if let Some(archetype) = catalog.get(card.archetype_id) {
                 let card = translator
-                    .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
+                    .get(&format!("card-{}", archetype.safe_name))
                     .to_string();
                 args.set("card", card);
             } else {
@@ -217,9 +213,9 @@ pub fn translate_log<'a>(
             "log-card-token-generated"
         }
         GameLog::CardTokenDestroyed { card } => {
-            if let Ok(card) = env.find_card(*card) {
+            if let Some(archetype) = catalog.get(card.archetype_id) {
                 let card = translator
-                    .get(&format!("card-{}", catalog[card.archetype_id].safe_name))
+                    .get(&format!("card-{}", archetype.safe_name))
                     .to_string();
                 args.set("card", card);
             } else {
@@ -228,12 +224,9 @@ pub fn translate_log<'a>(
             "log-card-token-destroyed"
         }
         GameLog::AttackDeclared { attacker } => {
-            if let Ok(attacker) = env.find_card(*attacker) {
+            if let Some(attacker) = catalog.get(attacker.archetype_id) {
                 let attacker = translator
-                    .get(&format!(
-                        "card-{}",
-                        catalog[attacker.archetype_id].safe_name
-                    ))
+                    .get(&format!("card-{}", attacker.safe_name))
                     .to_string();
                 args.set("attacker", attacker);
             } else {
@@ -242,20 +235,17 @@ pub fn translate_log<'a>(
             "log-attack-declared"
         }
         GameLog::CreatureAttackedCreature { attacker, blocker } => {
-            if let Ok(attacker) = env.find_card(*attacker) {
+            if let Some(attacker) = catalog.get(attacker.archetype_id) {
                 let attacker = translator
-                    .get(&format!(
-                        "card-{}",
-                        catalog[attacker.archetype_id].safe_name
-                    ))
+                    .get(&format!("card-{}", attacker.safe_name))
                     .to_string();
                 args.set("attacker", attacker);
             } else {
                 args.set("attacker", "unknown");
             }
-            if let Ok(blocker) = env.find_card(*blocker) {
+            if let Some(blocker) = catalog.get(blocker.archetype_id) {
                 let blocker = translator
-                    .get(&format!("card-{}", catalog[blocker.archetype_id].safe_name))
+                    .get(&format!("card-{}", blocker.safe_name))
                     .to_string();
                 args.set("blocker", blocker);
             } else {
@@ -264,12 +254,9 @@ pub fn translate_log<'a>(
             "log-creature-attacked-creature"
         }
         GameLog::CreatureAttackedPlayer { attacker, player } => {
-            if let Ok(attacker) = env.find_card(*attacker) {
+            if let Some(attacker) = catalog.get(attacker.archetype_id) {
                 let attacker = translator
-                    .get(&format!(
-                        "card-{}",
-                        catalog[attacker.archetype_id].safe_name
-                    ))
+                    .get(&format!("card-{}", attacker.safe_name))
                     .to_string();
                 args.set("attacker", attacker);
             } else {

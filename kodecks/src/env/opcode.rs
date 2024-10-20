@@ -73,6 +73,7 @@ impl Environment {
                         }
                     })
                     .unwrap_or_default();
+                let source = self.state.find_card(source)?.snapshot();
                 let amount = ((amount as i32) + propagate).max(0) as u32;
                 let player = self.state.players.get_mut(player);
                 player.shards.add(color, amount);
@@ -89,6 +90,7 @@ impl Environment {
                 color,
                 amount,
             } => {
+                let source = self.state.find_card(source)?.snapshot();
                 let player = self.state.players.get_mut(player);
                 player.shards.consume(color, amount)?;
                 Ok(vec![GameLog::ShardsSpent {
@@ -99,34 +101,36 @@ impl Environment {
                 }])
             }
             Opcode::BreakShield { card } => {
-                let card = self.state.find_card_mut(card)?;
+                let card = self.state.find_card(card)?;
                 self.continuous.add(ContinuousItem::new(
                     card,
                     ShieldBroken,
                     condition::OnField(card.id()),
                 ));
-                Ok(vec![GameLog::ShieldBroken { card: card.id() }])
+                Ok(vec![GameLog::ShieldBroken {
+                    card: card.snapshot(),
+                }])
             }
             Opcode::GenerateCardToken { card } => {
-                let id = card.id();
+                let snapshot = card.snapshot();
                 let player = self.state.players.get_mut(card.controller());
                 player.field.push(card);
-                Ok(vec![GameLog::CardTokenGenerated { card: id }])
+                Ok(vec![GameLog::CardTokenGenerated { card: snapshot }])
             }
             Opcode::DrawCard { player } => {
                 let player = self.state.players.get_mut(player);
                 if let Some(mut card) = player.deck.remove_top() {
-                    let id = card.id();
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Hand);
                     let controller = card.controller();
                     card.set_timestamp(self.timestamp);
                     card.set_zone(to);
+                    let snapshot = card.snapshot();
                     player.hand.push(card);
                     player.counters.draw += 1;
                     return Ok(vec![GameLog::CardMoved {
                         player: controller,
-                        card: id,
+                        card: snapshot,
                         from,
                         to,
                         reason: MoveReason::Draw,
@@ -141,19 +145,19 @@ impl Environment {
             Opcode::CastCard { player, card, cost } => {
                 let player = self.state.players.get_mut(player);
                 if let Some(mut card) = player.hand.remove(card) {
-                    let id = card.id();
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Field);
                     let controller = card.controller();
                     card.set_timestamp(self.timestamp);
                     card.set_zone(to);
+                    let snapshot = card.snapshot();
                     player.field.push(card);
                     if cost == 0 {
                         player.counters.free_casted += 1;
                     }
                     return Ok(vec![GameLog::CardMoved {
                         player: controller,
-                        card: id,
+                        card: snapshot,
                         from,
                         to,
                         reason: MoveReason::Casted,
@@ -175,14 +179,16 @@ impl Environment {
                     Zone::Graveyard => player.graveyard.remove(card),
                 };
                 if let Some(mut card) = card {
-                    let id = card.id();
                     let controller = card.controller();
                     if card.is_token() && to.zone != Zone::Field {
-                        return Ok(vec![GameLog::CardTokenDestroyed { card: id }]);
+                        return Ok(vec![GameLog::CardTokenDestroyed {
+                            card: card.snapshot(),
+                        }]);
                     }
                     card.set_timestamp(self.timestamp);
                     card.set_zone(to);
                     card.reset_computed();
+                    let snapshot = card.snapshot();
                     let player = self.state.players.get_mut(to.player);
                     match to.zone {
                         Zone::Deck => player.deck.push(card),
@@ -192,7 +198,7 @@ impl Environment {
                     }
                     return Ok(vec![GameLog::CardMoved {
                         player: controller,
-                        card: id,
+                        card: snapshot,
                         from,
                         to,
                         reason,
@@ -222,7 +228,7 @@ impl Environment {
                 let log = stack
                     .iter()
                     .map(|id| GameLog::EffectActivated {
-                        source: target.id(),
+                        source: target.snapshot(),
                         id: *id,
                     })
                     .collect::<Vec<_>>();
@@ -248,12 +254,15 @@ impl Environment {
                 Ok(vec![])
             }
             Opcode::SetBattleState { card, state } => {
+                let attacker = self.state.find_card(card)?.snapshot();
                 let mut logs = Vec::new();
                 for player in self.state.players.iter_mut() {
                     if player.field.set_card_battle_state(card, state)
                         && state == Some(FieldBattleState::Attacking)
                     {
-                        logs.push(GameLog::AttackDeclared { attacker: card });
+                        logs.push(GameLog::AttackDeclared {
+                            attacker: attacker.clone(),
+                        });
                     }
                 }
                 Ok(logs)
@@ -269,16 +278,22 @@ impl Environment {
                 }
                 Ok(vec![])
             }
-            Opcode::Attack { attacker, target } => Ok(vec![match target {
-                Target::Card(target) => GameLog::CreatureAttackedCreature {
-                    attacker,
-                    blocker: target,
-                },
-                Target::Player(target) => GameLog::CreatureAttackedPlayer {
-                    attacker,
-                    player: target,
-                },
-            }]),
+            Opcode::Attack { attacker, target } => {
+                let attacker = self.state.find_card(attacker)?;
+                Ok(vec![match target {
+                    Target::Card(target) => {
+                        let blocker = self.state.find_card(target)?;
+                        GameLog::CreatureAttackedCreature {
+                            attacker: attacker.snapshot(),
+                            blocker: blocker.snapshot(),
+                        }
+                    }
+                    Target::Player(target) => GameLog::CreatureAttackedPlayer {
+                        attacker: attacker.snapshot(),
+                        player: target,
+                    },
+                }])
+            }
             Opcode::InflictDamage { player, amount } => {
                 let player = self.state.players.get_mut(player);
                 player.stats.life = player.stats.life.saturating_sub(amount);

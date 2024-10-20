@@ -180,14 +180,17 @@ impl Environment {
         };
 
         if let Some(item) = self.stack.pop() {
-            let card = self.state.find_card(item.source).unwrap();
-            let mut ctx = EffectTriggerContext::new(&self.state, &mut self.obj_counter, card);
+            let source = self.state.find_card(item.source).unwrap();
+            let mut ctx = EffectTriggerContext::new(&self.state, &mut self.obj_counter, source);
 
             let targeted = match &action {
-                Some(Action::SelectCard { card }) => Some(GameLog::CardTargeted {
-                    source: item.source,
-                    target: *card,
-                }),
+                Some(Action::SelectCard { card }) => {
+                    let target = self.state.find_card(*card).unwrap();
+                    Some(GameLog::CardTargeted {
+                        source: source.snapshot(),
+                        target: target.snapshot(),
+                    })
+                }
                 _ => None,
             };
 
