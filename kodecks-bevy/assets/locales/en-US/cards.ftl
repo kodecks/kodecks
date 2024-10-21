@@ -67,3 +67,4 @@ card-quagmire-trilobite = Quagmire Trilobite
 card-cyanide-spitter = Cyanide Spitter
 card-awkward-auk = Awkward Auk
 card-cenote-otter = Cenote Otter
+card-ruby-digger = Ruby Digger

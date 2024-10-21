@@ -67,3 +67,4 @@ card-quagmire-trilobite = ぬかるみの三葉虫
 card-cyanide-spitter = 青酸吐き
 card-awkward-auk = 不器用な海雀
 card-cenote-otter = セノーテの獺
+card-ruby-digger = 紅玉堀り

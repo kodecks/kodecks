@@ -39,6 +39,7 @@ mod quagmire_trilobite;
 mod quartz_moth;
 mod quicksand_skulker;
 mod radio_deer;
+mod ruby_digger;
 mod saltmarsh_moray;
 mod scrapyard_raven;
 mod solar_beetle;
@@ -57,6 +58,8 @@ mod zigzag_ammonite;
 
 pub static CARDS: CardMap = phf::phf_map! {
     // card-entries
+    "ruby-digger" => ruby_digger::ARCHETYPE,
+    "ruby" => ruby_digger::ARCHETYPE,
     "cenote-otter" => cenote_otter::ARCHETYPE,
     "ceno" => cenote_otter::ARCHETYPE,
     "awkward-auk" => awkward_auk::ARCHETYPE,

@@ -60,7 +60,7 @@ pub fn red_deck() -> DeckList {
         "
     # Red deck
     Volcanic Wyrm 2
-    Wind-Up Spider 2
+    Wind-Up Spider 1
     Pyrosnail 1
     Oil-Leaking Droid 2
     Diamond Porcupine 1
@@ -75,6 +75,7 @@ pub fn red_deck() -> DeckList {
     Amalgam Rat 1
     Amethyst Mantis 1
     Cyanide Spitter 1
+    Ruby Digger 1
     ",
         &CATALOG,
     )
