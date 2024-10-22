@@ -40,15 +40,15 @@ impl From<LocalEnvironment> for Environment {
 #[derive(Debug, Resource, Default)]
 pub struct AvailableActionList {
     list: action::AvailableActionList,
-    timestamp: u64,
+    timestamp: u32,
 }
 
 impl AvailableActionList {
-    pub fn new(list: action::AvailableActionList, timestamp: u64) -> Self {
+    pub fn new(list: action::AvailableActionList, timestamp: u32) -> Self {
         Self { list, timestamp }
     }
 
-    pub fn timestamp(&self) -> u64 {
+    pub fn timestamp(&self) -> u32 {
         self.timestamp
     }
 }

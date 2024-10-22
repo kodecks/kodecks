@@ -232,7 +232,7 @@ impl PlayerState {
                 state.debug.flags.contains(DebugFlags::IGNORE_COST)
                     || item.card.computed().cost.value() == 0
                     || self.shards.get(item.card.computed().color)
-                        >= item.card.computed().cost.value() as u32
+                        >= item.card.computed().cost.value()
             })
             .filter(|item| {
                 !item.card.computed().is_creature()
@@ -264,8 +264,8 @@ pub enum PlayerEndgameState {
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct PlayerCounters {
-    pub draw: u32,
-    pub free_casted: u32,
+    pub draw: u16,
+    pub free_casted: u16,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]

@@ -74,7 +74,7 @@ impl Environment {
                     })
                     .unwrap_or_default();
                 let source = self.state.find_card(source)?.snapshot();
-                let amount = ((amount as i32) + propagate).max(0) as u32;
+                let amount = ((amount as i32) + propagate).max(0) as u8;
                 let player = self.state.players.get_mut(player);
                 player.shards.add(color, amount);
                 Ok(vec![GameLog::ShardsEarned {

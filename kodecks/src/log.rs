@@ -14,7 +14,7 @@ pub enum GameLog {
         reason: EndgameReason,
     },
     TurnChanged {
-        turn: u32,
+        turn: u16,
         player: u8,
     },
     PhaseChanged {
@@ -43,13 +43,13 @@ pub enum GameLog {
         player: u8,
         source: CardSnapshot,
         color: Color,
-        amount: u32,
+        amount: u8,
     },
     ShardsSpent {
         player: u8,
         source: CardSnapshot,
         color: Color,
-        amount: u32,
+        amount: u8,
     },
     CardMoved {
         player: u8,

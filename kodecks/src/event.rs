@@ -49,7 +49,7 @@ impl CardEvent {
 
 bitflags! {
     #[derive(Clone, Copy, Eq, PartialEq)]
-    pub struct EventFilter: u32 {
+    pub struct EventFilter: u16 {
         const CASTED = 1 << 0;
         const DESTROYED = 1 << 1;
         const RETURNED_TO_HAND = 1 << 2;

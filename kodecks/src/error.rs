@@ -70,7 +70,7 @@ impl<'a> From<Error> for Request<'a, FluentArgs<'a>> {
 #[derive(Debug, Error, Clone, PartialEq, Eq)]
 pub enum ActionError {
     #[error("Insufficient shards: {color} {amount}")]
-    InsufficientShards { color: Color, amount: u32 },
+    InsufficientShards { color: Color, amount: u8 },
     #[error("Creature already free-casted")]
     CreatureAlreadyFreeCasted,
     #[error("Card not found: {id}")]

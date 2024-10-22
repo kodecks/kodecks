@@ -50,13 +50,13 @@ pub enum ActionCommand {
         player: u8,
         source: ObjectId,
         color: Color,
-        amount: u32,
+        amount: u8,
     },
     ConsumeShards {
         player: u8,
         source: ObjectId,
         color: Color,
-        amount: u32,
+        amount: u8,
     },
     BreakShield {
         target: TimedObjectId,

@@ -43,7 +43,7 @@ pub struct Environment {
     stack: Stack<StackItem>,
     continuous: ContinuousEffectList,
     endgame: EndgameState,
-    timestamp: u64,
+    timestamp: u32,
     last_available_actions: Option<PlayerAvailableActions>,
     rng: SmallRng,
     catalog: &'static Catalog,
@@ -430,5 +430,5 @@ pub struct Report {
     pub available_actions: Option<PlayerAvailableActions>,
     pub logs: Vec<GameLog>,
     pub endgame: EndgameState,
-    pub timestamp: u64,
+    pub timestamp: u32,
 }

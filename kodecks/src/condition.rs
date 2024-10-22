@@ -31,7 +31,7 @@ impl Condition for OnField {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct InTurn(pub u32);
+pub struct InTurn(pub u16);
 
 impl Condition for InTurn {
     fn is_met(&self, state: &GameState) -> bool {

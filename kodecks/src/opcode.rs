@@ -15,7 +15,7 @@ use std::fmt;
 pub enum Opcode {
     StartGame,
     ChangeTurn {
-        turn: u32,
+        turn: u16,
         player: u8,
         phase: Phase,
     },
@@ -33,13 +33,13 @@ pub enum Opcode {
         player: u8,
         source: ObjectId,
         color: Color,
-        amount: u32,
+        amount: u8,
     },
     ConsumeShards {
         player: u8,
         source: ObjectId,
         color: Color,
-        amount: u32,
+        amount: u8,
     },
     BreakShield {
         card: ObjectId,
@@ -53,7 +53,7 @@ pub enum Opcode {
     CastCard {
         player: u8,
         card: ObjectId,
-        cost: u32,
+        cost: u8,
     },
     MoveCard {
         card: ObjectId,

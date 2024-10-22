@@ -75,7 +75,7 @@ pub struct Card {
     event_filter: EventFilter,
     effect: Box<dyn Effect>,
     revealed: PlayerMask,
-    timestamp: u64,
+    timestamp: u32,
     is_token: bool,
 }
 
@@ -202,11 +202,11 @@ impl Card {
         self.effect = effect;
     }
 
-    pub fn timestamp(&self) -> u64 {
+    pub fn timestamp(&self) -> u32 {
         self.timestamp
     }
 
-    pub fn set_timestamp(&mut self, timestamp: u64) {
+    pub fn set_timestamp(&mut self, timestamp: u32) {
         self.timestamp = timestamp;
     }
 
@@ -307,7 +307,7 @@ pub struct CardSnapshot {
     pub owner: u8,
     pub revealed: PlayerMask,
     pub computed: Option<ComputedAttribute>,
-    pub timestamp: u64,
+    pub timestamp: u32,
     pub is_token: bool,
 }
 

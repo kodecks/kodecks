@@ -19,7 +19,7 @@ use super::LocalEnvironment;
 pub struct GameState {
     pub regulation: Regulation,
     pub debug: DebugConfig,
-    pub turn: u32,
+    pub turn: u16,
     pub phase: Phase,
     pub players: PlayerList<PlayerState>,
 }

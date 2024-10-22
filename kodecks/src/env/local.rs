@@ -17,8 +17,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct LocalEnvironment {
     pub player: u8,
-    pub turn: u32,
-    pub timestamp: u64,
+    pub turn: u16,
+    pub timestamp: u32,
     pub players: PlayerList<LocalPlayerState>,
     pub phase: Phase,
     pub stack: Stack<LocalStackItem>,

@@ -66,7 +66,7 @@ impl ComputedAttribute {
 
 bitflags! {
     #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, )]
-    pub struct ComputedFlags: u32 {
+    pub struct ComputedFlags: u8 {
         const TARGETABLE = 0b00000001;
     }
 }

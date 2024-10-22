@@ -5,7 +5,6 @@ use crate::{
     condition::Condition,
     env::GameState,
     id::ObjectId,
-    
 };
 use core::fmt;
 use dyn_clone::DynClone;
@@ -15,7 +14,7 @@ use tracing::error;
 #[derive(Clone)]
 pub struct ContinuousItem {
     source: ObjectId,
-    timestamp: u64,
+    timestamp: u32,
     func: Arc<Box<dyn ContinuousEffect>>,
     condition: Arc<Box<dyn Condition>>,
 }
@@ -109,11 +108,7 @@ impl ContinuousEffectList {
         computed
     }
 
-    pub fn apply_player(
-        &mut self,
-        state: &GameState,
-        player: u8,
-    ) -> AbilityList<PlayerAbility> {
+    pub fn apply_player(&mut self, state: &GameState, player: u8) -> AbilityList<PlayerAbility> {
         let mut abilities = AbilityList::new();
         for effect in self.effects.iter_mut().rev() {
             if let Err(err) = dyn_clone::arc_make_mut(&mut effect.func).apply_player(

@@ -139,7 +139,7 @@ impl Environment {
                         let cost = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                             0
                         } else {
-                            item.card.computed().cost.value() as u32
+                            item.card.computed().cost.value()
                         };
                         if player_in_turn.shards.get(color) < cost {
                             return Err(ActionError::InsufficientShards {
@@ -245,7 +245,7 @@ impl Environment {
                     let cost = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                         0
                     } else {
-                        item.card.computed().cost.value() as u32
+                        item.card.computed().cost.value()
                     };
                     if active_player.shards.get(color) < cost {
                         return Err(ActionError::InsufficientShards {
