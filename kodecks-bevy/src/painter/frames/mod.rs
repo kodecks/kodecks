@@ -144,11 +144,11 @@ const FRAME_IMAGES: &[(Color, &[u8])] = &[
 ];
 
 const DECK_FRAME_IMAGES: &[(Color, &[u8])] = &[
-    (Color::RED, include_bytes!("deck_frame_green.png")),
-    (Color::YELLOW, include_bytes!("deck_frame_green.png")),
+    (Color::RED, include_bytes!("deck_frame_red.png")),
+    (Color::YELLOW, include_bytes!("deck_frame_yellow.png")),
     (Color::GREEN, include_bytes!("deck_frame_green.png")),
-    (Color::BLUE, include_bytes!("deck_frame_green.png")),
-    (Color::empty(), include_bytes!("deck_frame_green.png")),
+    (Color::BLUE, include_bytes!("deck_frame_blue.png")),
+    (Color::empty(), include_bytes!("deck_frame_colorless.png")),
 ];
 
 const CREATURE_TYPES: &[(CreatureType, &[u8])] = &[
