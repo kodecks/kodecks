@@ -4,7 +4,7 @@ use futures::{
     channel::mpsc::{self, Sender},
     StreamExt,
 };
-use kodecks_catalog::decks::starter_deck;
+use kodecks_catalog::{decks::starter_deck, CATALOG};
 
 mod container;
 mod v1;
@@ -25,6 +25,7 @@ impl SaveData {
     pub fn load(opts: &StartupOptions) -> Self {
         let mut data = io::read_data(opts);
         data.decks.list = vec![starter_deck()];
+        data.inventory.cards = CATALOG.iter().map(|card| (card.id, 4)).collect();
         data
     }
 }

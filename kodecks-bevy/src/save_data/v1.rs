@@ -1,6 +1,6 @@
 use base64::{engine::general_purpose::URL_SAFE, Engine as _};
 use k256::schnorr::SigningKey;
-use kodecks::card::CardEntry;
+use kodecks::card::ArchetypeId;
 use kodecks::deck::DeckList;
 use kodecks_engine::version::VersionTag;
 use serde::{Deserialize, Serialize};
@@ -45,7 +45,7 @@ impl Decks {
 #[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Inventory {
     #[serde(default)]
-    pub cards: BTreeMap<CardEntry, usize>,
+    pub cards: BTreeMap<ArchetypeId, u8>,
 }
 
 #[derive(Clone, DefaultFromSerde, Serialize, Deserialize)]
