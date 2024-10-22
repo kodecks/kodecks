@@ -389,24 +389,24 @@ impl fmt::Display for ArchetypeId {
 
 impl Encode for ArchetypeId {
     fn encode<E: Encoder>(&self, encoder: &mut E) -> Result<(), EncodeError> {
-        Encode::encode(self.0.as_str(), encoder)?;
+        Encode::encode(&u64::from_be_bytes(*self.0.all_bytes()), encoder)?;
         Ok(())
     }
 }
 
 impl Decode for ArchetypeId {
     fn decode<D: Decoder>(decoder: &mut D) -> Result<Self, DecodeError> {
-        Ok(Self(TinyAsciiStr::from_bytes_lossy(
-            <String as Decode>::decode(decoder)?.as_bytes(),
-        )))
+        let bytes = <u64 as Decode>::decode(decoder)?.to_be_bytes();
+        let len = bytes.iter().position(|&b| b == 0).unwrap_or(8);
+        Ok(Self(TinyAsciiStr::from_bytes_lossy(&bytes[..len])))
     }
 }
 
 impl<'de> BorrowDecode<'de> for ArchetypeId {
     fn borrow_decode<D: BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, DecodeError> {
-        Ok(Self(TinyAsciiStr::from_bytes_lossy(
-            <String as Decode>::decode(decoder)?.as_bytes(),
-        )))
+        let bytes = <u64 as Decode>::decode(decoder)?.to_be_bytes();
+        let len = bytes.iter().position(|&b| b == 0).unwrap_or(8);
+        Ok(Self(TinyAsciiStr::from_bytes_lossy(&bytes[..len])))
     }
 }
 
