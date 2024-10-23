@@ -27,6 +27,7 @@ struct UiRoot;
 enum MenuEvent {
     StartBotMatch { deck_list: DeckList },
     StartRandomMatch,
+    EditDeck,
 }
 
 fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<AssetServer>) {
@@ -195,6 +196,37 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
                                 Label,
                             ));
                         });
+
+                    parent
+                        .spawn((
+                            ImageBundle {
+                                style: Style {
+                                    width: Val::Px(280.),
+                                    height: Val::Px(50.),
+                                    padding: UiRect::all(Val::Px(15.)),
+                                    justify_content: JustifyContent::Center,
+                                    align_items: AlignItems::Center,
+                                    ..default()
+                                },
+                                image: button.clone().into(),
+                                ..default()
+                            },
+                            ImageScaleMode::Sliced(slicer.clone()),
+                            On::<Pointer<Click>>::commands_mut(move |_, commands| {
+                                commands.add(move |w: &mut World| {
+                                    w.send_event(MenuEvent::EditDeck);
+                                });
+                            }),
+                        ))
+                        .with_children(|parent| {
+                            parent.spawn((
+                                TextBundle::from_section(
+                                    translator.get("menu-button-deck-edit"),
+                                    translator.style(TextPurpose::Button),
+                                ),
+                                Label,
+                            ));
+                        });
                 });
         });
 
@@ -246,18 +278,23 @@ fn handle_menu_events(
         return;
     };
 
-    let deck = match &event {
-        MenuEvent::StartBotMatch { .. } => save_data.decks.get_default("offline").unwrap(),
-        MenuEvent::StartRandomMatch => save_data.decks.get_default("online").unwrap(),
-    };
-
-    let kind = match event {
-        MenuEvent::StartBotMatch { deck_list } => GameModeKind::BotMatch {
-            bot_deck: deck_list.clone(),
-        },
-        MenuEvent::StartRandomMatch => GameModeKind::RandomMatch {
-            server: config.server.clone(),
-        },
+    let (kind, deck) = match &event {
+        MenuEvent::StartBotMatch { deck_list } => (
+            GameModeKind::BotMatch {
+                bot_deck: deck_list.clone(),
+            },
+            save_data.decks.get_default("offline").unwrap(),
+        ),
+        MenuEvent::StartRandomMatch => (
+            GameModeKind::RandomMatch {
+                server: config.server.clone(),
+            },
+            save_data.decks.get_default("online").unwrap(),
+        ),
+        MenuEvent::EditDeck => {
+            next_state.set(GlobalState::DeckMain);
+            return;
+        }
     };
 
     let mode = GameMode {

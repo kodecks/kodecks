@@ -20,6 +20,7 @@ pub enum GlobalState {
     GameMain,
     GameResult,
     GameCleanup,
+    DeckMain,
 }
 
 pub struct ScenePlugin;

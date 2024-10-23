@@ -1,6 +1,7 @@
 menu-button-cpu-match-1 = CPU対戦1
 menu-button-cpu-match-2 = CPU対戦2
 menu-button-random-match = ランダム対戦
+menu-button-deck-edit = デッキ編集
 
 loading-message-finding-player = プレイヤーを探しています...
 loading-button-cancel = キャンセル
