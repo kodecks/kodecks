@@ -747,7 +747,7 @@ pub fn handle_card_events(
     board: Res<Board>,
     list: Res<AvailableActionList>,
     mut events: CardEvents,
-    mut card_query: Query<(&mut Transform, &mut Card)>,
+    mut card_query: Query<(&mut Transform, &mut Card, &mut AnimationPlayer)>,
     parent_query: Query<&Parent>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
 ) {
@@ -755,7 +755,7 @@ pub fn handle_card_events(
         let mut target = event.target;
         while let Ok(parent) = parent_query.get(target) {
             target = parent.get();
-            if let Ok((_, card)) = card_query.get(target) {
+            if let Ok((_, card, _)) = card_query.get(target) {
                 events.player.send(PlayerEvent::CardClicked(card.id));
                 break;
             }
@@ -793,7 +793,7 @@ pub fn handle_card_events(
     }
 
     if let Some(drag) = drag {
-        if let Ok((_, card)) = card_query.get(drag.entity) {
+        if let Ok((_, card, _)) = card_query.get(drag.entity) {
             if !board.player_hand.contains(&card.id) && !list.blockers().contains(&card.id) {
                 return;
             }
@@ -803,7 +803,7 @@ pub fn handle_card_events(
         let top_left = Vec3::new(-0.5, -1.0, -0.5);
         let bottom_right = Vec3::new(0.5, 1.0, 0.5);
 
-        let mut targets = if let Ok((transform, dragged_card)) = card_query.get(drag.entity) {
+        let mut targets = if let Ok((transform, dragged_card, _)) = card_query.get(drag.entity) {
             let dragged_aabb = Aabb3d::from_point_cloud(
                 transform.translation,
                 transform.rotation,
@@ -812,8 +812,8 @@ pub fn handle_card_events(
 
             card_query
                 .iter()
-                .filter(|(_, card)| card.id != dragged_card.id)
-                .filter_map(|(transform, card)| {
+                .filter(|(_, card, _)| card.id != dragged_card.id)
+                .filter_map(|(transform, card, _)| {
                     let aabb = Aabb3d::from_point_cloud(
                         transform.translation,
                         transform.rotation,
@@ -831,7 +831,7 @@ pub fn handle_card_events(
         };
         targets.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap());
 
-        if let Ok((mut transform, card)) = card_query.get_mut(drag.entity) {
+        if let Ok((mut transform, card, mut anim)) = card_query.get_mut(drag.entity) {
             let z = 3.5;
             let y = 2.5;
 
@@ -851,6 +851,7 @@ pub fn handle_card_events(
                     .map(|distance| ray.get_point(distance))
             });
 
+            *anim = AnimationPlayer::default();
             if drag.drop && field_pos.is_some() {
                 if let Some((target, _)) = targets.first() {
                     events
@@ -868,19 +869,3 @@ pub fn handle_card_events(
         }
     }
 }
-
-/*
-fn switch_card_id(
-    state: Res<ConsoleUiState>,
-    mut query: Query<&mut Visibility, With<CardIdOverlay>>,
-) {
-    let visible = state.open();
-    query.par_iter_mut().for_each(|mut visibility| {
-        *visibility = if visible {
-            Visibility::Visible
-        } else {
-            Visibility::Hidden
-        };
-    });
-}
-*/
