@@ -46,13 +46,17 @@ fn main() {
             ..default()
         });
 
-    app.add_plugins(default_plugins)
-        .add_plugins((
-            input::InputPlugin,
-            scene::ScenePlugin,
-            save_data::SaveDataPlugin,
-        ))
-        .run();
+    let app = app.add_plugins(default_plugins);
+
+    #[cfg(feature = "inspector")]
+    let app = app.add_plugins(bevy_inspector_egui::quick::WorldInspectorPlugin::new());
+
+    app.add_plugins((
+        input::InputPlugin,
+        scene::ScenePlugin,
+        save_data::SaveDataPlugin,
+    ))
+    .run();
 }
 
 pub fn app_version() -> String {
