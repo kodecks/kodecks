@@ -575,7 +575,7 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
                     material: handles.card_back_material.clone(),
                     transform: Transform::from_scale(Vec3::splat(1.0 / CARD_WIDTH))
                         .with_rotation(Quat::from_rotation_z(std::f32::consts::PI))
-                        .with_translation(Vec3::new(0.0, -0.001, 0.0)),
+                        .with_translation(Vec3::new(0.0, -0.001, -1.0 / CARD_WIDTH * 6.0)),
                     ..default()
                 });
                 parent.spawn((

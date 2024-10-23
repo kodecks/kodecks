@@ -295,7 +295,7 @@ impl Board {
                 let x_offset = index as f32 - (self.opponent_hand.len() - 1) as f32 / 2.0;
                 let x = 1.1 * x_offset;
                 let y = 3.0 + 0.01 * index as f32;
-                let z = -2.4;
+                let z = -2.3;
 
                 let mut transform = Transform::from_xyz(0.0, 4.0, z)
                     .looking_at(camera_pos + Vec3::new(0.0, 0.0, z), Vec3::Y);
