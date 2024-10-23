@@ -25,10 +25,13 @@ fn init(mut commands: Commands) {
         (UserAction::Block, KeyCode::KeyA),
         (UserAction::Continue, KeyCode::Space),
     ]);
-    input_map.insert_chord(UserAction::AllAttack, [KeyCode::ShiftLeft, KeyCode::KeyA]);
-    input_map.insert_chord(
+    input_map.insert(
+        UserAction::AllAttack,
+        ButtonlikeChord::new([KeyCode::ShiftLeft, KeyCode::KeyA]),
+    );
+    input_map.insert(
         UserAction::Concede,
-        [KeyCode::ShiftLeft, KeyCode::ControlLeft, KeyCode::KeyO],
+        ButtonlikeChord::new([KeyCode::ShiftLeft, KeyCode::ControlLeft, KeyCode::KeyO]),
     );
     commands.spawn(InputManagerBundle::with_map(input_map));
 }
