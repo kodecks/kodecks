@@ -2,10 +2,12 @@ use super::{
     translator::{TextPurpose, Translator},
     GlobalState,
 };
+use crate::save_data::SaveData;
 use bevy::{
     input::mouse::{MouseScrollUnit, MouseWheel},
     prelude::*,
 };
+use kodecks_catalog::CATALOG;
 
 pub struct DeckPlugin;
 
@@ -17,7 +19,21 @@ impl Plugin for DeckPlugin {
     }
 }
 
-fn init(mut commands: Commands, translator: Res<Translator>) {
+fn init(
+    mut commands: Commands,
+    translator: Res<Translator>,
+    save_data: Res<SaveData>,
+    asset_server: Res<AssetServer>,
+) {
+    let deck = save_data.decks.get_default("offline").unwrap();
+
+    let slicer = TextureSlicer {
+        border: BorderRect::square(2.0),
+        center_scale_mode: SliceScaleMode::Tile { stretch_value: 1.0 },
+        sides_scale_mode: SliceScaleMode::Tile { stretch_value: 1.0 },
+        max_corner_scale: 1.0,
+    };
+
     commands
         .spawn((NodeBundle {
             style: Style {
@@ -37,7 +53,7 @@ fn init(mut commands: Commands, translator: Res<Translator>) {
                     style: Style {
                         flex_direction: FlexDirection::Column,
                         height: Val::Percent(50.),
-                        width: Val::Px(320.0),
+                        width: Val::Px(520.0),
                         overflow: Overflow::clip_y(),
                         ..default()
                     },
@@ -58,14 +74,41 @@ fn init(mut commands: Commands, translator: Res<Translator>) {
                             ScrollingList::default(),
                         ))
                         .with_children(|parent| {
-                            for i in 0..30 {
-                                parent.spawn((
-                                    TextBundle::from_section(
-                                        format!("Item {i}"),
-                                        translator.style(TextPurpose::Button),
-                                    ),
-                                    Label,
+                            for item in &deck.cards {
+                                let archetype = &CATALOG[item.card.archetype_id];
+                                let id = format!("card-{}", archetype.safe_name);
+                                //let name = translator.get(&id);
+                                let image = asset_server.load(format!(
+                                    "cards/{}/image.main.png#deck",
+                                    archetype.safe_name
                                 ));
+
+                                parent
+                                    .spawn(NodeBundle {
+                                        style: Style {
+                                            width: Val::Percent(100.),
+                                            height: Val::Px(60.),
+                                            ..default()
+                                        },
+                                        ..default()
+                                    })
+                                    .with_children(|parent| {
+                                        parent.spawn((
+                                            ButtonBundle {
+                                                style: Style {
+                                                    width: Val::Percent(100.),
+                                                    height: Val::Percent(100.),
+                                                    padding: UiRect::all(Val::Px(15.)),
+                                                    justify_content: JustifyContent::Center,
+                                                    align_items: AlignItems::Center,
+                                                    ..default()
+                                                },
+                                                image: UiImage::new(image),
+                                                ..default()
+                                            },
+                                            ImageScaleMode::Sliced(slicer.clone()),
+                                        ));
+                                    });
                             }
                         });
                 });
