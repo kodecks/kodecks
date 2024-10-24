@@ -439,6 +439,20 @@ pub struct CardArchetype {
     pub effect: fn() -> Box<dyn Effect>,
 }
 
+impl PartialOrd for CardArchetype {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for CardArchetype {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.attribute
+            .cmp(&other.attribute)
+            .then(self.id.cmp(&other.id))
+    }
+}
+
 impl CardArchetype {
     pub const NONE: fn() -> &'static CardArchetype = || {
         static CACHE: LazyLock<CardArchetype> = LazyLock::new(CardArchetype::default);
