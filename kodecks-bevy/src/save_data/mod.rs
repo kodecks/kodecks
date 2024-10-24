@@ -25,7 +25,11 @@ impl SaveData {
     pub fn load(opts: &StartupOptions) -> Self {
         let mut data = io::read_data(opts);
         data.decks.list = vec![starter_deck()];
-        data.inventory.cards = CATALOG.iter().map(|card| (card.id, 4)).collect();
+        data.inventory.cards = CATALOG
+            .iter()
+            .filter(|card| !card.attribute.is_token)
+            .map(|card| (card.id, 4))
+            .collect();
         data
     }
 }
