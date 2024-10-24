@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 bitflags! {
-    #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
+    #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
     pub struct Color: u8 {
         const COLORLESS = 0b00000000;
         const RED = 0b00000001;

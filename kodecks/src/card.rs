@@ -493,7 +493,38 @@ impl Default for CardAttribute {
     }
 }
 
-#[derive(Debug, Clone, Copy, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
+impl PartialOrd for CardAttribute {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for CardAttribute {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.cost
+            .cmp(&other.cost)
+            .then(self.color.cmp(&other.color))
+            .then(self.card_type.cmp(&other.card_type))
+            .then(self.creature_type.cmp(&other.creature_type))
+            .then(self.power.cmp(&other.power))
+            .then(self.shields.cmp(&other.shields))
+    }
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Display,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    Encode,
+    Decode,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum CardType {
     Creature,
@@ -501,7 +532,19 @@ pub enum CardType {
 }
 
 #[derive(
-    Debug, Clone, Copy, Display, PartialEq, Eq, Serialize, Deserialize, Hash, Encode, Decode,
+    Debug,
+    Clone,
+    Copy,
+    Display,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    Hash,
+    Encode,
+    Decode,
 )]
 #[serde(rename_all = "snake_case")]
 pub enum CreatureType {
