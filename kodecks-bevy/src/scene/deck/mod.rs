@@ -6,6 +6,7 @@ use crate::save_data::SaveData;
 use bevy::{
     input::mouse::{MouseScrollUnit, MouseWheel},
     prelude::*,
+    text::BreakLineOn,
 };
 use kodecks_catalog::CATALOG;
 
@@ -29,10 +30,12 @@ fn init(
 
     let slicer = TextureSlicer {
         border: BorderRect::square(2.0),
-        center_scale_mode: SliceScaleMode::Tile { stretch_value: 1.0 },
-        sides_scale_mode: SliceScaleMode::Tile { stretch_value: 1.0 },
-        max_corner_scale: 1.0,
+        center_scale_mode: SliceScaleMode::Stretch,
+        sides_scale_mode: SliceScaleMode::Stretch,
+        max_corner_scale: 2.0,
     };
+
+    let end = asset_server.load(format!("frames/deck_frame_end.png"));
 
     commands
         .spawn((NodeBundle {
@@ -53,11 +56,11 @@ fn init(
                     style: Style {
                         flex_direction: FlexDirection::Column,
                         height: Val::Percent(50.),
-                        width: Val::Px(520.0),
+                        width: Val::Px(320.0),
                         overflow: Overflow::clip_y(),
                         ..default()
                     },
-                    background_color: Color::srgb(0.10, 0.10, 0.10).into(),
+                    background_color: Color::srgb(1.0, 1.0, 1.0).into(),
                     ..default()
                 })
                 .with_children(|parent| {
@@ -77,7 +80,7 @@ fn init(
                             for item in &deck.cards {
                                 let archetype = &CATALOG[item.card.archetype_id];
                                 let id = format!("card-{}", archetype.safe_name);
-                                //let name = translator.get(&id);
+                                let name = translator.get(&id);
                                 let image = asset_server.load(format!(
                                     "cards/{}/image.main.png#deck",
                                     archetype.safe_name
@@ -86,28 +89,66 @@ fn init(
                                 parent
                                     .spawn(NodeBundle {
                                         style: Style {
+                                            flex_direction: FlexDirection::Row,
                                             width: Val::Percent(100.),
-                                            height: Val::Px(60.),
+                                            height: Val::Px(36.),
                                             ..default()
                                         },
                                         ..default()
                                     })
                                     .with_children(|parent| {
-                                        parent.spawn((
-                                            ButtonBundle {
-                                                style: Style {
-                                                    width: Val::Percent(100.),
-                                                    height: Val::Percent(100.),
-                                                    padding: UiRect::all(Val::Px(15.)),
-                                                    justify_content: JustifyContent::Center,
-                                                    align_items: AlignItems::Center,
-                                                    ..default()
-                                                },
-                                                image: UiImage::new(image),
+                                        parent.spawn((ImageBundle {
+                                            style: Style {
+                                                width: Val::Px(96.),
+                                                height: Val::Percent(100.),
+                                                padding: UiRect::all(Val::Px(15.)),
+                                                justify_content: JustifyContent::Center,
+                                                align_items: AlignItems::Center,
                                                 ..default()
                                             },
-                                            ImageScaleMode::Sliced(slicer.clone()),
-                                        ));
+                                            image: UiImage::new(image.clone()),
+                                            ..default()
+                                        },));
+                                        parent
+                                            .spawn((
+                                                ImageBundle {
+                                                    style: Style {
+                                                        width: Val::Px(100.),
+                                                        height: Val::Percent(100.),
+                                                        padding: UiRect::all(Val::Px(5.)),
+                                                        justify_content: JustifyContent::Center,
+                                                        align_items: AlignItems::Start,
+                                                        flex_grow: 1.,
+                                                        overflow: Overflow::clip_x(),
+                                                        ..default()
+                                                    },
+                                                    image: UiImage::new(end.clone()),
+                                                    ..default()
+                                                },
+                                                ImageScaleMode::Sliced(slicer.clone()),
+                                            ))
+                                            .with_children(|parent| {
+                                                parent.spawn((
+                                                    TextBundle {
+                                                        text: Text {
+                                                            sections: vec![TextSection {
+                                                                value: name.to_string(),
+                                                                style: translator
+                                                                    .style(TextPurpose::Button),
+                                                            }],
+                                                            justify: JustifyText::Left,
+                                                            linebreak_behavior: BreakLineOn::NoWrap,
+                                                        },
+                                                        style: Style {
+                                                            width: Val::Percent(100.),
+                                                            height: Val::Percent(100.),
+                                                            ..default()
+                                                        },
+                                                        ..Default::default()
+                                                    },
+                                                    Label,
+                                                ));
+                                            });
                                     });
                             }
                         });
