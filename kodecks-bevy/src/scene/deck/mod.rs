@@ -26,8 +26,6 @@ fn init(
     save_data: Res<SaveData>,
     asset_server: Res<AssetServer>,
 ) {
-    let deck = save_data.decks.get_default("offline").unwrap();
-
     let slicer = TextureSlicer {
         border: BorderRect::square(2.0),
         center_scale_mode: SliceScaleMode::Stretch,
@@ -36,6 +34,14 @@ fn init(
     };
 
     let end = asset_server.load(format!("frames/deck_frame_end.png"));
+
+    let deck = save_data.decks.get_default("offline").unwrap();
+    let mut deck = deck
+        .cards
+        .iter()
+        .map(|item| &CATALOG[item.card.archetype_id])
+        .collect::<Vec<_>>();
+    deck.sort_by_key(|card| card.attribute.cost);
 
     commands
         .spawn((NodeBundle {
@@ -77,8 +83,7 @@ fn init(
                             ScrollingList::default(),
                         ))
                         .with_children(|parent| {
-                            for item in &deck.cards {
-                                let archetype = &CATALOG[item.card.archetype_id];
+                            for archetype in &deck {
                                 let id = format!("card-{}", archetype.safe_name);
                                 let name = translator.get(&id);
                                 let image = asset_server.load(format!(
