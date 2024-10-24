@@ -47,9 +47,9 @@ fn init(
         .inventory
         .cards
         .iter()
-        .map(|(id, _)| &CATALOG[*id])
+        .map(|(id, count)| (&CATALOG[*id], *count))
         .collect::<Vec<_>>();
-    inventory.sort();
+    inventory.sort_by_key(|(card, _)| *card);
 
     commands
         .spawn((NodeBundle {
@@ -69,7 +69,7 @@ fn init(
                 .spawn(NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Column,
-                        height: Val::Percent(50.),
+                        height: Val::Percent(80.),
                         width: Val::Px(320.0),
                         overflow: Overflow::clip_y(),
                         ..default()
@@ -90,7 +90,7 @@ fn init(
                             ScrollingList::default(),
                         ))
                         .with_children(|parent| {
-                            for archetype in &inventory {
+                            for (archetype, count) in &inventory {
                                 let id = format!("card-{}", archetype.safe_name);
                                 let name = translator.get(&id);
                                 let image = asset_server.load(format!(
@@ -102,6 +102,7 @@ fn init(
                                     .spawn(NodeBundle {
                                         style: Style {
                                             flex_direction: FlexDirection::Row,
+                                            align_items: AlignItems::Center,
                                             width: Val::Percent(100.),
                                             height: Val::Px(36.),
                                             ..default()
@@ -109,6 +110,37 @@ fn init(
                                         ..default()
                                     })
                                     .with_children(|parent| {
+                                        parent
+                                            .spawn(NodeBundle {
+                                                style: Style {
+                                                    flex_direction: FlexDirection::Row,
+                                                    align_items: AlignItems::Center,
+                                                    justify_content: JustifyContent::Center,
+                                                    width: Val::Px(32.),
+                                                    height: Val::Percent(100.),
+                                                    ..default()
+                                                },
+                                                ..default()
+                                            })
+                                            .with_children(|parent| {
+                                                parent.spawn((
+                                                    TextBundle {
+                                                        text: Text {
+                                                            sections: vec![TextSection {
+                                                                value: count.to_string(),
+                                                                style: translator
+                                                                    .style(TextPurpose::Button),
+                                                            }],
+                                                            justify: JustifyText::Center,
+                                                            linebreak_behavior: BreakLineOn::NoWrap,
+                                                        },
+                                                        style: Style { ..default() },
+                                                        ..Default::default()
+                                                    },
+                                                    Label,
+                                                ));
+                                            });
+
                                         parent.spawn((ImageBundle {
                                             style: Style {
                                                 width: Val::Px(96.),
@@ -121,6 +153,7 @@ fn init(
                                             image: UiImage::new(image.clone()),
                                             ..default()
                                         },));
+
                                         parent
                                             .spawn((
                                                 ImageBundle {
@@ -170,7 +203,7 @@ fn init(
                 .spawn(NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Column,
-                        height: Val::Percent(50.),
+                        height: Val::Percent(80.),
                         width: Val::Px(320.0),
                         overflow: Overflow::clip_y(),
                         ..default()
