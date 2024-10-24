@@ -41,7 +41,15 @@ fn init(
         .iter()
         .map(|item| &CATALOG[item.card.archetype_id])
         .collect::<Vec<_>>();
-    deck.sort_by_key(|card| card.attribute.cost);
+    deck.sort();
+
+    let mut inventory = save_data
+        .inventory
+        .cards
+        .iter()
+        .map(|(id, _)| &CATALOG[*id])
+        .collect::<Vec<_>>();
+    inventory.sort();
 
     commands
         .spawn((NodeBundle {
@@ -51,7 +59,7 @@ fn init(
                 justify_content: JustifyContent::Center,
                 align_content: AlignContent::Center,
                 align_items: AlignItems::Center,
-                flex_direction: FlexDirection::Column,
+                flex_direction: FlexDirection::Row,
                 ..default()
             },
             ..default()
@@ -66,7 +74,107 @@ fn init(
                         overflow: Overflow::clip_y(),
                         ..default()
                     },
-                    background_color: Color::srgb(1.0, 1.0, 1.0).into(),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent
+                        .spawn((
+                            NodeBundle {
+                                style: Style {
+                                    flex_direction: FlexDirection::Column,
+                                    align_items: AlignItems::Center,
+                                    ..default()
+                                },
+                                ..default()
+                            },
+                            ScrollingList::default(),
+                        ))
+                        .with_children(|parent| {
+                            for archetype in &inventory {
+                                let id = format!("card-{}", archetype.safe_name);
+                                let name = translator.get(&id);
+                                let image = asset_server.load(format!(
+                                    "cards/{}/image.main.png#deck",
+                                    archetype.safe_name
+                                ));
+
+                                parent
+                                    .spawn(NodeBundle {
+                                        style: Style {
+                                            flex_direction: FlexDirection::Row,
+                                            width: Val::Percent(100.),
+                                            height: Val::Px(36.),
+                                            ..default()
+                                        },
+                                        ..default()
+                                    })
+                                    .with_children(|parent| {
+                                        parent.spawn((ImageBundle {
+                                            style: Style {
+                                                width: Val::Px(96.),
+                                                height: Val::Percent(100.),
+                                                padding: UiRect::all(Val::Px(15.)),
+                                                justify_content: JustifyContent::Center,
+                                                align_items: AlignItems::Center,
+                                                ..default()
+                                            },
+                                            image: UiImage::new(image.clone()),
+                                            ..default()
+                                        },));
+                                        parent
+                                            .spawn((
+                                                ImageBundle {
+                                                    style: Style {
+                                                        width: Val::Px(100.),
+                                                        height: Val::Percent(100.),
+                                                        padding: UiRect::all(Val::Px(5.)),
+                                                        justify_content: JustifyContent::Center,
+                                                        align_items: AlignItems::Start,
+                                                        flex_grow: 1.,
+                                                        overflow: Overflow::clip_x(),
+                                                        ..default()
+                                                    },
+                                                    image: UiImage::new(end.clone()),
+                                                    ..default()
+                                                },
+                                                ImageScaleMode::Sliced(slicer.clone()),
+                                            ))
+                                            .with_children(|parent| {
+                                                parent.spawn((
+                                                    TextBundle {
+                                                        text: Text {
+                                                            sections: vec![TextSection {
+                                                                value: name.to_string(),
+                                                                style: translator
+                                                                    .style(TextPurpose::Button),
+                                                            }],
+                                                            justify: JustifyText::Left,
+                                                            linebreak_behavior: BreakLineOn::NoWrap,
+                                                        },
+                                                        style: Style {
+                                                            width: Val::Percent(100.),
+                                                            height: Val::Percent(100.),
+                                                            ..default()
+                                                        },
+                                                        ..Default::default()
+                                                    },
+                                                    Label,
+                                                ));
+                                            });
+                                    });
+                            }
+                        });
+                });
+
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Column,
+                        height: Val::Percent(50.),
+                        width: Val::Px(320.0),
+                        overflow: Overflow::clip_y(),
+                        ..default()
+                    },
                     ..default()
                 })
                 .with_children(|parent| {
