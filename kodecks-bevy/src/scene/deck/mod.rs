@@ -79,7 +79,7 @@ fn init(
         max_corner_scale: 2.0,
     };
 
-    let end = asset_server.load(format!("frames/deck_frame_end.png"));
+    let end = asset_server.load("frames/deck_frame_end.png".to_string());
 
     let deck = save_data.decks.get_default("offline").unwrap();
     let mut deck = deck
