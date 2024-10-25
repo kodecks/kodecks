@@ -16,19 +16,52 @@ pub struct DeckPlugin;
 
 impl Plugin for DeckPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<DeckEvent>()
+        app.init_resource::<UIState>()
+            .add_event::<DeckEvent>()
             .add_systems(OnEnter(GlobalState::DeckMain), init)
             .add_systems(OnExit(GlobalState::DeckMain), cleanup)
             .add_systems(
                 Update,
-                (mouse_scroll, handle_event).run_if(in_state(GlobalState::DeckMain)),
+                (
+                    mouse_scroll,
+                    handle_event,
+                    (update_card_image, update_card_info)
+                        .run_if(resource_exists_and_changed::<UIState>),
+                )
+                    .run_if(in_state(GlobalState::DeckMain)),
             );
     }
 }
 
+#[derive(Clone, Copy, Component)]
+enum CardInfo {
+    Image,
+    Name,
+    Text,
+}
+
+#[derive(Component)]
+pub struct InventoryItem(ArchetypeId);
+
+#[derive(Component)]
+pub struct DeckItem(ArchetypeId);
+
+#[derive(Component)]
+pub struct KeywordList;
+
+#[derive(Component)]
+pub struct Keyword;
+
 #[derive(Debug, Event)]
 enum DeckEvent {
     CardHovered(ArchetypeId),
+    RemoveFromDeck(ArchetypeId),
+    AddToDeck(ArchetypeId),
+}
+
+#[derive(Debug, Resource, Default)]
+pub struct UIState {
+    pub selected_card: Option<ArchetypeId>,
 }
 
 fn init(
@@ -77,6 +110,114 @@ fn init(
         },))
         .with_children(|parent| {
             parent
+                .spawn((
+                    NodeBundle {
+                        style: Style {
+                            width: Val::Px(260.),
+                            height: Val::Percent(80.0),
+                            justify_content: JustifyContent::Start,
+                            flex_direction: FlexDirection::Column,
+                            ..default()
+                        },
+                        ..default()
+                    },
+                    Pickable::IGNORE,
+                ))
+                .with_children(|parent| {
+                    parent
+                        .spawn((
+                            NodeBundle {
+                                style: Style {
+                                    width: Val::Auto,
+                                    padding: UiRect::all(Val::Px(10.)),
+                                    justify_content: JustifyContent::Start,
+                                    align_items: AlignItems::End,
+                                    flex_direction: FlexDirection::Row,
+                                    ..default()
+                                },
+                                ..default()
+                            },
+                            Pickable::IGNORE,
+                        ))
+                        .with_children(|parent| {
+                            parent.spawn((
+                                ImageBundle {
+                                    style: Style {
+                                        width: Val::Px(60.),
+                                        height: Val::Px(60. / 36. * 48.),
+                                        padding: UiRect::all(Val::Px(5.)),
+                                        ..default()
+                                    },
+                                    ..default()
+                                },
+                                CardInfo::Image,
+                            ));
+
+                            parent.spawn((
+                                TextBundle::from_section(
+                                    "",
+                                    translator.style(TextPurpose::CardName),
+                                )
+                                .with_style(Style {
+                                    margin: UiRect::all(Val::Px(5.)),
+                                    ..default()
+                                }),
+                                CardInfo::Name,
+                                Label,
+                            ));
+                        });
+
+                    parent
+                        .spawn((
+                            NodeBundle {
+                                style: Style {
+                                    padding: UiRect::all(Val::Px(10.)),
+                                    justify_content: JustifyContent::Start,
+                                    flex_direction: FlexDirection::Column,
+                                    row_gap: Val::Px(20.),
+                                    ..default()
+                                },
+                                ..default()
+                            },
+                            Pickable::IGNORE,
+                        ))
+                        .with_children(|parent| {
+                            parent
+                                .spawn((NodeBundle {
+                                    style: Style {
+                                        padding: UiRect::all(Val::Px(5.)),
+                                        ..default()
+                                    },
+                                    ..default()
+                                },))
+                                .with_children(|parent| {
+                                    parent.spawn((
+                                        TextBundle::from_section(
+                                            "",
+                                            translator.style(TextPurpose::CardAbility),
+                                        ),
+                                        Label,
+                                        CardInfo::Text,
+                                    ));
+                                });
+
+                            parent.spawn((
+                                NodeBundle {
+                                    style: Style {
+                                        padding: UiRect::all(Val::Px(5.)),
+                                        justify_content: JustifyContent::Start,
+                                        flex_direction: FlexDirection::Column,
+                                        row_gap: Val::Px(5.),
+                                        ..default()
+                                    },
+                                    ..default()
+                                },
+                                KeywordList,
+                            ));
+                        });
+                });
+
+            parent
                 .spawn(NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Column,
@@ -122,9 +263,15 @@ fn init(
                                             },
                                             ..default()
                                         },
+                                        InventoryItem(archetype_id),
                                         On::<Pointer<Over>>::commands_mut(move |_, commands| {
                                             commands.add(move |w: &mut World| {
                                                 w.send_event(DeckEvent::CardHovered(archetype_id));
+                                            });
+                                        }),
+                                        On::<Pointer<Click>>::commands_mut(move |_, commands| {
+                                            commands.add(move |w: &mut World| {
+                                                w.send_event(DeckEvent::AddToDeck(archetype_id));
                                             });
                                         }),
                                     ))
@@ -148,14 +295,15 @@ fn init(
                                                             sections: vec![TextSection {
                                                                 value: count.to_string(),
                                                                 style: translator
-                                                                    .style(TextPurpose::Button),
+                                                                    .style(TextPurpose::Number),
                                                             }],
                                                             justify: JustifyText::Center,
                                                             linebreak_behavior: BreakLineOn::NoWrap,
                                                         },
-                                                        style: Style { ..default() },
+                                                        style: Style::default(),
                                                         ..Default::default()
                                                     },
+                                                    InventoryItem(archetype_id),
                                                     Label,
                                                 ));
                                             });
@@ -263,9 +411,17 @@ fn init(
                                             },
                                             ..default()
                                         },
+                                        DeckItem(archetype_id),
                                         On::<Pointer<Over>>::commands_mut(move |_, commands| {
                                             commands.add(move |w: &mut World| {
                                                 w.send_event(DeckEvent::CardHovered(archetype_id));
+                                            });
+                                        }),
+                                        On::<Pointer<Click>>::commands_mut(move |_, commands| {
+                                            commands.add(move |w: &mut World| {
+                                                w.send_event(DeckEvent::RemoveFromDeck(
+                                                    archetype_id,
+                                                ));
                                             });
                                         }),
                                     ))
@@ -360,8 +516,163 @@ fn mouse_scroll(
     }
 }
 
-fn handle_event(mut event: EventReader<DeckEvent>) {
-    for ev in event.read() {
-        dbg!(ev);
+fn handle_event(
+    mut commands: Commands,
+    mut event: EventReader<DeckEvent>,
+    mut state: ResMut<UIState>,
+    deck_query: Query<(Entity, &DeckItem)>,
+    mut inventory_query: Query<(&mut Text, &InventoryItem)>,
+) {
+    for event in event.read() {
+        match event {
+            DeckEvent::CardHovered(id) => {
+                state.selected_card = Some(*id);
+            }
+            DeckEvent::RemoveFromDeck(id) => {
+                if let Some((entity, _)) = deck_query.iter().find(|(_, item)| item.0 == *id) {
+                    commands.entity(entity).despawn_recursive();
+                    if let Some((mut text, _)) =
+                        inventory_query.iter_mut().find(|(_, item)| item.0 == *id)
+                    {
+                        let count = text.sections[0].value.parse::<u32>().unwrap();
+                        if count > 0 {
+                            text.sections[0].value = (count + 1).to_string();
+                        }
+                    }
+                }
+            }
+            DeckEvent::AddToDeck(id) => {
+                if let Some((mut text, _)) =
+                    inventory_query.iter_mut().find(|(_, item)| item.0 == *id)
+                {
+                    let count = text.sections[0].value.parse::<u32>().unwrap();
+                    if count > 0 {
+                        text.sections[0].value = (count - 1).to_string();
+                    }
+                }
+                let deck_items = deck_query
+                    .iter()
+                    .map(|(_, item)| &CATALOG[item.0])
+                    .collect::<Vec<_>>();
+                let index = match deck_items.binary_search(&&CATALOG[*id]) {
+                    Ok(index) => index,
+                    Err(index) => index,
+                };
+                println!("Card already in deck at position {}", index);
+            }
+        }
     }
+}
+
+fn update_card_image(
+    state: Res<UIState>,
+    mut image_query: Query<(&CardInfo, &mut UiImage)>,
+    asset_server: Res<AssetServer>,
+) {
+    for (_, mut image) in image_query.iter_mut() {
+        if let Some(card) = state.selected_card.as_ref() {
+            let safe_name = CATALOG[*card].safe_name;
+            *image = UiImage::new(asset_server.load(format!("cards/{}/image.main.png", safe_name)));
+        } else {
+            *image = UiImage::default();
+        }
+    }
+}
+
+fn update_card_info(
+    mut commands: Commands,
+    state: Res<UIState>,
+    mut text_query: Query<(&CardInfo, &mut Text)>,
+    keyword_query: Query<Entity, With<Keyword>>,
+    list_query: Query<Entity, With<KeywordList>>,
+    asset_server: Res<AssetServer>,
+    translator: Res<Translator>,
+) {
+    for (info, mut text) in text_query.iter_mut() {
+        text.sections = if let Some(card) = state.selected_card.as_ref() {
+            let safe_name = CATALOG[*card].safe_name;
+            let id = format!("card-{safe_name}");
+            let name = translator.get(&id);
+
+            match info {
+                CardInfo::Name => vec![TextSection::new(
+                    name,
+                    translator.style(TextPurpose::CardName),
+                )],
+                //CardInfo::Text => card.text_sections(&translator, &CATALOG),
+                _ => vec![],
+            }
+        } else {
+            vec![]
+        };
+    }
+
+    for entity in keyword_query.iter() {
+        commands.add(DespawnRecursive { entity });
+    }
+
+    /*
+    commands
+        .entity(list_query.single())
+        .with_children(|parent| {
+            if let Some(card) = state.selected_card.as_ref() {
+                for ability in card.related_abilities(&translator) {
+                    parent
+                        .spawn((
+                            NodeBundle {
+                                style: Style {
+                                    width: Val::Percent(100.),
+                                    justify_content: JustifyContent::Start,
+                                    column_gap: Val::Px(5.),
+                                    ..default()
+                                },
+                                ..default()
+                            },
+                            Keyword,
+                        ))
+                        .with_children(|parent| {
+                            parent.spawn((ImageBundle {
+                                style: Style {
+                                    width: Val::Px(24.),
+                                    height: Val::Px(24.),
+                                    padding: UiRect::all(Val::Px(5.)),
+                                    ..default()
+                                },
+                                image: UiImage::new(asset_server.load(format!(
+                                    "abilities/{}.png",
+                                    ability.to_string().to_lowercase()
+                                ))),
+                                ..default()
+                            },));
+
+                            let ability_name =
+                                format!("ability-{}", ability.to_string().to_lowercase());
+                            let ability_desc = format!("{ability_name}.description");
+                            let ability_name = translator.get(&ability_name);
+                            let ability_desc = translator.get(&ability_desc);
+                            parent.spawn((
+                                TextBundle::from_sections(vec![
+                                    TextSection::new(
+                                        ability_name,
+                                        TextStyle {
+                                            color: css::GOLD.into(),
+                                            ..translator.style(TextPurpose::CardAbility)
+                                        },
+                                    ),
+                                    TextSection::new(
+                                        " - ",
+                                        translator.style(TextPurpose::CardAbility),
+                                    ),
+                                    TextSection::new(
+                                        ability_desc,
+                                        translator.style(TextPurpose::CardAbility),
+                                    ),
+                                ]),
+                                Label,
+                            ));
+                        });
+                }
+            }
+        });
+        */
 }

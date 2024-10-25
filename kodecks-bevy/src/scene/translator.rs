@@ -138,6 +138,7 @@ pub enum TextPurpose {
     Dialog,
     Button,
     Result,
+    Number,
 }
 
 #[derive(Debug, Clone, Default)]
