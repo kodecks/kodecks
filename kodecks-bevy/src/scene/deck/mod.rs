@@ -1,15 +1,17 @@
 use super::{
+    card::UICardInfo,
     translator::{TextPurpose, Translator},
     GlobalState,
 };
 use crate::save_data::SaveData;
 use bevy::{
+    color::palettes::css,
     input::mouse::{MouseScrollUnit, MouseWheel},
     prelude::*,
     text::BreakLineOn,
 };
 use bevy_mod_picking::prelude::*;
-use kodecks::card::ArchetypeId;
+use kodecks::card::{ArchetypeId, CardSnapshot};
 use kodecks_catalog::CATALOG;
 
 pub struct DeckPlugin;
@@ -61,7 +63,7 @@ enum DeckEvent {
 
 #[derive(Debug, Resource, Default)]
 pub struct UIState {
-    pub selected_card: Option<ArchetypeId>,
+    pub selected_card: Option<UICardInfo>,
 }
 
 fn init(
@@ -526,7 +528,8 @@ fn handle_event(
     for event in event.read() {
         match event {
             DeckEvent::CardHovered(id) => {
-                state.selected_card = Some(*id);
+                let archetype = &CATALOG[*id];
+                state.selected_card = Some(UICardInfo::new(CardSnapshot::new(archetype)));
             }
             DeckEvent::RemoveFromDeck(id) => {
                 if let Some((entity, _)) = deck_query.iter().find(|(_, item)| item.0 == *id) {
@@ -571,7 +574,7 @@ fn update_card_image(
 ) {
     for (_, mut image) in image_query.iter_mut() {
         if let Some(card) = state.selected_card.as_ref() {
-            let safe_name = CATALOG[*card].safe_name;
+            let safe_name = CATALOG[card.snapshot.archetype_id].safe_name;
             *image = UiImage::new(asset_server.load(format!("cards/{}/image.main.png", safe_name)));
         } else {
             *image = UiImage::default();
@@ -590,7 +593,7 @@ fn update_card_info(
 ) {
     for (info, mut text) in text_query.iter_mut() {
         text.sections = if let Some(card) = state.selected_card.as_ref() {
-            let safe_name = CATALOG[*card].safe_name;
+            let safe_name = CATALOG[card.snapshot.archetype_id].safe_name;
             let id = format!("card-{safe_name}");
             let name = translator.get(&id);
 
@@ -599,7 +602,7 @@ fn update_card_info(
                     name,
                     translator.style(TextPurpose::CardName),
                 )],
-                //CardInfo::Text => card.text_sections(&translator, &CATALOG),
+                CardInfo::Text => card.text_sections(&translator, &CATALOG),
                 _ => vec![],
             }
         } else {
@@ -611,7 +614,6 @@ fn update_card_info(
         commands.add(DespawnRecursive { entity });
     }
 
-    /*
     commands
         .entity(list_query.single())
         .with_children(|parent| {
@@ -674,5 +676,4 @@ fn update_card_info(
                 }
             }
         });
-        */
 }
