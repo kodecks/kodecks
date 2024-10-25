@@ -8,16 +8,27 @@ use bevy::{
     prelude::*,
     text::BreakLineOn,
 };
+use bevy_mod_picking::prelude::*;
+use kodecks::card::ArchetypeId;
 use kodecks_catalog::CATALOG;
 
 pub struct DeckPlugin;
 
 impl Plugin for DeckPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GlobalState::DeckMain), init)
+        app.add_event::<DeckEvent>()
+            .add_systems(OnEnter(GlobalState::DeckMain), init)
             .add_systems(OnExit(GlobalState::DeckMain), cleanup)
-            .add_systems(Update, mouse_scroll.run_if(in_state(GlobalState::DeckMain)));
+            .add_systems(
+                Update,
+                (mouse_scroll, handle_event).run_if(in_state(GlobalState::DeckMain)),
+            );
     }
+}
+
+#[derive(Debug, Event)]
+enum DeckEvent {
+    CardHovered(ArchetypeId),
 }
 
 fn init(
@@ -97,18 +108,26 @@ fn init(
                                     "cards/{}/image.main.png#deck",
                                     archetype.safe_name
                                 ));
+                                let archetype_id = archetype.id;
 
                                 parent
-                                    .spawn(NodeBundle {
-                                        style: Style {
-                                            flex_direction: FlexDirection::Row,
-                                            align_items: AlignItems::Center,
-                                            width: Val::Percent(100.),
-                                            height: Val::Px(36.),
+                                    .spawn((
+                                        NodeBundle {
+                                            style: Style {
+                                                flex_direction: FlexDirection::Row,
+                                                align_items: AlignItems::Center,
+                                                width: Val::Percent(100.),
+                                                height: Val::Px(36.),
+                                                ..default()
+                                            },
                                             ..default()
                                         },
-                                        ..default()
-                                    })
+                                        On::<Pointer<Over>>::commands_mut(move |_, commands| {
+                                            commands.add(move |w: &mut World| {
+                                                w.send_event(DeckEvent::CardHovered(archetype_id));
+                                            });
+                                        }),
+                                    ))
                                     .with_children(|parent| {
                                         parent
                                             .spawn(NodeBundle {
@@ -231,17 +250,25 @@ fn init(
                                     "cards/{}/image.main.png#deck",
                                     archetype.safe_name
                                 ));
+                                let archetype_id = archetype.id;
 
                                 parent
-                                    .spawn(NodeBundle {
-                                        style: Style {
-                                            flex_direction: FlexDirection::Row,
-                                            width: Val::Percent(100.),
-                                            height: Val::Px(36.),
+                                    .spawn((
+                                        NodeBundle {
+                                            style: Style {
+                                                flex_direction: FlexDirection::Row,
+                                                width: Val::Percent(100.),
+                                                height: Val::Px(36.),
+                                                ..default()
+                                            },
                                             ..default()
                                         },
-                                        ..default()
-                                    })
+                                        On::<Pointer<Over>>::commands_mut(move |_, commands| {
+                                            commands.add(move |w: &mut World| {
+                                                w.send_event(DeckEvent::CardHovered(archetype_id));
+                                            });
+                                        }),
+                                    ))
                                     .with_children(|parent| {
                                         parent.spawn((ImageBundle {
                                             style: Style {
@@ -330,5 +357,11 @@ fn mouse_scroll(
             scrolling_list.position = scrolling_list.position.clamp(-max_scroll, 0.);
             style.top = Val::Px(scrolling_list.position);
         }
+    }
+}
+
+fn handle_event(mut event: EventReader<DeckEvent>) {
+    for ev in event.read() {
+        dbg!(ev);
     }
 }
