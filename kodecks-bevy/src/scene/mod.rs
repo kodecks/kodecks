@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_mod_picking::DefaultPickingPlugins;
 
 pub mod app;
+pub mod card;
 pub mod game;
 pub mod lang;
 pub mod menu;
