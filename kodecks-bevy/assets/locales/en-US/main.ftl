@@ -1,6 +1,11 @@
 menu-button-cpu-match-1 = CPU Match 1
 menu-button-cpu-match-2 = CPU Match 2
 menu-button-random-match = Random Match
+menu-button-deck-edit = Deck Edit
+
+deck-label-collection = Collection
+deck-label-deck = Deck
+deck-button-quit = Quit
 
 loading-message-finding-player = Finding a player...
 loading-button-cancel = Cancel

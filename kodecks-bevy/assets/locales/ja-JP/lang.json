@@ -31,6 +31,10 @@
         "result": {
             "font": "fonts/Jersey20-Regular.ttf",
             "size": 120.0
+        },
+        "number": {
+            "font": "fonts/Jersey20-Regular.ttf",
+            "size": 26.0
         }
     }
 }
