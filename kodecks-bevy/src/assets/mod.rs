@@ -56,7 +56,7 @@ impl AssetServerExt for AssetServer {
                 return handle;
             }
         }
-        let handle = self.load(path.clone());
-        handle
+        
+        self.load(path.clone())
     }
 }
