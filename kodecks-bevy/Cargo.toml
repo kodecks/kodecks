@@ -70,6 +70,7 @@ bpaf = { version = "0.9", features = ["derive"] }
 [target.'cfg(target_family = "wasm")'.dependencies]
 gloo-storage = "0.3.0"
 sys-locale = { version = "0.3.1", features = ["js"] }
+web-sys = "0.3.72"
 
 [build-dependencies]
 anyhow = "1.0.89"
