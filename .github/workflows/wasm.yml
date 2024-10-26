@@ -18,6 +18,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  RUSTFLAGS: --cfg=web_sys_unstable_apis
 
 jobs:
   build_wasm:
