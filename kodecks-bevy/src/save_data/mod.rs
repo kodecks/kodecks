@@ -27,7 +27,7 @@ impl SaveData {
         if data.decks.list.is_empty() {
             data.decks.list = vec![starter_deck()];
         }
-        data.inventory.cards = CATALOG
+        data.collection.cards = CATALOG
             .iter()
             .filter(|card| !card.attribute.is_token)
             .map(|card| (card.id, 4))

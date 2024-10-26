@@ -54,7 +54,7 @@ enum CardInfo {
 struct UiRoot;
 
 #[derive(Component)]
-struct InventoryItem(ArchetypeId);
+struct CollectionItem(ArchetypeId);
 
 #[derive(Component)]
 struct UiDeckItem(ArchetypeId);
@@ -125,7 +125,7 @@ fn init(
     }
 
     let mut inventory = save_data
-        .inventory
+        .collection
         .cards
         .iter()
         .map(|(id, count)| (&CATALOG[*id], *count - current_deck.get(id).unwrap_or(&0)))
@@ -332,7 +332,7 @@ fn init(
                                                     },
                                                     ..default()
                                                 },
-                                                InventoryItem(archetype_id),
+                                                CollectionItem(archetype_id),
                                                 On::<Pointer<Over>>::commands_mut(
                                                     move |_, commands| {
                                                         commands.add(move |w: &mut World| {
@@ -382,7 +382,7 @@ fn init(
                                                                 style: Style::default(),
                                                                 ..Default::default()
                                                             },
-                                                            InventoryItem(archetype_id),
+                                                            CollectionItem(archetype_id),
                                                             Label,
                                                         ));
                                                     });
@@ -721,7 +721,7 @@ fn handle_ui_event(
 #[derive(SystemParam)]
 pub struct DeckQueries<'w, 's> {
     deck: Query<'w, 's, (Entity, &'static UiDeckItem)>,
-    inventory: Query<'w, 's, (&'static mut Text, &'static InventoryItem)>,
+    inventory: Query<'w, 's, (&'static mut Text, &'static CollectionItem)>,
     list: Query<'w, 's, Entity, With<DeckList>>,
 }
 

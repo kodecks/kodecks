@@ -17,7 +17,7 @@ pub struct SaveDataV1 {
     #[serde(default)]
     pub decks: Decks,
     #[serde(default)]
-    pub inventory: Inventory,
+    pub collection: Collection,
 }
 
 #[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -43,7 +43,7 @@ impl Decks {
 }
 
 #[derive(Debug, Clone, DefaultFromSerde, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Inventory {
+pub struct Collection {
     #[serde(default)]
     pub cards: BTreeMap<ArchetypeId, u8>,
 }
