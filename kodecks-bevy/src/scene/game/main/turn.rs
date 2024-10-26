@@ -1,7 +1,10 @@
-use crate::scene::{
-    game::{board::Environment, event::TurnChanged},
-    translator::{TextPurpose, Translator},
-    GlobalState,
+use crate::{
+    assets::AssetServerExt,
+    scene::{
+        game::{board::Environment, event::TurnChanged},
+        translator::{TextPurpose, Translator},
+        GlobalState,
+    },
 };
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
@@ -143,7 +146,7 @@ fn init(
             mesh: meshes.add(Plane3d::default().mesh().size(10000.0, 1.0)),
             transform: Transform::from_translation(Vec3::new(0.0, 0.01, 4.8)),
             material: materials.add(StandardMaterial {
-                base_color_texture: Some(asset_server.load("ui/gradient.png")),
+                base_color_texture: Some(asset_server.load_with_cache("ui/gradient.png")),
                 base_color: Color::srgba(0.0, 0.0, 1.0, 1.0),
                 emissive: LinearRgba::rgb(0.0, 0.0, 1.0),
                 alpha_mode: AlphaMode::Blend,
@@ -160,7 +163,7 @@ fn init(
             transform: Transform::from_rotation(Quat::from_rotation_y(std::f32::consts::PI))
                 .with_translation(Vec3::new(0.0, 0.01, -3.4)),
             material: materials.add(StandardMaterial {
-                base_color_texture: Some(asset_server.load("ui/gradient.png")),
+                base_color_texture: Some(asset_server.load_with_cache("ui/gradient.png")),
                 base_color: Color::srgba(1.0, 0.0, 0.0, 1.0),
                 emissive: LinearRgba::rgb(1.0, 0.0, 0.0),
                 alpha_mode: AlphaMode::Blend,

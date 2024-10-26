@@ -2,7 +2,10 @@ use super::{
     card::{CARD_HEIGHT, CARD_WIDTH},
     ui::UIEvent,
 };
-use crate::scene::{game::board::Environment, GlobalState};
+use crate::{
+    assets::AssetServerExt,
+    scene::{game::board::Environment, GlobalState},
+};
 use bevy::{prelude::*, render::mesh::VertexAttributeValues};
 use bevy_mod_picking::prelude::*;
 use kodecks_catalog::CATALOG;
@@ -54,14 +57,14 @@ fn init(
     asset_server: Res<AssetServer>,
 ) {
     let deck_material = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("frames/back.png")),
+        base_color_texture: Some(asset_server.load_with_cache("frames/back.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
 
     let graveyard_material: Handle<StandardMaterial> = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("frames/graveyard.png")),
+        base_color_texture: Some(asset_server.load_with_cache("frames/graveyard.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
@@ -206,8 +209,8 @@ fn update_graveyards(
         transform.scale = Vec3::new(0.8 / CARD_WIDTH, height, 0.8 / CARD_WIDTH);
         if let Some(last) = player.graveyard.last() {
             let archetype = &CATALOG[last.archetype_id];
-            let card_image =
-                asset_server.load(format!("cards/{}/image.main.png", archetype.safe_name));
+            let card_image = asset_server
+                .load_with_cache(format!("cards/{}/image.main.png", archetype.safe_name));
             *material = materials.add(StandardMaterial {
                 base_color_texture: Some(card_image),
                 alpha_mode: AlphaMode::Blend,

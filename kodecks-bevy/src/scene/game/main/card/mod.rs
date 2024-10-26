@@ -1,6 +1,6 @@
 use super::event::PlayerEvent;
 use super::ui::UIEvent;
-use crate::assets::AssetHandleStore;
+use crate::assets::{AssetHandleStore, AssetServerExt};
 use crate::painter::frames::CardFramePainter;
 use crate::painter::numbers::{Alignment, DrawOptions, NumberPainter};
 use crate::painter::shield::draw_shield;
@@ -339,7 +339,7 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
 
         self.materials
             .get_or_insert_with(handles.card_back_material.id(), || {
-                let texture_handle = self.asset_server.load("frames/back.png");
+                let texture_handle = self.asset_server.load_with_cache("frames/back.png");
                 StandardMaterial {
                     base_color_texture: Some(texture_handle),
                     alpha_mode: bevy::prelude::AlphaMode::Blend,
@@ -349,7 +349,7 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
 
         self.materials
             .get_or_insert_with(handles.shadow_material.id(), || {
-                let texture_handle = self.asset_server.load("frames/frame.png");
+                let texture_handle = self.asset_server.load_with_cache("frames/frame.png");
                 StandardMaterial {
                     base_color_texture: Some(texture_handle),
                     alpha_mode: bevy::prelude::AlphaMode::Multiply,
@@ -536,7 +536,9 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
                                 -1.0 / CARD_WIDTH * 7.0,
                             )),
                         material: self.materials.add(StandardMaterial {
-                            base_color_texture: Some(self.asset_server.load("abilities/toxic.png")),
+                            base_color_texture: Some(
+                                self.asset_server.load_with_cache("abilities/toxic.png"),
+                            ),
                             alpha_mode: bevy::prelude::AlphaMode::Blend,
                             ..default()
                         }),
@@ -558,7 +560,9 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
                                 1.0 / CARD_WIDTH * 7.0,
                             )),
                         material: self.materials.add(StandardMaterial {
-                            base_color_texture: Some(self.asset_server.load("abilities/toxic.png")),
+                            base_color_texture: Some(
+                                self.asset_server.load_with_cache("abilities/toxic.png"),
+                            ),
                             alpha_mode: bevy::prelude::AlphaMode::Blend,
                             ..default()
                         }),
@@ -600,7 +604,7 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
     ) -> Handle<StandardMaterial> {
         if archetype.id.is_empty() {
             return self.materials.add(StandardMaterial {
-                base_color_texture: Some(self.asset_server.load("frames/back.png")),
+                base_color_texture: Some(self.asset_server.load_with_cache("frames/back.png")),
                 alpha_mode: bevy::prelude::AlphaMode::Blend,
                 ..default()
             });
@@ -610,7 +614,7 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
             CardImage::Frame => self
                 .asset_server
                 .load(format!("cards/{}/image.main.png#hand", archetype.safe_name)),
-            CardImage::Image => self.asset_server.load(format!(
+            CardImage::Image => self.asset_server.load_with_cache(format!(
                 "cards/{}/image.main.png#image",
                 archetype.safe_name
             )),

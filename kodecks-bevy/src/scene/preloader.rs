@@ -1,3 +1,5 @@
+use crate::assets::AssetServerExt;
+
 use super::GlobalState;
 use bevy::{asset::LoadState, prelude::*};
 use kodecks_catalog::CATALOG;
@@ -37,7 +39,8 @@ fn update(
     }
     if let Some(archetype) = CATALOG.iter().nth(*index) {
         debug!("Preloading: {}", archetype.name);
-        *loading = asset_server.load(format!("cards/{}/image.main.png", archetype.safe_name));
+        *loading =
+            asset_server.load_with_cache(format!("cards/{}/image.main.png", archetype.safe_name));
         *index += 1;
     } else {
         info!("Preloaded {} assets", *index);

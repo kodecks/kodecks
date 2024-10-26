@@ -1,6 +1,9 @@
-use crate::scene::{
-    game::{board::Environment, event::ShardUpdated},
-    GlobalState,
+use crate::{
+    assets::AssetServerExt,
+    scene::{
+        game::{board::Environment, event::ShardUpdated},
+        GlobalState,
+    },
 };
 use bevy::prelude::*;
 use kodecks::color::Color;
@@ -42,25 +45,25 @@ fn setup(
     let mesh = meshes.add(Plane3d::default().mesh().size(0.3, 0.3));
 
     let red = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("shards/red.png")),
+        base_color_texture: Some(asset_server.load_with_cache("shards/red.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
     let green = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("shards/green.png")),
+        base_color_texture: Some(asset_server.load_with_cache("shards/green.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
     let blue = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("shards/blue.png")),
+        base_color_texture: Some(asset_server.load_with_cache("shards/blue.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
     let yellow = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("shards/yellow.png")),
+        base_color_texture: Some(asset_server.load_with_cache("shards/yellow.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()

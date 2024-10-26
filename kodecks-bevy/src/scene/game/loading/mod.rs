@@ -4,6 +4,7 @@ use super::{
     server::{self, ServerConnection, ServerError},
 };
 use crate::{
+    assets::AssetServerExt,
     save_data,
     scene::{
         spinner::SpinnerState,
@@ -124,7 +125,7 @@ fn init_loading_screen(
         sides_scale_mode: SliceScaleMode::Stretch,
         max_corner_scale: 1.0,
     };
-    let button = asset_server.load("ui/button-red.png");
+    let button = asset_server.load_with_cache("ui/button-red.png");
 
     commands
         .spawn((

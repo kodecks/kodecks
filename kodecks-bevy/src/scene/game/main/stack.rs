@@ -1,7 +1,10 @@
 use super::animation::RegisterAnimation;
-use crate::scene::{
-    game::board::{Board, Environment},
-    GlobalState,
+use crate::{
+    assets::AssetServerExt,
+    scene::{
+        game::board::{Board, Environment},
+        GlobalState,
+    },
 };
 use bevy::{
     animation::{AnimationTarget, AnimationTargetId},
@@ -127,7 +130,7 @@ fn update_effect_stack(
                 };
                 let card = env.find_card(stack_item.source).unwrap();
                 let archetype = &CATALOG[card.archetype_id];
-                let card_image = asset_server.load(format!(
+                let card_image = asset_server.load_with_cache(format!(
                     "cards/{}/image.main.png#stack",
                     archetype.safe_name
                 ));

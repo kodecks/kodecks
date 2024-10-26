@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    asset::{AssetPath, LoadState},
+    prelude::*,
+};
 use dashmap::DashMap;
 use std::hash::Hash;
 
@@ -33,5 +36,27 @@ where
             .or_insert_with(|| assets.reserve_handle())
             .value()
             .clone()
+    }
+}
+
+pub trait AssetServerExt {
+    fn load_with_cache<'a, A>(&self, path: impl Into<AssetPath<'a>>) -> Handle<A>
+    where
+        A: Asset;
+}
+
+impl AssetServerExt for AssetServer {
+    fn load_with_cache<'a, A>(&self, path: impl Into<AssetPath<'a>>) -> Handle<A>
+    where
+        A: Asset,
+    {
+        let path: AssetPath<'a> = path.into();
+        if let Some(handle) = self.get_handle(path.clone()) {
+            if self.get_load_state(&handle.clone().untyped()) == Some(LoadState::Loaded) {
+                return handle;
+            }
+        }
+        let handle = self.load(path.clone());
+        handle
     }
 }

@@ -3,7 +3,7 @@ use super::{
     translator::{TextPurpose, Translator},
     GlobalState,
 };
-use crate::{app_version, config::GlobalConfig, save_data};
+use crate::{app_version, assets::AssetServerExt, config::GlobalConfig, save_data};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
 use kodecks::{deck::DeckList, regulation::Regulation};
@@ -37,7 +37,7 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
         sides_scale_mode: SliceScaleMode::Stretch,
         max_corner_scale: 1.0,
     };
-    let button = asset_server.load("ui/button.png");
+    let button = asset_server.load_with_cache("ui/button.png");
 
     commands
         .spawn((

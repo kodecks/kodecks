@@ -3,7 +3,7 @@ use super::{
     translator::{TextPurpose, Translator},
     GlobalState,
 };
-use crate::save_data::SaveData;
+use crate::{assets::AssetServerExt, save_data::SaveData};
 use bevy::{
     color::palettes::css,
     ecs::system::SystemParam,
@@ -105,8 +105,8 @@ fn init(
         max_corner_scale: 1.0,
     };
 
-    let button = asset_server.load("ui/button-red.png");
-    let end = asset_server.load("frames/deck_frame_end.png".to_string());
+    let button = asset_server.load_with_cache("ui/button-red.png");
+    let end = asset_server.load_with_cache("frames/deck_frame_end.png".to_string());
 
     let mut current_deck = BTreeMap::new();
 
@@ -314,7 +314,7 @@ fn init(
                                     for (archetype, count) in &inventory {
                                         let id = format!("card-{}", archetype.safe_name);
                                         let name = translator.get(&id);
-                                        let image = asset_server.load(format!(
+                                        let image = asset_server.load_with_cache(format!(
                                             "cards/{}/image.main.png#deck",
                                             archetype.safe_name
                                         ));
@@ -505,7 +505,7 @@ fn init(
                                     for archetype in &deck {
                                         let id = format!("card-{}", archetype.safe_name);
                                         let name = translator.get(&id);
-                                        let image = asset_server.load(format!(
+                                        let image = asset_server.load_with_cache(format!(
                                             "cards/{}/image.main.png#deck",
                                             archetype.safe_name
                                         ));
@@ -780,8 +780,8 @@ fn handle_deck_event(
                 let archetype = &CATALOG[*id];
                 let id = format!("card-{}", archetype.safe_name);
                 let name = translator.get(&id);
-                let image =
-                    asset_server.load(format!("cards/{}/image.main.png#deck", archetype.safe_name));
+                let image = asset_server
+                    .load_with_cache(format!("cards/{}/image.main.png#deck", archetype.safe_name));
                 let archetype_id = archetype.id;
 
                 let slicer = TextureSlicer {
@@ -791,7 +791,7 @@ fn handle_deck_event(
                     max_corner_scale: 2.0,
                 };
 
-                let end = asset_server.load("frames/deck_frame_end.png".to_string());
+                let end = asset_server.load_with_cache("frames/deck_frame_end.png".to_string());
                 let entity = commands
                     .spawn((
                         NodeBundle {
@@ -891,7 +891,9 @@ fn update_card_image(
     for (_, mut image) in image_query.iter_mut() {
         if let Some(card) = state.selected_card.as_ref() {
             let safe_name = CATALOG[card.snapshot.archetype_id].safe_name;
-            *image = UiImage::new(asset_server.load(format!("cards/{}/image.main.png", safe_name)));
+            *image = UiImage::new(
+                asset_server.load_with_cache(format!("cards/{}/image.main.png", safe_name)),
+            );
         } else {
             *image = UiImage::default();
         }
@@ -956,7 +958,7 @@ fn update_card_info(
                                     padding: UiRect::all(Val::Px(5.)),
                                     ..default()
                                 },
-                                image: UiImage::new(asset_server.load(format!(
+                                image: UiImage::new(asset_server.load_with_cache(format!(
                                     "abilities/{}.png",
                                     ability.to_string().to_lowercase()
                                 ))),

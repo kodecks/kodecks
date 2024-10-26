@@ -1,5 +1,8 @@
 use super::Card;
-use crate::scene::game::board::{AvailableActionList, Board};
+use crate::{
+    assets::AssetServerExt,
+    scene::game::board::{AvailableActionList, Board},
+};
 use bevy::prelude::*;
 use kodecks::field::FieldState;
 
@@ -30,7 +33,7 @@ pub fn setup(
 ) {
     let card_shadow = materials.add(StandardMaterial {
         base_color: Color::srgba(0.0, 0.0, 0.0, 0.5),
-        base_color_texture: Some(asset_server.load("frames/frame.png")),
+        base_color_texture: Some(asset_server.load_with_cache("frames/frame.png")),
         alpha_mode: AlphaMode::Blend,
         double_sided: true,
         cull_mode: None,
@@ -40,7 +43,7 @@ pub fn setup(
 
     let card_active = materials.add(StandardMaterial {
         base_color: Color::srgba(0.0, 0.0, 0.8, 1.0),
-        base_color_texture: Some(asset_server.load("frames/frame.png")),
+        base_color_texture: Some(asset_server.load_with_cache("frames/frame.png")),
         alpha_mode: AlphaMode::Blend,
         double_sided: true,
         cull_mode: None,
@@ -49,26 +52,28 @@ pub fn setup(
     });
 
     let card_normal = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("frames/compact.png")),
+        base_color_texture: Some(asset_server.load_with_cache("frames/compact.png")),
         alpha_mode: AlphaMode::Blend,
         ..default()
     });
 
     let card_select_small = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("frames/compact.png")),
+        base_color_texture: Some(asset_server.load_with_cache("frames/compact.png")),
         alpha_mode: AlphaMode::Blend,
         emissive: LinearRgba::rgb(0.0, 50.0, 0.0),
         ..default()
     });
 
     let card_attack = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("frames/compact_attack_inactive.png")),
+        base_color_texture: Some(
+            asset_server.load_with_cache("frames/compact_attack_inactive.png"),
+        ),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
     });
 
-    let select_texture_handle = asset_server.load("frames/frame.png");
+    let select_texture_handle = asset_server.load_with_cache("frames/frame.png");
     let card_select = materials.add(StandardMaterial {
         base_color: Color::srgba(0.0, 0.0, 0.0, 1.0),
         base_color_texture: Some(select_texture_handle.clone()),
@@ -79,14 +84,14 @@ pub fn setup(
 
     let card_attack_active = materials.add(StandardMaterial {
         base_color: Color::srgba(1.0, 0.0, 0.0, 1.0),
-        base_color_texture: Some(asset_server.load("frames/compact_attack.png")),
+        base_color_texture: Some(asset_server.load_with_cache("frames/compact_attack.png")),
         alpha_mode: AlphaMode::Blend,
         emissive: LinearRgba::rgb(50.0, 0.0, 0.0),
         ..default()
     });
 
     let card_block = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("frames/compact_block_inactive.png")),
+        base_color_texture: Some(asset_server.load_with_cache("frames/compact_block_inactive.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()
@@ -94,13 +99,13 @@ pub fn setup(
 
     let card_block_active = materials.add(StandardMaterial {
         base_color: Color::srgba(0.0, 0.0, 1.0, 1.0),
-        base_color_texture: Some(asset_server.load("frames/compact_block.png")),
+        base_color_texture: Some(asset_server.load_with_cache("frames/compact_block.png")),
         alpha_mode: AlphaMode::Blend,
         emissive: LinearRgba::rgb(0.0, 0.0, 50.0),
         ..default()
     });
 
-    let exhausted_texture_handle = asset_server.load("frames/compact_exhausted.png");
+    let exhausted_texture_handle = asset_server.load_with_cache("frames/compact_exhausted.png");
     let card_exhausted = materials.add(StandardMaterial {
         base_color_texture: Some(exhausted_texture_handle.clone()),
         alpha_mode: AlphaMode::Blend,

@@ -1,6 +1,9 @@
-use crate::scene::{
-    game::board::{Board, Environment},
-    GlobalState,
+use crate::{
+    assets::AssetServerExt,
+    scene::{
+        game::board::{Board, Environment},
+        GlobalState,
+    },
 };
 use bevy::prelude::*;
 use kodecks::zone::Zone;
@@ -35,7 +38,7 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let material = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("pointers/attack.png")),
+        base_color_texture: Some(asset_server.load_with_cache("pointers/attack.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..default()

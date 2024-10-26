@@ -4,6 +4,7 @@ use crate::{
     assets::{
         card::RenderedCardPlugin,
         fluent::{FluentAsset, FluentPlugin, DEFAULT_LANG},
+        AssetServerExt,
     },
     config::{ConfigPlugin, GlobalConfig},
     scene::lang::find_language,
@@ -56,13 +57,17 @@ fn update(
         info!("Found language: {} ({})", lang.name, lang.id);
 
         let path = format!("locales/{}/lang.json", lang.id);
-        asset_server.load::<FluentAsset>(path)
+        asset_server.load_with_cache::<FluentAsset>(path)
     });
 
     let preloading_assets = preloading_assets.get_or_insert_with(|| {
         vec![
-            asset_server.load::<Image>("ui/button.png").untyped(),
-            asset_server.load::<Image>("ui/button-red.png").untyped(),
+            asset_server
+                .load_with_cache::<Image>("ui/button.png")
+                .untyped(),
+            asset_server
+                .load_with_cache::<Image>("ui/button-red.png")
+                .untyped(),
         ]
     });
 

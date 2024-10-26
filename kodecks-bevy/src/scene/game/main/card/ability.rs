@@ -1,5 +1,5 @@
 use super::Card;
-use crate::scene::game::board::Environment;
+use crate::{assets::AssetServerExt, scene::game::board::Environment};
 use bevy::{prelude::*, utils::HashMap};
 use kodecks::{ability::KeywordAbility, zone::Zone};
 use strum::IntoEnumIterator;
@@ -17,7 +17,7 @@ pub fn setup(
 ) {
     let assets = KeywordAbility::iter()
         .map(|ability| {
-            let image = asset_server.load(format!(
+            let image = asset_server.load_with_cache(format!(
                 "abilities/{}.png",
                 ability.to_string().to_lowercase()
             ));

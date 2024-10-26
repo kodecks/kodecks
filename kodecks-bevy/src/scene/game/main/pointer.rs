@@ -1,4 +1,4 @@
-use crate::scene::GlobalState;
+use crate::{assets::AssetServerExt, scene::GlobalState};
 
 use super::dialog::DialogMessages;
 use bevy::prelude::*;
@@ -62,7 +62,7 @@ fn setup(
 ) {
     let mesh = meshes.add(Plane3d::default().mesh().size(0.4, 0.4));
     let material = materials.add(StandardMaterial {
-        base_color_texture: Some(asset_server.load("pointers/arrow.png")),
+        base_color_texture: Some(asset_server.load_with_cache("pointers/arrow.png")),
         alpha_mode: AlphaMode::Blend,
         unlit: true,
         ..Default::default()

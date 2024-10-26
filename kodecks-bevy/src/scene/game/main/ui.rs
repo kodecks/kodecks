@@ -1,12 +1,15 @@
 use super::event::PlayerEvent;
-use crate::scene::{
-    card::UICardInfo,
-    game::{
-        board::{self, AvailableActionList, Board},
-        event::InstructionsUpdated,
+use crate::{
+    assets::AssetServerExt,
+    scene::{
+        card::UICardInfo,
+        game::{
+            board::{self, AvailableActionList, Board},
+            event::InstructionsUpdated,
+        },
+        translator::{TextPurpose, Translator},
+        GlobalState,
     },
-    translator::{TextPurpose, Translator},
-    GlobalState,
 };
 use bevy::{color::palettes::css, prelude::*};
 use bevy_mod_picking::picking_core::Pickable;
@@ -148,7 +151,9 @@ fn update_card_image(
     for (_, mut image) in image_query.iter_mut() {
         if let Some(card) = state.selected_card.as_ref() {
             let safe_name = CATALOG[card.snapshot.archetype_id].safe_name;
-            *image = UiImage::new(asset_server.load(format!("cards/{}/image.main.png", safe_name)));
+            *image = UiImage::new(
+                asset_server.load_with_cache(format!("cards/{}/image.main.png", safe_name)),
+            );
         } else {
             *image = UiImage::default();
         }
@@ -237,7 +242,7 @@ fn update_card_info(
                                     padding: UiRect::all(Val::Px(5.)),
                                     ..default()
                                 },
-                                image: UiImage::new(asset_server.load(format!(
+                                image: UiImage::new(asset_server.load_with_cache(format!(
                                     "abilities/{}.png",
                                     ability.to_string().to_lowercase()
                                 ))),
@@ -328,8 +333,8 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
         sides_scale_mode: SliceScaleMode::Stretch,
         max_corner_scale: 1.0,
     };
-    let button = asset_server.load("ui/button.png");
-    let button_red = asset_server.load("ui/button-red.png");
+    let button = asset_server.load_with_cache("ui/button.png");
+    let button_red = asset_server.load_with_cache("ui/button-red.png");
 
     commands
         .spawn((

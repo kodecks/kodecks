@@ -1,7 +1,10 @@
-use crate::scene::{
-    game::{board::AvailableActionList, event::MessageDialogUpdated, server::SendCommand},
-    translator::{TextPurpose, Translator},
-    GlobalState,
+use crate::{
+    assets::AssetServerExt,
+    scene::{
+        game::{board::AvailableActionList, event::MessageDialogUpdated, server::SendCommand},
+        translator::{TextPurpose, Translator},
+        GlobalState,
+    },
 };
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
@@ -117,7 +120,7 @@ fn init(mut commands: Commands, asset_server: Res<AssetServer>) {
         sides_scale_mode: SliceScaleMode::Stretch,
         max_corner_scale: 1.0,
     };
-    let image = asset_server.load("ui/button.png");
+    let image = asset_server.load_with_cache("ui/button.png");
 
     commands
         .spawn((
