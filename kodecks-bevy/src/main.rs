@@ -16,6 +16,7 @@ fn main() {
     let opts = opts::get();
 
     let mut app = App::new();
+    app.insert_resource(Msaa::Off);
     app.insert_resource(opts);
 
     #[cfg(feature = "embed_assets")]
