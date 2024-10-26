@@ -54,9 +54,13 @@ impl AssetServerExt for AssetServer {
         if let Some(handle) = self.get_handle(path.clone()) {
             if self.get_load_state(&handle.clone().untyped()) == Some(LoadState::Loaded) {
                 return handle;
+            } else {
+                return self.load(path.clone());
             }
         }
-        
-        self.load(path.clone())
+
+        let handle = self.load(path.clone());
+        std::mem::forget(handle.clone());
+        handle
     }
 }
