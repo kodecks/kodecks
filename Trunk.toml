@@ -7,4 +7,4 @@ target = "web/index.html"
 no_spa = true
 
 [tools]
-wasm_bindgen = "0.2.93"
+wasm_bindgen = "0.2.95"
