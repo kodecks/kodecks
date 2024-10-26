@@ -4,6 +4,7 @@ use bevy::{asset::AssetMetaCheck, prelude::*, window::WindowTheme};
 
 mod assets;
 mod config;
+mod debugger;
 mod engine;
 mod input;
 mod opts;
@@ -46,10 +47,9 @@ fn main() {
             ..default()
         });
 
-    let app = app.add_plugins(default_plugins);
-
-    #[cfg(feature = "inspector")]
-    let app = app.add_plugins(bevy_inspector_egui::quick::WorldInspectorPlugin::new());
+    let app = app
+        .add_plugins(default_plugins)
+        .add_plugins(debugger::DebuggerPlugin);
 
     app.add_plugins((
         input::InputPlugin,

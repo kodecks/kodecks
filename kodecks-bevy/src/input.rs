@@ -17,6 +17,7 @@ pub enum UserAction {
     Block,
     Continue,
     Concede,
+    ToggleDebugger,
 }
 
 fn init(mut commands: Commands) {
@@ -32,6 +33,10 @@ fn init(mut commands: Commands) {
     input_map.insert(
         UserAction::Concede,
         ButtonlikeChord::new([KeyCode::ShiftLeft, KeyCode::ControlLeft, KeyCode::KeyO]),
+    );
+    input_map.insert(
+        UserAction::ToggleDebugger,
+        ButtonlikeChord::new([KeyCode::ShiftLeft, KeyCode::ControlLeft, KeyCode::KeyD]),
     );
     commands.spawn(InputManagerBundle::with_map(input_map));
 }
