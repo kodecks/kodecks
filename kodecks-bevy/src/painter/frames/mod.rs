@@ -11,6 +11,7 @@ use std::{io::Cursor, sync::LazyLock};
 #[derive(Default, Resource)]
 pub struct CardFramePainter {
     frames: DashMap<CardFrame, DynamicImage>,
+    deck_frames: DashMap<CardFrame, DynamicImage>,
     number: NumberPainter,
 }
 
@@ -19,6 +20,13 @@ impl CardFramePainter {
         self.frames
             .entry(frame)
             .or_insert_with(|| self.generate(&frame))
+            .clone()
+    }
+
+    pub fn generate_deck_frame(&self, frame: CardFrame) -> DynamicImage {
+        self.deck_frames
+            .entry(frame)
+            .or_insert_with(|| self.generate_deck(&frame))
             .clone()
     }
 
@@ -57,9 +65,43 @@ impl CardFramePainter {
         frame_base
     }
 
+    fn generate_deck(&self, frame: &CardFrame) -> DynamicImage {
+        let mut frame_base = Self::get_deck_frame(frame.color).clone();
+        self.number.draw(
+            &frame.cost.to_string(),
+            &DrawOptions {
+                x: 14,
+                y: 4,
+                h_align: Alignment::Start,
+                v_align: Alignment::Start,
+                background: [0, 0, 0, 255].into(),
+                foreground: [255, 255, 255, 255].into(),
+            },
+            &mut frame_base,
+        );
+        frame_base
+    }
+
     fn get_frame(color: Color) -> &'static DynamicImage {
         static FRAMES: LazyLock<HashMap<Color, DynamicImage>> = LazyLock::new(|| {
             FRAME_IMAGES
+                .iter()
+                .map(|(color, data)| {
+                    let image = ImageReader::new(Cursor::new(data))
+                        .with_guessed_format()
+                        .unwrap()
+                        .decode()
+                        .unwrap();
+                    (*color, image)
+                })
+                .collect()
+        });
+        FRAMES.get(&color).unwrap()
+    }
+
+    fn get_deck_frame(color: Color) -> &'static DynamicImage {
+        static FRAMES: LazyLock<HashMap<Color, DynamicImage>> = LazyLock::new(|| {
+            DECK_FRAME_IMAGES
                 .iter()
                 .map(|(color, data)| {
                     let image = ImageReader::new(Cursor::new(data))
@@ -99,6 +141,14 @@ const FRAME_IMAGES: &[(Color, &[u8])] = &[
     (Color::GREEN, include_bytes!("frame_green.png")),
     (Color::BLUE, include_bytes!("frame_blue.png")),
     (Color::empty(), include_bytes!("frame_colorless.png")),
+];
+
+const DECK_FRAME_IMAGES: &[(Color, &[u8])] = &[
+    (Color::RED, include_bytes!("deck_frame_red.png")),
+    (Color::YELLOW, include_bytes!("deck_frame_yellow.png")),
+    (Color::GREEN, include_bytes!("deck_frame_green.png")),
+    (Color::BLUE, include_bytes!("deck_frame_blue.png")),
+    (Color::empty(), include_bytes!("deck_frame_colorless.png")),
 ];
 
 const CREATURE_TYPES: &[(CreatureType, &[u8])] = &[

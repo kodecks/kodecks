@@ -3,6 +3,7 @@ use bevy_mod_picking::DefaultPickingPlugins;
 
 pub mod app;
 pub mod card;
+pub mod deck;
 pub mod game;
 pub mod lang;
 pub mod menu;
@@ -20,6 +21,7 @@ pub enum GlobalState {
     GameMain,
     GameResult,
     GameCleanup,
+    DeckMain,
 }
 
 pub struct ScenePlugin;
@@ -29,6 +31,7 @@ impl Plugin for ScenePlugin {
         app.add_plugins(DefaultPickingPlugins)
             .add_plugins(app::AppLoadingPlugin)
             .add_plugins(menu::MenuPlugin)
+            .add_plugins(deck::DeckPlugin)
             .add_plugins(spinner::SpinnerPlugin)
             .add_plugins(preloader::PreloaderPlugin)
             .add_plugins(game::loading::GameLoadingPlugin)

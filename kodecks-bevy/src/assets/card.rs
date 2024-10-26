@@ -101,6 +101,29 @@ impl AssetLoader for RenderedCardLoader {
                 }
             }
 
+            load_context.labeled_asset_scope("deck".to_string(), |_| {
+                let mut frame_image = self.painter.generate_deck_frame(CardFrame::new(&attr));
+                for (x, y, pixel) in image.enumerate_pixels() {
+                    if y >= 16 {
+                        break;
+                    }
+                    if frame_image.get_pixel(x + 11, y + 2)[3] == 0 {
+                        frame_image.put_pixel(x + 11, y + 2, *pixel);
+                    }
+                }
+                Image::new(
+                    Extent3d {
+                        width: frame_image.width(),
+                        height: frame_image.height(),
+                        depth_or_array_layers: 1,
+                    },
+                    TextureDimension::D2,
+                    frame_image.clone().into_bytes(),
+                    TextureFormat::Rgba8UnormSrgb,
+                    RenderAssetUsages::RENDER_WORLD,
+                )
+            });
+
             load_context.labeled_asset_scope("hand".to_string(), |_| {
                 Image::new(
                     Extent3d {

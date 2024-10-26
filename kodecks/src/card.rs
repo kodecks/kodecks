@@ -325,6 +325,20 @@ impl CardId for CardSnapshot {
 }
 
 impl CardSnapshot {
+    pub fn new(archetype: &CardArchetype) -> Self {
+        Self {
+            id: 1.try_into().unwrap(),
+            archetype_id: archetype.id,
+            style: 0,
+            controller: 0,
+            owner: 0,
+            revealed: PlayerMask::default(),
+            computed: Some(archetype.into()),
+            timestamp: 0,
+            is_token: false,
+        }
+    }
+
     pub fn redacted(self, viewer: u8) -> Self {
         if self.revealed.contains(viewer) {
             self

@@ -24,7 +24,9 @@ pub struct SaveData(v1::SaveDataV1);
 impl SaveData {
     pub fn load(opts: &StartupOptions) -> Self {
         let mut data = io::read_data(opts);
-        data.decks.list = vec![starter_deck()];
+        if data.decks.list.is_empty() {
+            data.decks.list = vec![starter_deck()];
+        }
         data.inventory.cards = CATALOG
             .iter()
             .filter(|card| !card.attribute.is_token)

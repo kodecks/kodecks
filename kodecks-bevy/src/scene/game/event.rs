@@ -166,6 +166,7 @@ fn preload_assets(
             let handles = vec![
                 asset_server.load(format!("cards/{}/image.main.png", archetype.safe_name)),
                 asset_server.load(format!("cards/{}/image.main.png#hand", archetype.safe_name)),
+                asset_server.load(format!("cards/{}/image.main.png#deck", archetype.safe_name)),
                 asset_server.load(format!(
                     "cards/{}/image.main.png#image",
                     archetype.safe_name
