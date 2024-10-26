@@ -24,7 +24,7 @@ jobs:
       - name: Download assets
         run: ./scripts/download.sh
       - name: Build
-        run: trunk build --release
+        run: trunk build --cargo-profile web-distribution
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
         with:
