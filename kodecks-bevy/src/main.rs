@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use bevy::{asset::AssetMetaCheck, prelude::*, window::WindowTheme};
+use bevy::{asset::AssetMetaCheck, log::LogPlugin, prelude::*, window::WindowTheme};
 
 mod assets;
 mod config;
@@ -31,6 +31,10 @@ fn main() {
         .set(AssetPlugin {
             meta_check: AssetMetaCheck::Never,
             ..default()
+        })
+        .set(LogPlugin {
+            filter: "wgpu_hal::auxil::dxgi::exception=off".to_string(),
+            ..Default::default()
         })
         .set(WindowPlugin {
             primary_window: Some(Window {
