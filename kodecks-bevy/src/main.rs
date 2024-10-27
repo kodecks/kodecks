@@ -1,6 +1,14 @@
 #![forbid(unsafe_code)]
 
-use bevy::{asset::AssetMetaCheck, prelude::*, window::WindowTheme};
+use bevy::{
+    asset::AssetMetaCheck,
+    prelude::*,
+    render::{
+        settings::{Backends, RenderCreation, WgpuSettings},
+        RenderPlugin,
+    },
+    window::WindowTheme,
+};
 
 mod assets;
 mod config;
@@ -30,6 +38,13 @@ fn main() {
         .set(ImagePlugin::default_nearest())
         .set(AssetPlugin {
             meta_check: AssetMetaCheck::Never,
+            ..default()
+        })
+        .set(RenderPlugin {
+            render_creation: RenderCreation::Automatic(WgpuSettings {
+                backends: Some(Backends::all() - Backends::DX12),
+                ..default()
+            }),
             ..default()
         })
         .set(WindowPlugin {
