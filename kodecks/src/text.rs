@@ -46,7 +46,7 @@ enum Token<'source> {
     EndKeyword,
     #[regex("[+-]?[0-9]+", |lex| lex.slice().parse::<i32>().unwrap())]
     Number(i32),
-    #[regex("[^+\\-<>\\[\\]0-9]+", |lex| lex.slice())]
+    #[regex("[^+<>\\[\\]0-9]+", |lex| lex.slice())]
     Text(&'source str),
 }
 
