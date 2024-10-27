@@ -30,12 +30,65 @@ use tinystr::TinyAsciiStr;
 
 pub type CardMap = phf::Map<&'static str, fn() -> &'static CardArchetype>;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Catalog {
+    pub sets: Vec<CardSet>,
+}
+
+impl Catalog {
+    pub fn new(cards: &'static CardMap) -> Self {
+        Self {
+            sets: vec![CardSet::new(cards)],
+        }
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &Arc<CardArchetype>> {
+        self.sets.iter().flat_map(|set| set.iter())
+    }
+
+    pub fn get<S>(&self, id: S) -> Option<&Arc<CardArchetype>>
+    where
+        S: AsRef<str>,
+    {
+        self.sets.iter().find_map(|set| set.get(id.as_ref()))
+    }
+
+    pub fn contains<S>(&self, id: S) -> bool
+    where
+        S: AsRef<str>,
+    {
+        let id = id.as_ref();
+        self.sets.iter().any(|set| set.contains(id))
+    }
+}
+
+impl Index<&str> for Catalog {
+    type Output = Arc<CardArchetype>;
+
+    fn index(&self, safe_name: &str) -> &Self::Output {
+        static NONE: LazyLock<Arc<CardArchetype>> =
+            LazyLock::new(|| Arc::new(CardArchetype::default()));
+        self.iter()
+            .find(|archetype| archetype.safe_name == safe_name)
+            .unwrap_or(&NONE)
+    }
+}
+
+impl Index<ArchetypeId> for Catalog {
+    type Output = Arc<CardArchetype>;
+
+    fn index(&self, short_id: ArchetypeId) -> &Self::Output {
+        &self[short_id.as_str()]
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CardSet {
     map: HashMap<String, usize>,
     list: Vec<Arc<CardArchetype>>,
 }
 
-impl Catalog {
+impl CardSet {
     pub fn new(cards: &'static CardMap) -> Self {
         let mut list = cards
             .values()
@@ -66,29 +119,11 @@ impl Catalog {
         self.map.get(id.as_ref()).map(|&i| &self.list[i])
     }
 
-    pub fn contains(&self, safe_name: &str) -> bool {
-        self.map.contains_key(safe_name)
-    }
-}
-
-impl Index<&str> for Catalog {
-    type Output = Arc<CardArchetype>;
-
-    fn index(&self, safe_name: &str) -> &Self::Output {
-        static NONE: LazyLock<Arc<CardArchetype>> =
-            LazyLock::new(|| Arc::new(CardArchetype::default()));
-        self.map
-            .get(safe_name)
-            .map(|i| &self.list[*i])
-            .unwrap_or(&NONE)
-    }
-}
-
-impl Index<ArchetypeId> for Catalog {
-    type Output = Arc<CardArchetype>;
-
-    fn index(&self, short_id: ArchetypeId) -> &Self::Output {
-        &self[short_id.as_str()]
+    pub fn contains<S>(&self, id: S) -> bool
+    where
+        S: AsRef<str>,
+    {
+        self.map.contains_key(id.as_ref())
     }
 }
 

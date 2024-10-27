@@ -133,7 +133,7 @@ impl AppState {
                 host_player,
             }) => {
                 if !config.regulation.verify(&host_player.deck, &CATALOG)
-                    || !config.card_pool.verify(&host_player.deck)
+                    || !config.card_pool.verify(&host_player.deck, &CATALOG)
                 {
                     self.send(user_id, Output::Error(Error::InvalidDeck));
                     return;
