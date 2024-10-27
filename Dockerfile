@@ -5,9 +5,9 @@ FROM rust:latest AS builder
 WORKDIR /usr/src/app
 
 # Copy the actual source code
+COPY .git .git
 COPY Cargo.toml Cargo.lock ./
 COPY kodecks kodecks
-COPY kodecks-bevy kodecks-bevy
 COPY kodecks-bot kodecks-bot
 COPY kodecks-catalog kodecks-catalog
 COPY kodecks-engine kodecks-engine
