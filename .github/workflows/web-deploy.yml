@@ -23,6 +23,8 @@ jobs:
         with:
           target: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ github.event_name }}
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@v1.10.3
       - name: Install trunk
