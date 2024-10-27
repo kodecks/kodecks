@@ -3,6 +3,8 @@ name: Web Deploy
 on:
   push:
     branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -28,7 +30,11 @@ jobs:
       - name: Download assets
         run: ./scripts/download.sh
       - name: Build
+        if: github.event_name == 'push'
         run: trunk build --cargo-profile web-distribution
+      - name: Debug Build
+        if: github.event_name == 'pull_request'
+        run: trunk build
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v3.0
         with:
