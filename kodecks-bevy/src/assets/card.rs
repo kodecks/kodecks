@@ -93,7 +93,7 @@ impl AssetLoader for RenderedCardLoader {
                 .to_str()
                 .unwrap();
             let archetype = &CATALOG[id];
-            let attr = ComputedAttribute::from(archetype);
+            let attr = ComputedAttribute::from(&**archetype);
             let mut frame_image = self.painter.generate_frame(CardFrame::new(&attr));
             for (x, y, pixel) in image.enumerate_pixels() {
                 if frame_image.get_pixel(x + 2, y + 14)[3] == 0 {

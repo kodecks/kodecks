@@ -20,46 +20,75 @@ use bincode::{
 use core::fmt;
 use num::Zero;
 use serde::{Deserialize, Serialize};
-use std::{ops::Index, sync::LazyLock};
+use std::{
+    collections::HashMap,
+    ops::Index,
+    sync::{Arc, LazyLock},
+};
 use strum::Display;
 use tinystr::TinyAsciiStr;
 
 pub type CardMap = phf::Map<&'static str, fn() -> &'static CardArchetype>;
 
 pub struct Catalog {
-    pub str_index: &'static CardMap,
+    map: HashMap<String, usize>,
+    list: Vec<Arc<CardArchetype>>,
 }
 
 impl Catalog {
-    pub fn iter(&self) -> impl Iterator<Item = &'static CardArchetype> {
-        self.str_index.values().map(|entry| entry())
+    pub fn new(cards: &'static CardMap) -> Self {
+        let mut list = cards
+            .values()
+            .map(|archetype| Arc::new(archetype().clone()))
+            .collect::<Vec<_>>();
+        list.sort();
+        let map = list
+            .iter()
+            .enumerate()
+            .flat_map(|(i, card)| {
+                [
+                    (card.id.as_str().to_string(), i),
+                    (card.safe_name.to_string(), i),
+                ]
+            })
+            .collect();
+        Self { map, list }
     }
 
-    pub fn get<S>(&self, id: S) -> Option<&'static CardArchetype>
+    pub fn iter(&self) -> impl Iterator<Item = &Arc<CardArchetype>> {
+        self.list.iter()
+    }
+
+    pub fn get<S>(&self, id: S) -> Option<&Arc<CardArchetype>>
     where
         S: AsRef<str>,
     {
-        self.str_index.get(id.as_ref()).map(|entry| entry())
+        self.map.get(id.as_ref()).map(|&i| &self.list[i])
     }
 
     pub fn contains(&self, safe_name: &str) -> bool {
-        self.str_index.contains_key(safe_name)
+        self.map.contains_key(safe_name)
     }
 }
 
 impl Index<&str> for Catalog {
-    type Output = CardArchetype;
+    type Output = Arc<CardArchetype>;
 
     fn index(&self, safe_name: &str) -> &Self::Output {
-        self.get(safe_name).unwrap_or(CardArchetype::NONE())
+        static NONE: LazyLock<Arc<CardArchetype>> =
+            LazyLock::new(|| Arc::new(CardArchetype::default()));
+        self.map
+            .get(safe_name)
+            .map(|i| &self.list[*i])
+            .unwrap_or(&NONE)
     }
 }
 
 impl Index<ArchetypeId> for Catalog {
-    type Output = CardArchetype;
+    type Output = Arc<CardArchetype>;
 
     fn index(&self, short_id: ArchetypeId) -> &Self::Output {
-        self.index(short_id.as_str())
+        &self[short_id.as_str()]
     }
 }
 
@@ -465,13 +494,6 @@ impl Ord for CardArchetype {
             .cmp(&other.attribute)
             .then(self.id.cmp(&other.id))
     }
-}
-
-impl CardArchetype {
-    pub const NONE: fn() -> &'static CardArchetype = || {
-        static CACHE: LazyLock<CardArchetype> = LazyLock::new(CardArchetype::default);
-        &CACHE
-    };
 }
 
 impl Default for CardArchetype {
