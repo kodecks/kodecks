@@ -1,61 +1,72 @@
 <html>
-  <head>
-    <meta charset="utf-8"/>
-    <link data-trunk rel="rust" href="../kodecks-bevy" data-initializer="initializer.mjs"/>
-    <link data-trunk rel="rust" href="../kodecks-engine" data-type="worker" data-wasm-opt="z" data-bin="worker" data-weak-refs data-loader-shim />
-    <link data-trunk rel="copy-dir" href="../kodecks-bevy/assets"/>
-  </head>
-  <title>Kodecks</title>
-  <div id="loading-screen">
-      <div class="spinner"></div>
-      <span id="loading-percentage">0%</span>
-  </div>
-  <style>
-    @font-face {
-        font-family: 'Jersey 20';
-        src: url('assets/fonts/Jersey20-Regular.ttf') format('truetype');
-        font-weight: normal;
-        font-style: normal;
-    }
-    body {
-      background-color: #282c34;
-    }
-    #loading-screen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
+
+<head>
+  <meta charset="utf-8" />
+  <link data-trunk rel="rust" href="../kodecks-bevy" data-initializer="initializer.mjs" />
+  <link data-trunk rel="rust" href="../kodecks-engine" data-type="worker" data-wasm-opt="z" data-bin="worker"
+    data-weak-refs data-loader-shim />
+  <link data-trunk rel="copy-dir" href="../kodecks-bevy/assets" />
+  <link data-trunk rel="icon" href="favicon.svg" />
+</head>
+<title>Kodecks</title>
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <span id="loading-percentage">0%</span>
+</div>
+<style>
+  @font-face {
+    font-family: 'Jersey 20';
+    src: url('assets/fonts/Jersey20-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  body {
+    background-color: #282c34;
+  }
+
+  #loading-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .spinner {
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 5px solid #282c34;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    position: relative;
+  }
+
+  #loading-percentage {
+    position: absolute;
+    color: #fff;
+    font-size: 32px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Jersey 20';
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
     }
 
-    .spinner {
-      border: 5px solid #f3f3f3;
-      border-radius: 50%;
-      border-top: 5px solid #282c34;
-      width: 120px;
-      height: 120px;
-      animation: spin 2s linear infinite;
-      position: relative;
+    100% {
+      transform: rotate(360deg);
     }
+  }
+</style>
 
-    #loading-percentage {
-      position: absolute;
-      color: #fff;
-      font-size: 32px;
-      font-weight: bold;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: 'Jersey 20';
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
 </html>
