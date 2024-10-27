@@ -3,7 +3,7 @@ use kodecks::prelude::*;
 
 card_def!(
     CardDef,
-    "tung",
+    "tung", // spellchecker:disable-line
     "Tungsten Rhino",
     color: Color::RED,
     cost: 5,

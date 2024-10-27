@@ -3,7 +3,7 @@ use kodecks::prelude::*;
 
 card_def!(
     CardDef,
-    "ther",
+    "ther", // spellchecker:disable-line
     "Thermite Crab",
     color: Color::RED,
     cost: 2,
