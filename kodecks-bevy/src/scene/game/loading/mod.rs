@@ -270,6 +270,7 @@ fn init_game_mode(
             save_data.hash(&mut hasher);
             let profile = GameProfile {
                 regulation: mode.regulation.clone(),
+                card_pool: mode.card_pool.clone(),
                 debug: None,
                 players: vec![
                     PlayerConfig {
@@ -300,6 +301,7 @@ fn init_game_mode(
             conn.send(Input::Command(Command::CreateRoom {
                 config: RoomConfig {
                     regulation: mode.regulation.clone(),
+                    card_pool: mode.card_pool.clone(),
                     room_type: RoomType::RandomMatch,
                 },
                 host_player: PlayerConfig {

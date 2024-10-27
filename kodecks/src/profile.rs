@@ -1,4 +1,4 @@
-use crate::{player::PlayerConfig, regulation::Regulation};
+use crate::{player::PlayerConfig, pool::CardPool, regulation::Regulation};
 use bincode::{
     de::{BorrowDecoder, Decoder},
     enc::Encoder,
@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Encode, Decode)]
 pub struct GameProfile {
     pub regulation: Regulation,
+    pub card_pool: CardPool,
     pub debug: Option<DebugConfig>,
     pub players: Vec<PlayerConfig>,
     pub bots: Vec<BotConfig>,
