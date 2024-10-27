@@ -28,7 +28,7 @@ use std::{
 use strum::Display;
 use tinystr::TinyAsciiStr;
 
-pub type CardMap = phf::Map<&'static str, fn() -> &'static CardArchetype>;
+pub type CardList = [fn() -> &'static CardArchetype];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Catalog {
@@ -36,7 +36,7 @@ pub struct Catalog {
 }
 
 impl Catalog {
-    pub fn new(cards: &'static CardMap) -> Self {
+    pub fn new(cards: &CardList) -> Self {
         Self {
             sets: vec![CardSet::new(cards)],
         }
@@ -87,9 +87,9 @@ pub struct CardSet {
 }
 
 impl CardSet {
-    pub fn new(cards: &'static CardMap) -> Self {
+    pub fn new(cards: &CardList) -> Self {
         let mut list = cards
-            .values()
+            .iter()
             .map(|archetype| Arc::new(archetype().clone()))
             .collect::<Vec<_>>();
         list.sort();
