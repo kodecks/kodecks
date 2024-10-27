@@ -1,4 +1,7 @@
-use crate::{card::ArchetypeId, deck::DeckList};
+use crate::{
+    card::{ArchetypeId, Catalog},
+    deck::DeckList,
+};
 use bincode::{
     de::{BorrowDecoder, Decoder},
     enc::Encoder,
@@ -16,23 +19,38 @@ impl CardPool {
         Self::default()
     }
 
-    pub fn verify(&self, deck: &DeckList) -> bool {
+    pub fn verify(&self, deck: &DeckList, catalog: &Catalog) -> bool {
         let mut count = HashMap::new();
         for item in &deck.cards {
             let entry = count.entry(item.card.archetype_id).or_insert(0);
             *entry += 1;
         }
         for (entry, status) in &self.0 {
-            if let CardPoolEntry::Card(id) = entry {
-                let status: u8 = (*status).into();
-                if let Some(&value) = count.get(id) {
-                    if value > status {
-                        return false;
+            let status: u8 = (*status).into();
+            match entry {
+                CardPoolEntry::CoreSet => {
+                    for (id, value) in count.clone() {
+                        if catalog.contains(id) {
+                            if value > status {
+                                return false;
+                            } else {
+                                count.remove(&id);
+                            }
+                        }
+                    }
+                }
+                CardPoolEntry::Card(id) => {
+                    if let Some(&value) = count.get(id) {
+                        if value > status {
+                            return false;
+                        } else {
+                            count.remove(id);
+                        }
                     }
                 }
             }
         }
-        true
+        count.is_empty()
     }
 }
 
