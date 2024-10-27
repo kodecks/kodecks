@@ -65,12 +65,10 @@ impl Catalog {
 impl Index<&str> for Catalog {
     type Output = Arc<CardArchetype>;
 
-    fn index(&self, safe_name: &str) -> &Self::Output {
+    fn index(&self, id: &str) -> &Self::Output {
         static NONE: LazyLock<Arc<CardArchetype>> =
             LazyLock::new(|| Arc::new(CardArchetype::default()));
-        self.iter()
-            .find(|archetype| archetype.safe_name == safe_name)
-            .unwrap_or(&NONE)
+        self.get(id).unwrap_or(&NONE)
     }
 }
 
