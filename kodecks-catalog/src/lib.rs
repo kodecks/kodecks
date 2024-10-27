@@ -7,4 +7,4 @@ mod cards;
 pub mod decks;
 mod macros;
 
-pub static CATALOG: LazyLock<Catalog> = LazyLock::new(|| Catalog::new(&cards::CARDS));
+pub static CATALOG: LazyLock<Catalog> = LazyLock::new(|| Catalog::new(cards::CARDS));
