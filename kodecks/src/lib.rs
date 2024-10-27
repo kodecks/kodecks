@@ -23,6 +23,7 @@ pub mod message;
 pub mod opcode;
 pub mod phase;
 pub mod player;
+pub mod pool;
 pub mod prelude;
 pub mod profile;
 pub mod regulation;

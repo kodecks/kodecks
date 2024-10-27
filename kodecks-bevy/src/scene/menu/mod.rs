@@ -6,7 +6,7 @@ use super::{
 use crate::{app_version, assets::AssetServerExt, config::GlobalConfig, save_data};
 use bevy::prelude::*;
 use bevy_mod_picking::prelude::*;
-use kodecks::{deck::DeckList, regulation::Regulation};
+use kodecks::{deck::DeckList, pool::CardPool, regulation::Regulation};
 use kodecks_catalog::decks::{blue_deck, red_deck};
 
 pub struct MenuPlugin;
@@ -299,6 +299,7 @@ fn handle_menu_events(
 
     let mode = GameMode {
         regulation: Regulation::STANDARD,
+        card_pool: CardPool::default(),
         player_deck: deck.clone(),
         kind,
     };
