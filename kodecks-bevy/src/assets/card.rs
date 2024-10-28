@@ -1,5 +1,7 @@
 use crate::painter::frames::{CardFrame, CardFramePainter};
 use crate::painter::numbers::{Alignment, DrawOptions, NumberPainter};
+use crate::scene::card::Catalog;
+use arc_swap::ArcSwap;
 use bevy::asset::AsyncReadExt;
 use bevy::asset::{io::Reader, AssetLoader, LoadContext};
 use bevy::prelude::*;
@@ -9,10 +11,8 @@ use bevy::utils::ConditionalSendFuture;
 use image::codecs::png::PngDecoder;
 use image::{DynamicImage, GenericImage, GenericImageView};
 use kodecks::computed::ComputedAttribute;
-use kodecks_catalog::CATALOG;
 use std::io::Cursor;
 use std::sync::LazyLock;
-
 use thiserror;
 use thiserror::Error;
 
@@ -30,10 +30,21 @@ pub struct RenderedCard {
     pub image: Handle<Image>,
 }
 
-#[derive(Default)]
 struct RenderedCardLoader {
+    catalog: ArcSwap<kodecks::card::Catalog>,
     painter: CardFramePainter,
     number: NumberPainter,
+}
+
+impl FromWorld for RenderedCardLoader {
+    fn from_world(world: &mut World) -> Self {
+        let catalog = ArcSwap::new((**world.get_resource::<Catalog>().unwrap()).clone());
+        Self {
+            catalog,
+            painter: CardFramePainter::default(),
+            number: NumberPainter::default(),
+        }
+    }
 }
 
 #[non_exhaustive]
@@ -92,8 +103,8 @@ impl AssetLoader for RenderedCardLoader {
                 .unwrap()
                 .to_str()
                 .unwrap();
-            let archetype = &CATALOG[id];
-            let attr = ComputedAttribute::from(&**archetype);
+            let archetype = self.catalog.load()[id].clone();
+            let attr = ComputedAttribute::from(&*archetype);
             let mut frame_image = self.painter.generate_frame(CardFrame::new(&attr));
             for (x, y, pixel) in image.enumerate_pixels() {
                 if frame_image.get_pixel(x + 2, y + 14)[3] == 0 {

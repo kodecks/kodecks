@@ -65,6 +65,7 @@ thiserror = "1.0.63"
 tracing = "0.1.40"
 unic-langid = { version = "0.9.5", features = ["macros"] }
 url = { version = "2.5.2", features = ["serde"] }
+arc-swap = "1.7.1"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 kodecks-bot = { path = "../kodecks-bot", features = ["rayon"] }
