@@ -68,10 +68,7 @@ async fn main() -> anyhow::Result<()> {
         .route_layer(middleware::from_fn_with_state(state.clone(), auth::auth));
 
     let app = Router::new()
-        .route(
-            "/",
-            get(|| async { Redirect::permanent("https://github.com/kodecks/kodecks") }),
-        )
+        .route("/", get(|| async { Redirect::temporary("/status") }))
         .route("/status", get(app::status))
         .route("/login", post(login::login))
         .route("/ws", get(socket::ws_handler))
