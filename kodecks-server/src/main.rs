@@ -33,9 +33,10 @@ mod token;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::registry()
-        .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-            format!("{}=debug,tower_http=debug", env!("CARGO_CRATE_NAME")).into()
-        }))
+        .with(
+            EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| format!("{}=info", env!("CARGO_CRATE_NAME")).into()),
+        )
         .with(tracing_subscriber::fmt::layer())
         .init();
 
