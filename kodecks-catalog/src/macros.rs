@@ -5,11 +5,10 @@ macro_rules! card_def {
         pub struct $struct;
 
         pub const ARCHETYPE: fn() -> &'static CardArchetype = || {
-            static SAFE_NAME: std::sync::LazyLock<String> = std::sync::LazyLock::new(|| kodecks::card::safe_name($name).unwrap());
             static CACHE: std::sync::LazyLock<CardArchetype> = std::sync::LazyLock::new(|| CardArchetype {
                 id: ArchetypeId::new($id),
-                name: $name,
-                safe_name: &SAFE_NAME,
+                name: $name.to_string(),
+                safe_name: kodecks::card::safe_name($name).unwrap(),
                 attribute: CardAttribute {
                     $( $key : ($value).into(), )*
                     ..Default::default()

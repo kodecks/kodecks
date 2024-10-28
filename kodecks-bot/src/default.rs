@@ -71,7 +71,7 @@ impl Bot for DefaultBot {
                 .state
                 .find_card(*card)
                 .ok()
-                .map(|card| card.archetype().name)
+                .map(|card| card.archetype().name.clone())
                 .unwrap_or_default();
             debug!("Select: {} score: {:?}", name, score);
         }
@@ -87,7 +87,7 @@ impl Bot for DefaultBot {
                 .state
                 .find_card(*card)
                 .ok()
-                .map(|card| card.archetype().name)
+                .map(|card| card.archetype().name.clone())
                 .unwrap_or_default();
             debug!("Cast: {} score: {:?}", name, score);
         }
@@ -102,7 +102,7 @@ impl Bot for DefaultBot {
             let attackers = attackers
                 .iter()
                 .filter_map(|id| env.state.find_card(*id).ok())
-                .map(|card| card.archetype().name)
+                .map(|card| card.archetype().name.clone())
                 .collect::<Vec<_>>()
                 .join(", ");
             debug!("Battle: {} score: {:?}", attackers, score);
@@ -138,12 +138,12 @@ impl Bot for DefaultBot {
                         env.state
                             .find_card(*attacker)
                             .ok()
-                            .map(|card| card.archetype().name)
+                            .map(|card| card.archetype().name.clone())
                             .unwrap_or_default(),
                         env.state
                             .find_card(*blocker)
                             .ok()
-                            .map(|card| card.archetype().name)
+                            .map(|card| card.archetype().name.clone())
                             .unwrap()
                     )
                 })

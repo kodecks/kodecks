@@ -28,8 +28,8 @@ impl UICardInfo {
             .unwrap_or_default()
             .to_vec();
 
-        let safe_name = CATALOG[self.snapshot.archetype_id].safe_name;
-        abilities.extend(translator.get_related_items(safe_name).abilities);
+        let safe_name = CATALOG[self.snapshot.archetype_id].safe_name.clone();
+        abilities.extend(translator.get_related_items(&safe_name).abilities);
         abilities.sort();
         abilities.dedup();
 
@@ -37,7 +37,7 @@ impl UICardInfo {
     }
 
     pub fn text_sections(&self, translator: &Translator, catalog: &Catalog) -> Vec<TextSection> {
-        let safe_name = catalog[self.snapshot.archetype_id].safe_name;
+        let safe_name = catalog[self.snapshot.archetype_id].safe_name.clone();
         let id = format!("card-{safe_name}.text");
         let text = translator.get(&id);
 

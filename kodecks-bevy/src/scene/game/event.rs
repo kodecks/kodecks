@@ -152,7 +152,7 @@ fn preload_assets(
             let archetype = &catalog[card.archetype_id];
             cards.push(archetype);
 
-            for safe_name in translator.get_related_items(archetype.safe_name).cards {
+            for safe_name in translator.get_related_items(&archetype.safe_name).cards {
                 cards.push(&catalog[safe_name.as_str()]);
             }
         }

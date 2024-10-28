@@ -150,7 +150,7 @@ fn update_card_image(
 ) {
     for (_, mut image) in image_query.iter_mut() {
         if let Some(card) = state.selected_card.as_ref() {
-            let safe_name = CATALOG[card.snapshot.archetype_id].safe_name;
+            let safe_name = CATALOG[card.snapshot.archetype_id].safe_name.clone();
             *image = UiImage::new(
                 asset_server.load_with_cache(format!("cards/{}/image.main.png", safe_name)),
             );
@@ -201,7 +201,7 @@ fn update_card_info(
 ) {
     for (info, mut text) in queries.text.iter_mut() {
         text.sections = if let Some(card) = state.selected_card.as_ref() {
-            let safe_name = CATALOG[card.snapshot.archetype_id].safe_name;
+            let safe_name = CATALOG[card.snapshot.archetype_id].safe_name.clone();
             let id = format!("card-{safe_name}");
             let name = translator.get(&id);
 

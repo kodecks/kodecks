@@ -511,8 +511,8 @@ impl AsRef<str> for ArchetypeId {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CardArchetype {
     pub id: ArchetypeId,
-    pub name: &'static str,
-    pub safe_name: &'static str,
+    pub name: String,
+    pub safe_name: String,
     pub attribute: CardAttribute,
     pub effect: fn() -> Box<dyn Effect>,
 }
@@ -535,8 +535,8 @@ impl Default for CardArchetype {
     fn default() -> Self {
         Self {
             id: ArchetypeId::new(""),
-            name: "",
-            safe_name: "",
+            name: String::new(),
+            safe_name: String::new(),
             attribute: CardAttribute::default(),
             effect: no_effect(),
         }
@@ -553,12 +553,12 @@ pub struct CardAttribute {
     pub cost: u8,
     pub card_type: CardType,
     pub creature_type: Option<CreatureType>,
-    pub abilities: &'static [KeywordAbility],
-    pub anon_abilities: &'static [AnonymousAbility],
+    pub abilities: Vec<KeywordAbility>,
+    pub anon_abilities: Vec<AnonymousAbility>,
     pub power: Option<u32>,
     pub shields: Option<u8>,
     pub is_token: bool,
-    pub alt_styles: &'static [CardStyle],
+    pub alt_styles: Vec<CardStyle>,
 }
 
 impl Default for CardAttribute {
@@ -568,12 +568,12 @@ impl Default for CardAttribute {
             cost: 0,
             card_type: CardType::Hex,
             creature_type: None,
-            abilities: &[],
-            anon_abilities: &[],
+            abilities: Vec::new(),
+            anon_abilities: Vec::new(),
             power: None,
             shields: None,
             is_token: false,
-            alt_styles: &[],
+            alt_styles: Vec::new(),
         }
     }
 }
