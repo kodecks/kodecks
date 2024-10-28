@@ -1,10 +1,13 @@
-use crate::opts::StartupOptions;
+use crate::{
+    opts::StartupOptions,
+    scene::{card::Catalog, GlobalState},
+};
 use bevy::prelude::*;
 use futures::{
     channel::mpsc::{self, Sender},
     StreamExt,
 };
-use kodecks_catalog::{decks::starter_deck, CATALOG};
+use kodecks_catalog::decks::starter_deck;
 
 mod container;
 mod v1;
@@ -14,6 +17,7 @@ pub struct SaveDataPlugin;
 impl Plugin for SaveDataPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, init)
+            .add_systems(OnExit(GlobalState::AppInit), init_savedata)
             .add_systems(Update, write_data.run_if(resource_changed::<SaveData>));
     }
 }
@@ -23,22 +27,24 @@ pub struct SaveData(v1::SaveDataV1);
 
 impl SaveData {
     pub fn load(opts: &StartupOptions) -> Self {
-        let mut data = io::read_data(opts);
-        if data.decks.list.is_empty() {
-            data.decks.list = vec![starter_deck()];
-        }
-        data.collection.cards = CATALOG
-            .iter()
-            .filter(|card| !card.attribute.is_token)
-            .map(|card| (card.id, 4))
-            .collect();
-        data
+        io::read_data(opts)
     }
 }
 
 fn init(mut commands: Commands, opts: Res<StartupOptions>) {
     commands.insert_resource(DataWriter::new(opts.clone()));
     commands.insert_resource(SaveData::load(&opts));
+}
+
+fn init_savedata(mut data: ResMut<SaveData>, catalog: Res<Catalog>) {
+    if data.decks.list.is_empty() {
+        data.decks.list = vec![starter_deck(&catalog)];
+    }
+    data.collection.cards = catalog
+        .iter()
+        .filter(|card| !card.attribute.is_token)
+        .map(|card| (card.id, 4))
+        .collect();
 }
 
 fn write_data(config: Res<SaveData>, mut data_writer: ResMut<DataWriter>) {

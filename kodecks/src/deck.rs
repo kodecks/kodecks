@@ -24,7 +24,7 @@ impl fmt::Display for DeckList {
 }
 
 impl DeckList {
-    pub fn parse(s: &str, catalog: &'static Catalog) -> Option<Self> {
+    pub fn parse(s: &str, catalog: &Catalog) -> Option<Self> {
         let mut name = String::new();
         let mut cards = Vec::new();
         for line in s.lines().map(|s| s.trim()) {
@@ -48,7 +48,7 @@ pub struct DeckItem {
 }
 
 impl DeckItem {
-    pub fn parse(s: &str, catalog: &'static Catalog) -> Vec<Self> {
+    pub fn parse(s: &str, catalog: &Catalog) -> Vec<Self> {
         let (name, count) = match s.rsplit_once(' ') {
             Some((name, count)) => {
                 if let Ok(count) = count.parse() {

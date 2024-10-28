@@ -1,7 +1,6 @@
-use crate::CATALOG;
-use kodecks::deck::DeckList;
+use kodecks::{card::Catalog, deck::DeckList};
 
-pub fn starter_deck() -> DeckList {
+pub fn starter_deck(catalog: &Catalog) -> DeckList {
     DeckList::parse(
         "
     # Starter deck
@@ -24,12 +23,12 @@ pub fn starter_deck() -> DeckList {
     Quagmire Trilobite 1
     Cenote Otter 1
     ",
-        &CATALOG,
+        catalog,
     )
     .unwrap()
 }
 
-pub fn blue_deck() -> DeckList {
+pub fn blue_deck(catalog: &Catalog) -> DeckList {
     DeckList::parse(
         "
     # Blue deck
@@ -50,12 +49,12 @@ pub fn blue_deck() -> DeckList {
     Auto Parrot 1
     Awkward Auk 1
     ",
-        &CATALOG,
+        catalog,
     )
     .unwrap()
 }
 
-pub fn red_deck() -> DeckList {
+pub fn red_deck(catalog: &Catalog) -> DeckList {
     DeckList::parse(
         "
     # Red deck
@@ -77,7 +76,7 @@ pub fn red_deck() -> DeckList {
     Cyanide Spitter 1
     Ruby Digger 1
     ",
-        &CATALOG,
+        catalog,
     )
     .unwrap()
 }

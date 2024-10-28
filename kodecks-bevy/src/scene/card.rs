@@ -2,11 +2,12 @@ use super::translator::Translator;
 use crate::scene::translator::TextPurpose;
 use bevy::{color::palettes::css, prelude::*};
 use kodecks::{
-    card::{CardSnapshot, Catalog},
+    card::CardSnapshot,
     prelude::KeywordAbility,
     text::{parse_text, Section},
 };
 use kodecks_catalog::CATALOG;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct UICardInfo {
@@ -114,5 +115,14 @@ impl UICardInfo {
         }
 
         sections
+    }
+}
+
+#[derive(Clone, Resource, Deref)]
+pub struct Catalog(Arc<kodecks::card::Catalog>);
+
+impl Catalog {
+    pub fn new(catalog: Arc<kodecks::card::Catalog>) -> Self {
+        Self(catalog)
     }
 }

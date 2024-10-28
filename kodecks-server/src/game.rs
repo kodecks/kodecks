@@ -154,7 +154,7 @@ impl Game {
     ) {
         let regulation = profile.regulation.clone();
 
-        let mut env = Arc::new(Environment::new(profile, &CATALOG));
+        let mut env = Arc::new(Environment::new(profile, CATALOG.clone()));
         let mut available_actions: Option<PlayerAvailableActions> = None;
         let mut player_in_action = env.state.players.player_in_turn().id;
 

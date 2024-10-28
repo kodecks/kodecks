@@ -2,6 +2,7 @@ use super::animation::RegisterAnimation;
 use crate::{
     assets::AssetServerExt,
     scene::{
+        card::Catalog,
         game::board::{Board, Environment},
         GlobalState,
     },
@@ -10,7 +11,6 @@ use bevy::{
     animation::{AnimationTarget, AnimationTargetId},
     prelude::*,
 };
-use kodecks_catalog::CATALOG;
 
 pub struct StackPlugin;
 
@@ -119,6 +119,7 @@ fn update_effect_stack(
         &mut Handle<StandardMaterial>,
     )>,
     camera: Query<&Transform, (With<Camera>, Without<EffectStackItem>)>,
+    catalog: Res<Catalog>,
 ) {
     for (item, mut transform, mut material) in query.iter_mut() {
         if let Some(stack_item) = env.stack.as_slice().get(item.index) {
@@ -129,7 +130,7 @@ fn update_effect_stack(
                     continue;
                 };
                 let card = env.find_card(stack_item.source).unwrap();
-                let archetype = &CATALOG[card.archetype_id];
+                let archetype = &catalog[card.archetype_id];
                 let card_image = asset_server.load_with_cache(format!(
                     "cards/{}/image.main.png#stack",
                     archetype.safe_name

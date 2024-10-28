@@ -88,7 +88,7 @@ impl ContinuousEffectList {
     }
 
     pub fn apply_card(&mut self, state: &GameState, card: &Card) -> ComputedAttribute {
-        let mut computed = ComputedAttribute::from(card.archetype());
+        let mut computed = ComputedAttribute::from(&**card.archetype());
         for effect in self.effects.iter_mut().rev() {
             if let Err(err) = state
                 .find_card(effect.source)

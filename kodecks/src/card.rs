@@ -130,7 +130,7 @@ pub struct Card {
     owner: u8,
     zone: PlayerZone,
     controller: u8,
-    archetype: &'static CardArchetype,
+    archetype: Arc<CardArchetype>,
     style: u8,
     computed: ComputedAttribute,
     flags: ComputedFlags,
@@ -151,11 +151,12 @@ impl Card {
     pub fn new(
         counter: &mut ObjectIdCounter,
         item: &DeckItem,
-        archetype: &'static CardArchetype,
+        archetype: Arc<CardArchetype>,
         style: u8,
         owner: u8,
     ) -> Self {
         let effect = (archetype.effect)();
+        let computed = (&*archetype).into();
         Self {
             id: counter.allocate(item.base_id),
             owner,
@@ -163,7 +164,7 @@ impl Card {
             controller: owner,
             archetype,
             style,
-            computed: archetype.into(),
+            computed,
             flags: ComputedFlags::empty(),
             event_filter: effect.event_filter(),
             effect,
@@ -173,8 +174,9 @@ impl Card {
         }
     }
 
-    pub fn new_token(id: ObjectId, archetype: &'static CardArchetype, owner: u8) -> Self {
+    pub fn new_token(id: ObjectId, archetype: Arc<CardArchetype>, owner: u8) -> Self {
         let effect = (archetype.effect)();
+        let computed = (&*archetype).into();
         Self {
             id,
             owner,
@@ -182,7 +184,7 @@ impl Card {
             controller: owner,
             archetype,
             style: 0,
-            computed: archetype.into(),
+            computed,
             flags: ComputedFlags::empty(),
             event_filter: effect.event_filter(),
             revealed: PlayerMask::default(),
@@ -221,8 +223,8 @@ impl Card {
         }
     }
 
-    pub fn archetype(&self) -> &'static CardArchetype {
-        self.archetype
+    pub fn archetype(&self) -> &Arc<CardArchetype> {
+        &self.archetype
     }
 
     pub fn computed(&self) -> &ComputedAttribute {
@@ -240,7 +242,7 @@ impl Card {
     }
 
     pub fn reset_computed(&mut self) {
-        self.set_computed(self.archetype.into());
+        self.set_computed((&*self.archetype).into());
     }
 
     pub fn flags(&self) -> ComputedFlags {
@@ -303,7 +305,7 @@ impl Clone for Card {
             owner: self.owner,
             zone: self.zone,
             controller: self.controller,
-            archetype: self.archetype,
+            archetype: self.archetype.clone(),
             style: self.style,
             computed: self.computed.clone(),
             flags: self.flags,

@@ -4,11 +4,10 @@ use super::{
 };
 use crate::{
     assets::AssetServerExt,
-    scene::{game::board::Environment, GlobalState},
+    scene::{card::Catalog, game::board::Environment, GlobalState},
 };
 use bevy::{prelude::*, render::mesh::VertexAttributeValues};
 use bevy_mod_picking::prelude::*;
-use kodecks_catalog::CATALOG;
 
 pub struct DeckPlugin;
 
@@ -197,6 +196,7 @@ fn update_graveyards(
     )>,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    catalog: Res<Catalog>,
 ) {
     for (graveyard, mut transform, mut material, mut visibility) in query.iter_mut() {
         let player = match graveyard {
@@ -208,7 +208,7 @@ fn update_graveyards(
         let height = 0.005 * len as f32;
         transform.scale = Vec3::new(0.8 / CARD_WIDTH, height, 0.8 / CARD_WIDTH);
         if let Some(last) = player.graveyard.last() {
-            let archetype = &CATALOG[last.archetype_id];
+            let archetype = &catalog[last.archetype_id];
             let card_image = asset_server
                 .load_with_cache(format!("cards/{}/image.main.png", archetype.safe_name));
             *material = materials.add(StandardMaterial {

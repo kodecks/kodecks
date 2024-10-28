@@ -34,7 +34,7 @@ pub async fn start_game(
         })
         .collect::<Vec<_>>();
 
-    let mut env = Arc::new(Environment::new(profile, &CATALOG));
+    let mut env = Arc::new(Environment::new(profile, CATALOG.clone()));
     let mut available_actions: Option<PlayerAvailableActions> = None;
     let mut player_in_action = env.state.players.player_in_turn().id;
 

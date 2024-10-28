@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 use bevy_mod_picking::DefaultPickingPlugins;
+use card::Catalog;
+use kodecks_catalog::CATALOG;
 
 pub mod app;
 pub mod card;
@@ -28,7 +30,8 @@ pub struct ScenePlugin;
 
 impl Plugin for ScenePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(DefaultPickingPlugins)
+        app.insert_resource(Catalog::new(CATALOG.clone()))
+            .add_plugins(DefaultPickingPlugins)
             .add_plugins(app::AppLoadingPlugin)
             .add_plugins(menu::MenuPlugin)
             .add_plugins(deck::DeckPlugin)

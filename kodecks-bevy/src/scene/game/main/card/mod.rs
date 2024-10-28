@@ -4,6 +4,7 @@ use crate::assets::{AssetHandleStore, AssetServerExt};
 use crate::painter::frames::CardFramePainter;
 use crate::painter::numbers::{Alignment, DrawOptions, NumberPainter};
 use crate::painter::shield::draw_shield;
+use crate::scene::card::Catalog;
 use crate::scene::game::board::{self, AvailableActionList, Board, Environment};
 use crate::scene::GlobalState;
 use ability::AbilityOverlay;
@@ -24,7 +25,6 @@ use image::{DynamicImage, RgbaImage};
 use kodecks::card::{ArchetypeId, CardArchetype, CardSnapshot};
 use kodecks::id::ObjectId;
 use kodecks::zone::Zone;
-use kodecks_catalog::CATALOG;
 use number::{NumberOverlay, NumberOverlayKey};
 use std::cmp::Ordering;
 use std::f32::consts::PI;
@@ -146,10 +146,11 @@ fn update_card(
     mut card_frame_query: Query<(&mut Handle<StandardMaterial>, &CardImage)>,
     mut transform_query: Query<&mut Transform>,
     mut builder: CardBundleBuilder,
+    catalog: Res<Catalog>,
 ) {
     for (card, entity) in changed_query.iter() {
         for child in children.iter_descendants(entity) {
-            let archetype = &CATALOG[card.archetype_id];
+            let archetype = &catalog[card.archetype_id];
             if let Ok((mut material, frame)) = card_frame_query.get_mut(child) {
                 *material = builder.load_image(*frame, archetype);
             }
@@ -283,15 +284,16 @@ pub struct CardBundleBuilder<'w, 's> {
     asset_server: Res<'w, AssetServer>,
     handles: Local<'s, Option<SharedHandles>>,
     id_store: Res<'w, AssetHandleStore<NumberOverlayKey, StandardMaterial>>,
+    catalog: Res<'w, Catalog>,
 }
 
 impl<'w, 's> CardBundleBuilder<'w, 's> {
     pub fn spawn(&mut self, card: CardSnapshot, opponent: bool) -> Entity {
         let card_id = card.id;
-        let archetype = &CATALOG[card.archetype_id];
+        let archetype = self.catalog[card.archetype_id].clone();
 
-        let image = self.load_image(CardImage::Image, archetype);
-        let frame = self.load_image(CardImage::Frame, archetype);
+        let image = self.load_image(CardImage::Image, &archetype);
+        let frame = self.load_image(CardImage::Frame, &archetype);
         let number_cost = self.number(&NumberOverlay::Cost, &card);
         let number_field = self.number(&NumberOverlay::Field, &card);
 

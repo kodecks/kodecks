@@ -1,4 +1,5 @@
 use super::{
+    card::Catalog,
     game::mode::{GameMode, GameModeKind},
     translator::{TextPurpose, Translator},
     GlobalState,
@@ -30,7 +31,13 @@ enum MenuEvent {
     EditDeck,
 }
 
-fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<AssetServer>) {
+fn init(
+    mut commands: Commands,
+    translator: Res<Translator>,
+    asset_server: Res<AssetServer>,
+    catalog: Res<Catalog>,
+) {
+    let catalog = catalog.clone();
     let slicer = TextureSlicer {
         border: BorderRect::square(5.0),
         center_scale_mode: SliceScaleMode::Stretch,
@@ -84,7 +91,7 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
                         Label,
                     ));
                 });
-
+            let catalog_cloned = catalog.clone();
             parent
                 .spawn(NodeBundle {
                     style: Style {
@@ -116,9 +123,10 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
                             },
                             ImageScaleMode::Sliced(slicer.clone()),
                             On::<Pointer<Click>>::commands_mut(move |_, commands| {
+                                let catalog = catalog_cloned.clone();
                                 commands.add(move |w: &mut World| {
                                     w.send_event(MenuEvent::StartBotMatch {
-                                        deck_list: red_deck(),
+                                        deck_list: red_deck(&catalog),
                                     });
                                 });
                             }),
@@ -149,9 +157,10 @@ fn init(mut commands: Commands, translator: Res<Translator>, asset_server: Res<A
                             },
                             ImageScaleMode::Sliced(slicer.clone()),
                             On::<Pointer<Click>>::commands_mut(move |_, commands| {
+                                let catalog = catalog.clone();
                                 commands.add(move |w: &mut World| {
                                     w.send_event(MenuEvent::StartBotMatch {
-                                        deck_list: blue_deck(),
+                                        deck_list: blue_deck(&catalog),
                                     });
                                 });
                             }),

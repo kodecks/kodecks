@@ -1,5 +1,5 @@
 use super::{
-    card::UICardInfo,
+    card::{Catalog, UICardInfo},
     translator::{TextPurpose, Translator},
     GlobalState,
 };
@@ -90,6 +90,7 @@ fn init(
     translator: Res<Translator>,
     save_data: Res<SaveData>,
     asset_server: Res<AssetServer>,
+    catalog: Res<Catalog>,
 ) {
     let slicer = TextureSlicer {
         border: BorderRect::square(2.0),
@@ -114,7 +115,7 @@ fn init(
     let mut deck = deck
         .cards
         .iter()
-        .map(|item| &CATALOG[item.card.archetype_id])
+        .map(|item| &catalog[item.card.archetype_id])
         .collect::<Vec<_>>();
     deck.sort();
     for card in deck.iter() {
@@ -128,7 +129,7 @@ fn init(
         .collection
         .cards
         .iter()
-        .map(|(id, count)| (&CATALOG[*id], *count - current_deck.get(id).unwrap_or(&0)))
+        .map(|(id, count)| (&catalog[*id], *count - current_deck.get(id).unwrap_or(&0)))
         .collect::<Vec<_>>();
     inventory.sort_by_key(|(card, _)| *card);
 
@@ -704,11 +705,12 @@ fn handle_ui_event(
     mut event: EventReader<UiEvent>,
     mut state: ResMut<UIState>,
     mut next_state: ResMut<NextState<GlobalState>>,
+    catalog: Res<Catalog>,
 ) {
     for event in event.read() {
         match event {
             UiEvent::CardHovered(id) => {
-                let archetype = &CATALOG[*id];
+                let archetype = &catalog[*id];
                 state.selected_card = Some(UICardInfo::new(CardSnapshot::new(archetype)));
             }
             UiEvent::Quit => {
@@ -732,6 +734,7 @@ fn handle_deck_event(
     mut save_data: ResMut<SaveData>,
     translator: Res<Translator>,
     asset_server: Res<AssetServer>,
+    catalog: Res<Catalog>,
 ) {
     for event in event.read() {
         match event {
@@ -774,10 +777,10 @@ fn handle_deck_event(
                 let deck_items = queries
                     .deck
                     .iter()
-                    .map(|(_, item)| &CATALOG[item.0])
+                    .map(|(_, item)| &catalog[item.0])
                     .collect::<Vec<_>>();
 
-                let archetype = &CATALOG[*id];
+                let archetype = &catalog[*id];
                 let id = format!("card-{}", archetype.safe_name);
                 let name = translator.get(&id);
                 let image = asset_server
@@ -900,16 +903,22 @@ fn update_card_image(
     }
 }
 
+#[derive(SystemParam)]
+pub struct CardQueries<'w, 's> {
+    text: Query<'w, 's, (&'static CardInfo, &'static mut Text)>,
+    keyword: Query<'w, 's, Entity, With<Keyword>>,
+    list: Query<'w, 's, Entity, With<KeywordList>>,
+}
+
 fn update_card_info(
     mut commands: Commands,
     state: Res<UIState>,
-    mut text_query: Query<(&CardInfo, &mut Text)>,
-    keyword_query: Query<Entity, With<Keyword>>,
-    list_query: Query<Entity, With<KeywordList>>,
+    catalog: Res<Catalog>,
+    mut queries: CardQueries,
     asset_server: Res<AssetServer>,
     translator: Res<Translator>,
 ) {
-    for (info, mut text) in text_query.iter_mut() {
+    for (info, mut text) in queries.text.iter_mut() {
         text.sections = if let Some(card) = state.selected_card.as_ref() {
             let safe_name = CATALOG[card.snapshot.archetype_id].safe_name;
             let id = format!("card-{safe_name}");
@@ -920,7 +929,7 @@ fn update_card_info(
                     name,
                     translator.style(TextPurpose::CardName),
                 )],
-                CardInfo::Text => card.text_sections(&translator, &CATALOG),
+                CardInfo::Text => card.text_sections(&translator, &catalog),
                 _ => vec![],
             }
         } else {
@@ -928,12 +937,12 @@ fn update_card_info(
         };
     }
 
-    for entity in keyword_query.iter() {
+    for entity in queries.keyword.iter() {
         commands.add(DespawnRecursive { entity });
     }
 
     commands
-        .entity(list_query.single())
+        .entity(queries.list.single())
         .with_children(|parent| {
             if let Some(card) = state.selected_card.as_ref() {
                 for ability in card.related_abilities(&translator) {

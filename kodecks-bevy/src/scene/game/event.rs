@@ -6,7 +6,7 @@ use super::{
 };
 use crate::{
     save_data::SaveData,
-    scene::{translator::Translator, GlobalState},
+    scene::{card::Catalog, translator::Translator, GlobalState},
 };
 use bevy::utils::Duration;
 use bevy::{
@@ -21,7 +21,6 @@ use kodecks::{
     prelude::Message,
     target::Target,
 };
-use kodecks_catalog::CATALOG;
 use std::collections::VecDeque;
 
 pub struct EventPlugin;
@@ -145,15 +144,16 @@ fn preload_assets(
     mut assets: ResMut<PreloadedAssets>,
     translator: Res<Translator>,
     mut next_state: ResMut<NextState<AssetState>>,
+    catalog: Res<Catalog>,
 ) {
     let mut cards = vec![];
     for event in events.read() {
         for card in event.env.cards() {
-            let archetype = &CATALOG[card.archetype_id];
+            let archetype = &catalog[card.archetype_id];
             cards.push(archetype);
 
             for safe_name in translator.get_related_items(archetype.safe_name).cards {
-                cards.push(&CATALOG[safe_name.as_str()]);
+                cards.push(&catalog[safe_name.as_str()]);
             }
         }
     }
@@ -219,6 +219,7 @@ pub struct ServerEvents<'w> {
     turn: EventWriter<'w, TurnChanged>,
     list: Res<'w, AvailableActionList>,
     translator: Res<'w, Translator>,
+    catalog: Res<'w, Catalog>,
 }
 
 fn recv_server_events(
@@ -348,7 +349,7 @@ fn recv_server_events(
         }
 
         for log in &event.logs {
-            if let Some(log) = translate_log(log, &env, &CATALOG, &events.translator) {
+            if let Some(log) = translate_log(log, &env, &events.catalog, &events.translator) {
                 info!("{}", log);
             }
         }

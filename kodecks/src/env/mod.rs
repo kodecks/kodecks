@@ -22,7 +22,7 @@ use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
 use rand::SeedableRng;
 use serde::{Deserialize, Serialize};
-use std::{collections::VecDeque, fmt};
+use std::{collections::VecDeque, fmt, sync::Arc};
 use strum::Display;
 use tracing::{error, warn};
 
@@ -46,12 +46,12 @@ pub struct Environment {
     timestamp: u32,
     last_available_actions: Option<PlayerAvailableActions>,
     rng: SmallRng,
-    catalog: &'static Catalog,
+    catalog: Arc<Catalog>,
     obj_counter: ObjectIdCounter,
 }
 
 impl Environment {
-    pub fn new(profile: GameProfile, catalog: &'static Catalog) -> Self {
+    pub fn new(profile: GameProfile, catalog: Arc<Catalog>) -> Self {
         let debug = profile.debug.unwrap_or_default();
         let mut rng: SmallRng = profile
             .rng_seed
@@ -67,8 +67,13 @@ impl Environment {
                 let mut state = PlayerState::new(id as u8);
                 for item in &player.deck.cards {
                     let archetype = &catalog[item.card.archetype_id];
-                    let card =
-                        Card::new(&mut obj_counter, item, archetype, item.card.style, id as u8);
+                    let card = Card::new(
+                        &mut obj_counter,
+                        item,
+                        archetype.clone(),
+                        item.card.style,
+                        id as u8,
+                    );
                     state.deck.add_top(card);
                 }
                 state
@@ -378,7 +383,7 @@ impl Environment {
 
     pub fn generate_card_token(&self, player: u8, token: ObjectId, archetype: ArchetypeId) -> Card {
         let archetype = &self.catalog[archetype];
-        let mut card = Card::new_token(token, archetype, player);
+        let mut card = Card::new_token(token, archetype.clone(), player);
         card.set_timestamp(self.timestamp);
         card.set_zone(PlayerZone::new(player, Zone::Field));
         card

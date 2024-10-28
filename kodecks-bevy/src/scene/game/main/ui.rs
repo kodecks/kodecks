@@ -2,7 +2,7 @@ use super::event::PlayerEvent;
 use crate::{
     assets::AssetServerExt,
     scene::{
-        card::UICardInfo,
+        card::{Catalog, UICardInfo},
         game::{
             board::{self, AvailableActionList, Board},
             event::InstructionsUpdated,
@@ -11,7 +11,7 @@ use crate::{
         GlobalState,
     },
 };
-use bevy::{color::palettes::css, prelude::*};
+use bevy::{color::palettes::css, ecs::system::SystemParam, prelude::*};
 use bevy_mod_picking::picking_core::Pickable;
 use bevy_mod_picking::prelude::*;
 use fluent_bundle::{FluentArgs, FluentValue};
@@ -184,16 +184,22 @@ fn update_instructions(
     }
 }
 
+#[derive(SystemParam)]
+pub struct CardQueries<'w, 's> {
+    text: Query<'w, 's, (&'static CardInfo, &'static mut Text)>,
+    keyword: Query<'w, 's, Entity, With<Keyword>>,
+    list: Query<'w, 's, Entity, With<KeywordList>>,
+}
+
 fn update_card_info(
     mut commands: Commands,
     state: Res<UIState>,
-    mut text_query: Query<(&CardInfo, &mut Text)>,
-    keyword_query: Query<Entity, With<Keyword>>,
-    list_query: Query<Entity, With<KeywordList>>,
+    catalog: Res<Catalog>,
+    mut queries: CardQueries,
     asset_server: Res<AssetServer>,
     translator: Res<Translator>,
 ) {
-    for (info, mut text) in text_query.iter_mut() {
+    for (info, mut text) in queries.text.iter_mut() {
         text.sections = if let Some(card) = state.selected_card.as_ref() {
             let safe_name = CATALOG[card.snapshot.archetype_id].safe_name;
             let id = format!("card-{safe_name}");
@@ -204,7 +210,7 @@ fn update_card_info(
                     name,
                     translator.style(TextPurpose::CardName),
                 )],
-                CardInfo::Text => card.text_sections(&translator, &CATALOG),
+                CardInfo::Text => card.text_sections(&translator, &catalog),
                 _ => vec![],
             }
         } else {
@@ -212,12 +218,12 @@ fn update_card_info(
         };
     }
 
-    for entity in keyword_query.iter() {
+    for entity in queries.keyword.iter() {
         commands.add(DespawnRecursive { entity });
     }
 
     commands
-        .entity(list_query.single())
+        .entity(queries.list.single())
         .with_children(|parent| {
             if let Some(card) = state.selected_card.as_ref() {
                 for ability in card.related_abilities(&translator) {
