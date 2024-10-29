@@ -558,7 +558,7 @@ pub struct CardAttribute {
     pub power: Option<u32>,
     pub shields: Option<u8>,
     pub is_token: bool,
-    pub alt_styles: Vec<CardStyle>,
+    pub styles: Vec<CardStyle>,
 }
 
 impl Default for CardAttribute {
@@ -573,7 +573,7 @@ impl Default for CardAttribute {
             power: None,
             shields: None,
             is_token: false,
-            alt_styles: Vec::new(),
+            styles: Vec::new(),
         }
     }
 }
@@ -640,9 +640,10 @@ pub enum CreatureType {
     Program,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CardStyle {
-    pub illustration: u8,
+    pub artwork: u8,
+    pub artist: Option<String>,
 }
 
 #[derive(
