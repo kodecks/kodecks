@@ -22,6 +22,7 @@ kodecks-catalog = { path = "../kodecks-catalog" }
 semver = { version = "1.0.23", features = ["serde"] }
 serde = { version = "1.0.210", features = ["derive"] }
 tracing = "0.1.40"
+url = { version = "2.5.2", features = ["serde"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 wasm-bindgen-futures = "0.4.45"

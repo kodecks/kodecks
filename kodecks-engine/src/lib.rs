@@ -4,6 +4,7 @@ pub mod message;
 pub mod room;
 pub mod user;
 pub mod version;
+pub mod well_known;
 pub mod worker;
 
 pub trait Connection {

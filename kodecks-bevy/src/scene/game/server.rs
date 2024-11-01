@@ -13,6 +13,7 @@ use kodecks::{action::Action, env::LocalGameState, error::Error};
 use kodecks_engine::{
     login::{LoginRequest, LoginResponse, LoginType},
     message::{self, GameEventKind, Input, Output},
+    well_known::WellKnown,
     Connection,
 };
 use reqwest_websocket::{CloseCode, RequestBuilderExt, WebSocket};
@@ -206,14 +207,31 @@ async fn connect(
 }
 
 async fn connect_websocket(server: Url, key: SigningKey) -> anyhow::Result<WebSocket> {
-    let url = server.join("login")?;
-
     let mut client_version: Version = env!("CARGO_PKG_VERSION").parse().unwrap();
     if let Some(sha) = option_env!("VERGEN_GIT_SHA") {
         client_version.build = BuildMetadata::new(sha).unwrap();
     }
-    let pubkey = key.verifying_key();
+
     let client = reqwest::Client::new();
+    let url = server.join("/.well-known/kodecks.json")?;
+    let res = client.get(url).send().await?;
+    let well_known = match res.json::<WellKnown>().await {
+        Ok(well_known) => {
+            info!("Well-known entry detected: {:?}", well_known);
+            Some(well_known)
+        }
+        Err(err) => {
+            warn!("Failed to fetch well-known entry: {}", err);
+            None
+        }
+    };
+    let server = well_known
+        .and_then(|well_known| well_known.find_latest(&client_version))
+        .map(|server| server.host)
+        .unwrap_or(server);
+
+    let url = server.join("login")?;
+    let pubkey = key.verifying_key();
 
     let res = client
         .post(url.clone())

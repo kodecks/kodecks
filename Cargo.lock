@@ -4044,6 +4044,7 @@ dependencies = [
  "semver",
  "serde",
  "tracing",
+ "url",
  "wasm-bindgen-futures",
 ]
 
