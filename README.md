@@ -35,8 +35,8 @@ trunk serve
 
 ## License
 
-Source code and assets are licensed under the [MIT License](LICENSE-MIT) unless otherwise specified.
+Source code and assets are licensed under the [MIT License](LICENSE-MIT.md) unless otherwise specified.
 
-The server program (kodecks-server) is licensed under the [GNU Affero General Public License v3.0](kodecks-server/LICENSE-AGPL3).
+The server program (kodecks-server) is licensed under the [GNU Affero General Public License v3.0](kodecks-server/LICENSE-AGPL3.md).
 
 [Fonts](https://github.com/kodecks/assets/tree/main/fonts) are licensed under the Open Font License or the Apache License.
