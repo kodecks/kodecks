@@ -1,6 +1,5 @@
 # Kodecks
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Test Status](https://github.com/kodecks/kodecks/actions/workflows/test.yml/badge.svg)](https://github.com/kodecks/kodecks/actions/workflows/test.yml)
 
 Open-source Classic-Style Digital Card Game
@@ -36,6 +35,8 @@ trunk serve
 
 ## License
 
-Source code and assets are licensed under the [MIT License](LICENSE) unless otherwise specified.
+Source code and assets are licensed under the [MIT License](LICENSE-MIT) unless otherwise specified.
 
-[Fonts](https://github.com/kodecks/assets/tree/main/fonts) are licensed under the Open Font License.
+The server program (kodecks-server) is licensed under the [GNU Affero General Public License v3.0](kodecks-server/LICENSE-AGPL3).
+
+[Fonts](https://github.com/kodecks/assets/tree/main/fonts) are licensed under the Open Font License or the Apache License.

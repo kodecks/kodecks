@@ -3,6 +3,7 @@ name = "kodecks-bevy"
 version = "0.1.0"
 edition = "2021"
 default-run = "kodecks"
+license = "MIT"
 
 [[bin]]
 name = "kodecks"

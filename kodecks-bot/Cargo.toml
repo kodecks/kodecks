@@ -2,6 +2,7 @@
 name = "kodecks-bot"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 
 [dependencies]
 bitflags = { version = "2.6.0", features = ["serde"] }
