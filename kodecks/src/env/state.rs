@@ -8,7 +8,7 @@ use crate::{
     id::ObjectId,
     log::GameLog,
     phase::Phase,
-    player::{PlayerList, PlayerState, PlayerZone},
+    player::{Player, PlayerList, PlayerZone},
     profile::DebugConfig,
     regulation::Regulation,
 };
@@ -21,7 +21,7 @@ pub struct GameState {
     pub debug: DebugConfig,
     pub turn: u16,
     pub phase: Phase,
-    pub players: PlayerList<PlayerState>,
+    pub players: PlayerList<Player>,
 }
 
 impl GameState {
@@ -53,7 +53,7 @@ impl GameState {
         Err(ActionError::CardNotFound { id: card })
     }
 
-    pub fn players(&self) -> &PlayerList<PlayerState> {
+    pub fn players(&self) -> &PlayerList<Player> {
         &self.players
     }
 }

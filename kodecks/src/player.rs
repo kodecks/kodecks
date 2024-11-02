@@ -153,7 +153,7 @@ pub trait PlayerItem {
 }
 
 #[derive(Debug, Clone)]
-pub struct PlayerState {
+pub struct Player {
     pub id: u8,
     pub deck: CardList<Card>,
     pub hand: CardList<HandItem<Card>>,
@@ -166,15 +166,15 @@ pub struct PlayerState {
     pub abilities: AbilityList<PlayerAbility>,
 }
 
-impl PlayerItem for PlayerState {
+impl PlayerItem for Player {
     fn id(&self) -> u8 {
         self.id
     }
 }
 
-impl PlayerState {
+impl Player {
     pub fn new(id: u8) -> Self {
-        PlayerState {
+        Player {
             id,
             deck: CardList::default(),
             hand: CardList::default(),
@@ -298,7 +298,7 @@ impl PlayerItem for LocalPlayerState {
 }
 
 impl LocalPlayerState {
-    pub fn new(state: &PlayerState, viewer: u8) -> Self {
+    pub fn new(state: &Player, viewer: u8) -> Self {
         Self {
             id: state.id,
             deck: state.deck.len(),

@@ -10,7 +10,7 @@ use crate::{
     log::GameLog,
     opcode::OpcodeList,
     phase::Phase,
-    player::{PlayerEndgameState, PlayerList, PlayerState, PlayerZone},
+    player::{Player, PlayerEndgameState, PlayerList, PlayerZone},
     profile::DebugFlags,
     profile::GameProfile,
     sequence::CardSequence,
@@ -64,7 +64,7 @@ impl Environment {
             .into_iter()
             .enumerate()
             .map(|(id, player)| {
-                let mut state = PlayerState::new(id as u8);
+                let mut state = Player::new(id as u8);
                 for item in &player.deck.cards {
                     let archetype = &catalog[item.card.archetype_id];
                     let card = Card::new(
