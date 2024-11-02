@@ -257,7 +257,7 @@ impl Node {
             Node::Not(node) => node.matches(item).xor(Some(1)),
             Node::Text(text) => item.matches_text(text),
             Node::Tag(key, value) => item.matches_tag(key, value),
-            Node::Comparison(lhs, op, rhs) => item.matechs_cmp(lhs, op, rhs),
+            Node::Comparison(lhs, op, rhs) => item.matches_cmp(lhs, op, rhs),
         }
     }
 }
@@ -284,18 +284,18 @@ mod tests {
             }
         }
 
-        fn matechs_cmp(&self, lhs: &str, op: &str, rhs: &str) -> Option<u32> {
+        fn matches_cmp(&self, lhs: &str, op: &str, rhs: &str) -> Option<u32> {
             let num: u32 = rhs.parse().ok()?;
             let len = self.len() as u32;
             if lhs != "len" {
                 return None;
             }
             match op {
-                "=" => (len == num).then(|| 1),
-                ">" => (len > num).then(|| 1),
-                "<" => (len < num).then(|| 1),
-                ">=" => (len >= num).then(|| 1),
-                "<=" => (len <= num).then(|| 1),
+                "=" => (len == num).then_some(1),
+                ">" => (len > num).then_some(1),
+                "<" => (len < num).then_some(1),
+                ">=" => (len >= num).then_some(1),
+                "<=" => (len <= num).then_some(1),
                 _ => None,
             }
         }
