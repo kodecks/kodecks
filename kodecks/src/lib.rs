@@ -2,7 +2,9 @@
 
 pub mod ability;
 pub mod action;
+pub mod archetype;
 pub mod card;
+pub mod catalog;
 pub mod color;
 pub mod command;
 pub mod computed;

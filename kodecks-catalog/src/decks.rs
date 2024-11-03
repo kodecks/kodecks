@@ -1,4 +1,4 @@
-use kodecks::{card::Catalog, deck::DeckList};
+use kodecks::{catalog::Catalog, deck::DeckList};
 
 pub fn starter_deck(catalog: &Catalog) -> DeckList {
     DeckList::parse(

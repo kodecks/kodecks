@@ -14,7 +14,7 @@ use bevy::{
 };
 use kodecks::{
     action::{Action, AvailableAction},
-    card::ArchetypeId,
+    archetype::ArchetypeId,
     id::ObjectId,
     log::GameLog,
     message::MessageDialog,

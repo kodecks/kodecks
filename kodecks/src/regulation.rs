@@ -1,4 +1,4 @@
-use crate::{card::Catalog, deck::DeckList};
+use crate::{catalog::Catalog, deck::DeckList};
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};

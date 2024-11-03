@@ -31,7 +31,7 @@ pub struct RenderedCard {
 }
 
 struct RenderedCardLoader {
-    catalog: ArcSwap<kodecks::card::Catalog>,
+    catalog: ArcSwap<kodecks::catalog::Catalog>,
     painter: CardFramePainter,
     number: NumberPainter,
 }

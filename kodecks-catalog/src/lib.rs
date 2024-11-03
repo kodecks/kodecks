@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use kodecks::card::Catalog;
+use kodecks::catalog::Catalog;
 use std::sync::{Arc, LazyLock};
 
 mod cards;

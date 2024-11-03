@@ -1,5 +1,6 @@
 use crate::{
-    card::{safe_name, CardEntry, Catalog},
+    card::{safe_name, CardEntry},
+    catalog::Catalog,
     id::ObjectId,
 };
 use bincode::{Decode, Encode};

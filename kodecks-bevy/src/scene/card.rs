@@ -119,10 +119,10 @@ impl UICardInfo {
 }
 
 #[derive(Clone, Resource, Deref)]
-pub struct Catalog(Arc<kodecks::card::Catalog>);
+pub struct Catalog(Arc<kodecks::catalog::Catalog>);
 
 impl Catalog {
-    pub fn new(catalog: Arc<kodecks::card::Catalog>) -> Self {
+    pub fn new(catalog: Arc<kodecks::catalog::Catalog>) -> Self {
         Self(catalog)
     }
 }

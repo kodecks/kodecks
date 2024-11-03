@@ -5,7 +5,7 @@ use super::{
 use bevy::{ecs::system::Resource, utils::HashMap};
 use dashmap::DashMap;
 use image::{DynamicImage, GenericImage, GenericImageView, ImageReader, Rgba};
-use kodecks::{card::CreatureType, color::Color, computed::ComputedAttribute};
+use kodecks::{archetype::CreatureType, color::Color, computed::ComputedAttribute};
 use std::{io::Cursor, sync::LazyLock};
 
 #[derive(Default, Resource)]

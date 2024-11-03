@@ -1,7 +1,4 @@
-use crate::{
-    card::{ArchetypeId, Catalog},
-    deck::DeckList,
-};
+use crate::{archetype::ArchetypeId, catalog::Catalog, deck::DeckList};
 use bincode::{
     de::{BorrowDecoder, Decoder},
     enc::Encoder,

@@ -14,7 +14,8 @@ use bevy::{
 };
 use bevy_mod_picking::prelude::*;
 use kodecks::{
-    card::{ArchetypeId, CardEntry, CardSnapshot},
+    archetype::ArchetypeId,
+    card::{CardEntry, CardSnapshot},
     deck::DeckItem,
 };
 use kodecks_catalog::CATALOG;

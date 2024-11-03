@@ -1,6 +1,7 @@
 use crate::{
     ability::{AbilityList, AnonymousAbility, KeywordAbility},
-    card::{Card, CardArchetype, CardType, CreatureType},
+    archetype::{CardArchetype, CardType, CreatureType},
+    card::Card,
     color::Color,
     linear::Linear,
     zone::CardZone,

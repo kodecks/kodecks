@@ -1,6 +1,6 @@
 use crate::{
     ability::KeywordAbility,
-    card::ArchetypeId,
+    archetype::ArchetypeId,
     color::Color,
     env::Environment,
     error::ActionError,

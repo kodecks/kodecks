@@ -2,7 +2,7 @@ use crate::scene::translator::Translator;
 use fluent_bundle::FluentArgs;
 use fluent_content::Request;
 use kodecks::{
-    card::Catalog,
+    catalog::Catalog,
     env::LocalEnvironment,
     log::GameLog,
     zone::{MoveReason, Zone},
