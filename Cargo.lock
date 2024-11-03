@@ -4026,6 +4026,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kodecks-dsl"
+version = "0.1.0"
+dependencies = [
+ "kodecks",
+ "logos",
+ "thiserror",
+]
+
+[[package]]
 name = "kodecks-engine"
 version = "0.1.0"
 dependencies = [

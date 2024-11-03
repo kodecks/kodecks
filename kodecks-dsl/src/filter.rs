@@ -1,6 +1,11 @@
-use crate::search::Searchable;
 use logos::Logos;
 use thiserror::Error;
+
+pub trait Searchable {
+    fn matches_text(&self, name: &str) -> Option<u32>;
+    fn matches_tag(&self, key: &str, value: &str) -> Option<u32>;
+    fn matches_cmp(&self, lhs: &str, op: &str, rhs: &str) -> Option<u32>;
+}
 
 #[derive(Logos, Debug)]
 #[logos(skip r"[\p{White_Space}\t\n\f]+")]
