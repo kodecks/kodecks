@@ -2,6 +2,7 @@ use super::{
     error::Error,
     value::{Constant, Value},
 };
+use crate::{card::Card, id::ObjectId, player::Player};
 use bincode::{Decode, Encode};
 use jaq_core::{
     load::{
@@ -11,7 +12,6 @@ use jaq_core::{
     ops::{Cmp, Math},
     path::{Opt, Part},
 };
-use kodecks::{card::Card, id::ObjectId, player::Player};
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -654,7 +654,7 @@ impl<'a, T, I> ExpContext<'a, T, I> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use kodecks::card::Card;
+    use crate::card::Card;
 
     struct TestEnv {}
 

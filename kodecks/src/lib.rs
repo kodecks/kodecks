@@ -9,6 +9,7 @@ pub mod computed;
 pub mod condition;
 pub mod continuous;
 pub mod deck;
+pub mod dsl;
 pub mod effect;
 pub mod env;
 pub mod error;

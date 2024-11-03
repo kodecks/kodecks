@@ -3954,6 +3954,7 @@ dependencies = [
  "fluent-bundle",
  "fluent_content",
  "idna 1.0.2",
+ "jaq-core",
  "logos",
  "nanoid",
  "num",
@@ -4034,19 +4035,6 @@ version = "0.1.0"
 dependencies = [
  "bpaf",
  "kodecks",
-]
-
-[[package]]
-name = "kodecks-dsl"
-version = "0.1.0"
-dependencies = [
- "bincode 2.0.0-rc.3",
- "jaq-core",
- "kodecks",
- "logos",
- "serde",
- "serde_json",
- "thiserror",
 ]
 
 [[package]]

@@ -12,11 +12,13 @@ dyn-clone = "1.0.17"
 fluent-bundle = "0.15.3"
 fluent_content = "0.0.5"
 idna = "1.0.2"
+jaq-core = { version = "2.0.0-beta", default-features = false }
 logos = "0.14.2"
 nanoid = "0.4.0"
 num = "0.4.3"
 rand = { version = "0.8.5", features = ["small_rng"] }
 serde = { version = "1.0.208", features = ["derive"] }
+serde_json = "1.0.128"
 strum = { version = "0.26.3", features = ["derive"] }
 thiserror = "1.0.63"
 tinystr = { version = "0.7.6", features = ["serde"] }
