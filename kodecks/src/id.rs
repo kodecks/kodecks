@@ -5,7 +5,9 @@ use std::num::NonZeroU32;
 
 const MAX_RESERVED_ID: u32 = 100;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash, Encode, Decode)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Hash, Encode, Decode,
+)]
 #[serde(transparent)]
 pub struct ObjectId(NonZeroU32);
 
