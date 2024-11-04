@@ -17,7 +17,10 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
@@ -26,6 +29,7 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v2
       - name: Install dependencies
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libudev-dev
