@@ -25,8 +25,8 @@ pub enum Exp {
     #[default]
     Ident,
     Path(Box<Self>, Vec<Path>),
-    Var(String),
-    Constant(Value),
+    Variable(String),
+    Value(Value),
     Arr(Option<Box<Self>>),
     Obj(Vec<(Box<Self>, Option<Box<Self>>)>),
     Assign(String, Box<Self>),
@@ -126,7 +126,7 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
                     .collect::<Result<_, _>>()?;
                 Ok(Self::Path(Box::new(lhs), parts))
             }
-            Term::Var(s) => Ok(Self::Var(s.to_string())),
+            Term::Var(s) => Ok(Self::Variable(s.to_string())),
             Term::BinOp(lhs, op, rhs) => match (lhs.as_ref(), op, rhs.as_ref()) {
                 (Term::Var(s), BinaryOp::Assign, rhs) => {
                     Ok(Self::Assign(s.to_string(), Box::new(Self::try_from(rhs)?)))
@@ -160,7 +160,7 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
                 let rhs = Self::try_from(&**rhs)?;
                 Ok(Self::Pipe(Box::new(lhs), Box::new(rhs)))
             }
-            Term::Num(n) => Ok(Self::Constant(if let Ok(n) = n.parse::<u64>() {
+            Term::Num(n) => Ok(Self::Value(if let Ok(n) = n.parse::<u64>() {
                 Value::Constant(Constant::U64(n))
             } else if let Ok(n) = n.parse::<i64>() {
                 Value::Constant(Constant::I64(n))
@@ -194,12 +194,12 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
                 for item in parts {
                     match item {
                         StrPart::Char(c) => {
-                            args.push(Self::Constant(Value::Constant(Constant::String(
+                            args.push(Self::Value(Value::Constant(Constant::String(
                                 c.to_string(),
                             ))));
                         }
                         StrPart::Str(s) => {
-                            args.push(Self::Constant(Value::Constant(Constant::String(
+                            args.push(Self::Value(Value::Constant(Constant::String(
                                 s.to_string(),
                             ))));
                         }
@@ -231,15 +231,15 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
                 }
                 Ok(Self::Obj(obj))
             }
-            Term::Call("null", _) => Ok(Self::Constant(Value::Constant(Constant::Null))),
+            Term::Call("null", _) => Ok(Self::Value(Value::Constant(Constant::Null))),
             Term::Call("empty", _) => Ok(Self::Empty),
             Term::Call("not", _) => Ok(Self::Not),
-            Term::Call("nan", _) => Ok(Self::Constant(Value::Constant(Constant::F64(f64::NAN)))),
-            Term::Call("infinite", _) => Ok(Self::Constant(Value::Constant(Constant::F64(
-                f64::INFINITY,
-            )))),
-            Term::Call("true", _) => Ok(Self::Constant(Value::Constant(Constant::Bool(true)))),
-            Term::Call("false", _) => Ok(Self::Constant(Value::Constant(Constant::Bool(false)))),
+            Term::Call("nan", _) => Ok(Self::Value(Value::Constant(Constant::F64(f64::NAN)))),
+            Term::Call("infinite", _) => {
+                Ok(Self::Value(Value::Constant(Constant::F64(f64::INFINITY))))
+            }
+            Term::Call("true", _) => Ok(Self::Value(Value::Constant(Constant::Bool(true)))),
+            Term::Call("false", _) => Ok(Self::Value(Value::Constant(Constant::Bool(false)))),
             Term::Call("error", msg) => {
                 if let Some(msg) = msg.first() {
                     Ok(Self::Error(Box::new(Self::try_from(msg)?)))
@@ -409,14 +409,15 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                 }
                 Ok(val)
             }
-            Self::Var(name) => {
+            Self::Variable(name) => {
                 let val = ctx
                     .env
                     .get_var(name)
-                    .unwrap_or_else(|| ctx.params.get_var(name).clone());
+                    .or_else(|| ctx.params.get_var(name))
+                    .ok_or(Error::UndefinedVariable)?;
                 Ok(vec![val])
             }
-            Self::Constant(n) => Ok(vec![n.clone()]),
+            Self::Value(n) => Ok(vec![n.clone()]),
             Self::Arr(exp) => {
                 if let Some(exp) = exp {
                     Ok(vec![Value::Array(exp.eval(ctx)?)])
@@ -599,7 +600,9 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                 Ok(vec![])
             }
             Self::CustomFunction(name, args) => {
-                if let Some(Exp::Constant(Value::Function(func))) = ctx.params.get_def(name) {
+                if let Some(Exp::Value(Value::Function(func))) =
+                    ctx.params.get_def(name, args.len())
+                {
                     let func = func.clone();
                     let mut new_args = vec![];
                     for (name, exp) in func.args.iter().zip(args) {
@@ -710,33 +713,43 @@ impl ExpParams {
         }
     }
 
-    pub fn get_var(&self, name: &str) -> Value {
+    pub fn get_var(&self, name: &str) -> Option<Value> {
         for vars in self.vars.iter().rev() {
-            if let Some(Exp::Constant(val)) = vars.get(name) {
-                return val.clone();
+            if let Some(Exp::Value(val)) = vars.get(name) {
+                return Some(val.clone());
             }
         }
-        Default::default()
+        None
     }
 
     pub fn set_var(&mut self, name: &str, val: Value) {
         if let Some(vars) = self.vars.last_mut() {
-            vars.insert(name.to_string(), Exp::Constant(val));
+            vars.insert(name.to_string(), Exp::Value(val));
         }
     }
 
-    pub fn get_def(&self, name: &str) -> Option<&Exp> {
+    pub fn get_def(&self, name: &str, arity: usize) -> Option<&Exp> {
+        let id = if arity > 0 {
+            format!("{name}/{arity}")
+        } else {
+            name.to_string()
+        };
         for vars in self.vars.iter().rev() {
-            if let Some(val) = vars.get(name) {
+            if let Some(val) = vars.get(&id) {
                 return Some(val);
             }
         }
         None
     }
 
-    pub fn set_def(&mut self, name: &str, val: Exp) {
+    pub fn set_def(&mut self, name: &str, arity: usize, val: Exp) {
+        let id = if arity > 0 {
+            format!("{name}/{arity}")
+        } else {
+            name.to_string()
+        };
         if let Some(vars) = self.vars.last_mut() {
-            vars.insert(name.to_string(), val);
+            vars.insert(id, val);
         }
     }
 }
@@ -759,6 +772,31 @@ pub struct ExpContext<'a, T, I> {
 impl<'a, T, I> ExpContext<'a, T, I> {
     pub fn new(env: &'a T, input: I, params: &'a mut ExpParams) -> Self {
         Self { env, input, params }
+    }
+}
+
+pub struct Module {
+    pub funcs: HashMap<String, Function>,
+}
+
+impl FromStr for Module {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let defs = jaq_core::load::parse(s, |p| p.defs()).ok_or(Error::InvalidSyntax)?;
+        let mut funcs = HashMap::new();
+        for def in defs {
+            let name = def.name.to_string();
+            funcs.insert(
+                name.to_string(),
+                Function {
+                    name: name.to_string(),
+                    args: def.args.iter().map(|s| s.to_string()).collect(),
+                    body: (&def.body).try_into()?,
+                },
+            );
+        }
+        Ok(Self { funcs })
     }
 }
 
@@ -785,9 +823,51 @@ mod tests {
             None
         }
 
-        fn invoke(&self, _name: &str, args: Vec<Value>) -> Result<Vec<Value>, Error> {
-            Ok(vec![args.get(1).cloned().unwrap_or_default()])
+        fn invoke(&self, name: &str, args: Vec<Value>) -> Result<Vec<Value>, Error> {
+            if name == "test_builtin_func" {
+                Ok(vec![args.get(1).cloned().unwrap_or_default()])
+            } else {
+                Err(Error::UndefinedFilter)
+            }
         }
+    }
+
+    #[test]
+    fn test_module() {
+        let module = Module::from_str(
+            r#"
+                def foo(f): f*2;
+                def bar(f): f|f;
+                def baz($f): $f|$f;
+                def foo2: .+100;
+            "#,
+        )
+        .unwrap();
+
+        let env = TestEnv {};
+        let array: Vec<Value> = vec![1.into()];
+
+        let mut params = ExpParams::new();
+        for (name, func) in module.funcs {
+            params.set_def(
+                &name,
+                func.args.len(),
+                Exp::Value(Value::Function(Box::new(func))),
+            );
+        }
+
+        let mut ctx = ExpContext::new(&env, array.as_slice(), &mut params);
+        let exp = Exp::from_str("foo(.)").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![2.into()]));
+
+        let exp = Exp::from_str("5|bar(.*2)").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![20.into()]));
+
+        let exp = Exp::from_str("5|baz(.*2)").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![10.into()]));
+
+        let exp = Exp::from_str("5|bar(foo2)").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![205.into()]));
     }
 
     #[test]
@@ -802,7 +882,11 @@ mod tests {
             args: vec!["$a".to_string(), "b".to_string()],
             body: Exp::from_str("[$a|$a, b|b]").unwrap(),
         };
-        params.set_def("foo", Exp::Constant(Value::Function(Box::new(func))));
+        params.set_def(
+            "foo",
+            func.args.len(),
+            Exp::Value(Value::Function(Box::new(func))),
+        );
 
         let mut ctx = ExpContext::new(&env, array.as_slice(), &mut params);
 
@@ -813,14 +897,11 @@ mod tests {
         assert_eq!(exp.eval(&mut ctx), Ok(vec![42.into(), 42.into()]));
 
         let exp = Exp::from_str("$none").unwrap();
-        assert_eq!(
-            exp.eval(&mut ctx),
-            Ok(vec![Value::default(), Value::default()])
-        );
+        assert_eq!(exp.eval(&mut ctx), Err(Error::UndefinedVariable));
 
         let exp = Exp::from_str("$new = $x").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![42.into(), 42.into()]));
-        assert_eq!(ctx.params.get_var("$new"), 42.into());
+        assert_eq!(ctx.params.get_var("$new"), Some(42.into()));
 
         let exp = Exp::from_str(". | $new").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![42.into(), 42.into()]));
@@ -951,7 +1032,7 @@ mod tests {
         let exp = Exp::from_str("empty").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![]));
 
-        let exp = Exp::from_str("test_func(0, 1)").unwrap();
+        let exp = Exp::from_str("test_builtin_func(0, 1)").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![1.into(), 1.into()]));
 
         let exp = Exp::from_str("try (. - 5) catch 0").unwrap();

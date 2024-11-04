@@ -6,10 +6,14 @@ pub enum Error {
     InvalidSyntax,
     #[error("Invalid calculation")]
     InvalidCalculation,
-    #[error("Invalid argument")]
+    #[error("Integer overflow")]
     IntegerOverflow,
-    #[error("Invalid argument")]
+    #[error("Execution limit exceeded")]
     ExecutionLimitExceeded,
+    #[error("Undefined variable")]
+    UndefinedVariable,
+    #[error("Undefined filter")]
+    UndefinedFilter,
     #[error("Invalid key")]
     InvalidKey,
     #[error("Division by zero")]
