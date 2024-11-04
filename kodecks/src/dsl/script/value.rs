@@ -1,4 +1,7 @@
-use super::{error::Error, exp::ExpEnv};
+use super::{
+    error::Error,
+    exp::{ExpEnv, Function},
+};
 use crate::id::ObjectId;
 use bincode::{Decode, Encode};
 use std::{
@@ -7,11 +10,12 @@ use std::{
     ops::{Add, Div, Mul, Neg, Not, Rem, Sub},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Encode, Decode)]
 pub enum Value {
     Constant(Constant),
     Array(Vec<Self>),
     Object(BTreeMap<String, Self>),
+    Function(Box<Function>),
     Custom(CustomType),
 }
 
@@ -298,7 +302,7 @@ impl From<&str> for Constant {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Encode, Decode)]
 pub enum CustomType {
     Card(ObjectId),
     Player(u8),
@@ -313,6 +317,7 @@ enum ValueKind {
     String,
     Array,
     Object,
+    Function,
     Custom,
 }
 
@@ -496,6 +501,7 @@ impl Value {
             Value::Constant(Constant::String(_)) => ValueKind::String,
             Value::Array(_) => ValueKind::Array,
             Value::Object(_) => ValueKind::Object,
+            Value::Function(_) => ValueKind::Function,
             Value::Custom(_) => ValueKind::Custom,
         }
     }
@@ -621,6 +627,7 @@ impl fmt::Display for Value {
             Value::Constant(Constant::I64(n)) => write!(f, "{}", n),
             Value::Constant(Constant::F64(n)) => write!(f, "{}", n),
             Value::Constant(Constant::String(s)) => write!(f, "{}", s),
+            Value::Function(function) => write!(f, "func {}", function.name),
             Value::Custom(CustomType::Card(card)) => write!(f, "{}", card),
             Value::Custom(CustomType::Player(player)) => write!(f, "Player {}", player),
         }
