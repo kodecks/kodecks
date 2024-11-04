@@ -233,8 +233,8 @@ pub trait Effect: Send + Sync + DynClone {
         EventFilter::empty()
     }
 
-    fn is_castable(&self, _state: &GameState, _target: &Card) -> bool {
-        true
+    fn is_castable(&self, _state: &GameState, _target: &Card, castable: bool) -> bool {
+        castable
     }
 
     fn trigger(&mut self, _id: EffectId, _ctx: &mut EffectTriggerContext) -> anyhow::Result<()> {

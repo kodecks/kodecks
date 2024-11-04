@@ -229,17 +229,15 @@ impl Player {
         self.hand
             .items()
             .filter(|item| {
-                state.debug.flags.contains(DebugFlags::IGNORE_COST)
+                let castable = (state.debug.flags.contains(DebugFlags::IGNORE_COST)
                     || item.card.computed().cost.value() == 0
                     || self.shards.get(item.card.computed().color)
-                        >= item.card.computed().cost.value()
+                        >= item.card.computed().cost.value())
+                    && (!item.card.computed().is_creature()
+                        || item.card.computed().cost.value() > 0
+                        || self.counters.free_casted == 0);
+                item.card.effect().is_castable(state, &item.card, castable)
             })
-            .filter(|item| {
-                !item.card.computed().is_creature()
-                    || item.card.computed().cost.value() > 0
-                    || self.counters.free_casted == 0
-            })
-            .filter(|item| item.card.effect().is_castable(state, &item.card))
             .map(|item| item.card.id())
     }
 }
