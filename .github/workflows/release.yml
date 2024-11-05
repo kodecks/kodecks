@@ -23,6 +23,8 @@ jobs:
         uses: cargo-bins/cargo-binstall@v1.10.3
       - name: Install cross
         run: cargo binstall cross --force -y
+      - name: Download assets
+        run: ./scripts/download.sh
       - name: Build project
         run: cross build -p kodecks-bevy -p kodecks-server --profile distribution --features embed_assets --target ${{ matrix.toolchain }}
       - name: Make archive
@@ -53,6 +55,8 @@ jobs:
         with:
           target: ${{ matrix.toolchain }}
       - uses: Swatinem/rust-cache@v2
+      - name: Download assets
+        run: ./scripts/download.sh
       - name: Build project
         run: cargo build -p kodecks-bevy -p kodecks-server --profile distribution --features embed_assets --target ${{ matrix.toolchain }}
       - name: Make archive
@@ -83,6 +87,8 @@ jobs:
         with:
           target: ${{ matrix.toolchain }}
       - uses: Swatinem/rust-cache@v2
+      - name: Download assets
+        run: scripts/download.ps1
       - name: Build project
         run: cargo build -p kodecks-bevy -p kodecks-server --profile distribution --features embed_assets --target ${{ matrix.toolchain }}
       - name: Make archive
