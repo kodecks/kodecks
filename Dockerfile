@@ -26,4 +26,4 @@ WORKDIR /app
 COPY --from=builder /usr/src/app/target/distribution/kodecks-server /usr/bin
 
 # Set the entrypoint to run the Rust binary
-ENTRYPOINT ["kodecks-server"]
+ENTRYPOINT ["kodecks-server", "--host", "0.0.0.0"]

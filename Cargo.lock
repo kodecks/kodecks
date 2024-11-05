@@ -4070,6 +4070,7 @@ dependencies = [
  "base64 0.22.1",
  "bech32",
  "bincode 2.0.0-rc.3",
+ "bpaf",
  "chrono",
  "dashmap 6.1.0",
  "futures-util",

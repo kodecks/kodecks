@@ -4,12 +4,16 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
+use bpaf::*;
 use http::{
     header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
     Method, StatusCode,
 };
 use kodecks::error::Error;
-use std::{net::SocketAddr, sync::Arc};
+use std::{
+    net::{IpAddr, Ipv4Addr, SocketAddr},
+    sync::Arc,
+};
 use tokio::try_join;
 use tower_governor::{governor::GovernorConfigBuilder, GovernorLayer};
 use tower_http::{
@@ -30,8 +34,25 @@ mod session;
 mod socket;
 mod token;
 
+#[derive(Debug, Clone, Bpaf)]
+#[bpaf(options)]
+pub struct Options {
+    /// The host to listen on.
+    #[bpaf(
+        argument("HOST"),
+        fallback(IpAddr::V4(Ipv4Addr::LOCALHOST)),
+        display_fallback
+    )]
+    host: IpAddr,
+    /// The port to listen on.
+    #[bpaf(argument("PORT"), env("PORT"), fallback(8080), display_fallback)]
+    port: u16,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    let opt = options().run();
+
     tracing_subscriber::registry()
         .with(
             EnvFilter::try_from_default_env()
@@ -40,13 +61,8 @@ async fn main() -> anyhow::Result<()> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let port = std::env::var("PORT")
-        .ok()
-        .and_then(|port| port.parse::<u16>().ok())
-        .unwrap_or(3000);
-    let addr = ("0.0.0.0", port);
-    info!("Listening on {}:{}", addr.0, addr.1);
-    let listener = tokio::net::TcpListener::bind(addr).await?;
+    info!("Listening on {}:{}", opt.host, opt.port);
+    let listener = tokio::net::TcpListener::bind((opt.host, opt.port)).await?;
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST])
