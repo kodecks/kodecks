@@ -4,6 +4,7 @@ use super::{
 };
 use crate::id::ObjectId;
 use bincode::{Decode, Encode};
+use serde_json::Number;
 use std::{
     collections::BTreeMap,
     fmt,
@@ -44,6 +45,40 @@ impl From<serde_json::Value> for Value {
             serde_json::Value::Object(o) => {
                 Value::Object(o.into_iter().map(|(k, v)| (k, Value::from(v))).collect())
             }
+        }
+    }
+}
+
+impl TryFrom<Value> for serde_json::Value {
+    type Error = Error;
+
+    fn try_from(value: Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Constant(Constant::Null) => Ok(serde_json::Value::Null),
+            Value::Constant(Constant::Bool(b)) => Ok(serde_json::Value::Bool(b)),
+            Value::Constant(Constant::U64(n)) => Ok(serde_json::Value::Number(n.into())),
+            Value::Constant(Constant::I64(n)) => Ok(serde_json::Value::Number(n.into())),
+            Value::Constant(Constant::F64(n)) => Ok(serde_json::Value::Number(
+                Number::from_f64(n).ok_or(Error::InvalidConversion)?,
+            )),
+            Value::Constant(Constant::String(s)) => Ok(serde_json::Value::String(s)),
+            Value::Array(a) => Ok(serde_json::Value::Array(
+                a.into_iter()
+                    .map(serde_json::Value::try_from)
+                    .collect::<Result<_, _>>()?,
+            )),
+            Value::Object(o) => Ok(serde_json::Value::Object(
+                o.into_iter()
+                    .map(|(k, v)| Ok((k, serde_json::Value::try_from(v)?)))
+                    .collect::<Result<_, _>>()?,
+            )),
+            Value::Custom(CustomType::Card(card)) => {
+                Ok(serde_json::Value::Number(Into::<u32>::into(card).into()))
+            }
+            Value::Custom(CustomType::Player(player)) => {
+                Ok(serde_json::Value::Number(player.into()))
+            }
+            _ => Err(Error::InvalidConversion),
         }
     }
 }

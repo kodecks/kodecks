@@ -18,6 +18,8 @@ pub enum Error {
     InvalidKey,
     #[error("Division by zero")]
     DivisionByZero,
+    #[error("Invalid conversion")]
+    InvalidConversion,
     #[error("Error: {0}")]
     Custom(String),
 }

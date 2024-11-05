@@ -25,6 +25,12 @@ impl TryFrom<u32> for ObjectId {
     }
 }
 
+impl From<ObjectId> for u32 {
+    fn from(id: ObjectId) -> Self {
+        id.0.get()
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct ObjectIdCounter(u32);
 
