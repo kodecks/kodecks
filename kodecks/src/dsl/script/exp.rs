@@ -35,6 +35,7 @@ pub enum Exp {
     TryCatch(Box<Self>, Box<Self>),
     IfThenElse(Vec<(Self, Self)>, Option<Box<Self>>),
     BinOp(Box<Self>, BinOp, Box<Self>),
+    Alt(Box<Self>, Box<Self>),
     Neg(Box<Self>),
     Str(Vec<Self>),
     Select(Box<Self>),
@@ -149,6 +150,12 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
                         BinaryOp::Cmp(Cmp::Gt) => BinOp::Gt,
                         BinaryOp::Cmp(Cmp::Le) => BinOp::Le,
                         BinaryOp::Cmp(Cmp::Lt) => BinOp::Lt,
+                        BinaryOp::Alt => {
+                            return Ok(Self::Alt(
+                                Box::new(Self::try_from(lhs)?),
+                                Box::new(Self::try_from(rhs)?),
+                            ))
+                        }
                         _ => return Err(Error::InvalidSyntax),
                     },
                     Box::new(Self::try_from(rhs)?),
@@ -452,6 +459,7 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
             Self::BinOp(lhs, op, rhs) => {
                 let lhs = lhs.eval(ctx)?;
                 let rhs = rhs.eval(ctx)?;
+
                 let mut results = vec![];
                 for r in rhs {
                     for l in &lhs {
@@ -481,6 +489,16 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                     }
                 }
                 Ok(results)
+            }
+            Self::Alt(lhs, rhs) => {
+                let lhs = lhs.eval(ctx)?;
+                let rhs = rhs.eval(ctx)?;
+                let lhs = lhs.into_iter().filter(|v| !!v).collect::<Vec<_>>();
+                if lhs.is_empty() {
+                    Ok(rhs)
+                } else {
+                    Ok(lhs)
+                }
             }
             Self::Neg(exp) => {
                 let val = exp.eval(ctx)?;
@@ -932,6 +950,9 @@ mod tests {
 
         let exp = Exp::from_str(". >= 999").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![true.into(), false.into()]));
+
+        let exp = Exp::from_str("(false, null, 1) // 42").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![1.into(), 1.into()]));
 
         let exp = Exp::from_str("(0, -5, 1) + (1, 2)").unwrap();
         assert_eq!(
