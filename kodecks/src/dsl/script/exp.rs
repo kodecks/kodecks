@@ -453,12 +453,12 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                 let lhs = lhs.eval(ctx)?;
                 let rhs = rhs.eval(ctx)?;
                 let mut results = vec![];
-                for l in lhs {
-                    for r in &rhs {
+                for r in rhs {
+                    for l in &lhs {
                         if let (
                             Value::Constant(Constant::String(_)),
                             Value::Constant(Constant::U64(n)),
-                        ) = (&l, r)
+                        ) = (l, &r)
                         {
                             if *op == BinOp::Mul {
                                 ctx.params.consume_exec(*n as usize)?;
@@ -470,12 +470,12 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                             BinOp::Mul => (l.clone() * r.clone())?,
                             BinOp::Div => (l.clone() / r.clone())?,
                             BinOp::Rem => (l.clone() % r.clone())?,
-                            BinOp::Eq => (l == *r).into(),
-                            BinOp::Ne => (l != *r).into(),
-                            BinOp::Ge => (l >= *r).into(),
-                            BinOp::Gt => (l > *r).into(),
-                            BinOp::Le => (l <= *r).into(),
-                            BinOp::Lt => (l < *r).into(),
+                            BinOp::Eq => (*l == r).into(),
+                            BinOp::Ne => (*l != r).into(),
+                            BinOp::Ge => (*l >= r).into(),
+                            BinOp::Gt => (*l > r).into(),
+                            BinOp::Le => (*l <= r).into(),
+                            BinOp::Lt => (*l < r).into(),
                         };
                         results.push(val);
                     }
@@ -933,6 +933,25 @@ mod tests {
         let exp = Exp::from_str(". >= 999").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![true.into(), false.into()]));
 
+        let exp = Exp::from_str("(0, -5, 1) + (1, 2)").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                1.into(),
+                (-4).into(),
+                2.into(),
+                2.into(),
+                (-3).into(),
+                3.into(),
+                1.into(),
+                (-4).into(),
+                2.into(),
+                2.into(),
+                (-3).into(),
+                3.into(),
+            ])
+        );
+
         let exp = Exp::from_str("5|foo(.*2; .*2)").unwrap();
         assert_eq!(
             exp.eval(&mut ctx),
@@ -992,6 +1011,8 @@ mod tests {
         let exp = Exp::from_str("select(. * 0)").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec!["input".into(), 123.into()]));
 
+        ctx.params.reset_exec();
+
         let exp = Exp::from_str("if . == \"input\" then \"output\" end").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec!["output".into(), 123.into()]));
 
@@ -1022,7 +1043,6 @@ mod tests {
             ])
         );
 
-        ctx.params.reset_exec();
         let exp = Exp::from_str("null").unwrap();
         assert_eq!(
             exp.eval(&mut ctx),
