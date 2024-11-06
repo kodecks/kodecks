@@ -39,6 +39,7 @@ pub enum Exp {
     Neg(Box<Self>),
     Str(Vec<Self>),
     Select(Box<Self>),
+    Map(Box<Self>),
     Error(Box<Self>),
     CustomFunction(String, Vec<Self>),
     Not,
@@ -259,6 +260,13 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
             Term::Call("select", exp) => {
                 if let Some(exp) = exp.first() {
                     Ok(Self::Select(Box::new(Self::try_from(exp)?)))
+                } else {
+                    Err(Error::InvalidSyntax)
+                }
+            }
+            Term::Call("map", exp) => {
+                if let Some(exp) = exp.first() {
+                    Ok(Self::Map(Box::new(Self::try_from(exp)?)))
                 } else {
                     Err(Error::InvalidSyntax)
                 }
@@ -561,6 +569,33 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                     .map(|_| ctx.input.clone())
                     .collect())
             }
+            Self::Map(arg) => match ctx.input {
+                Value::Array(arr) => {
+                    let mut results = vec![];
+                    for item in arr {
+                        let mut new_ctx = ExpContext {
+                            env: ctx.env,
+                            input: item,
+                            params: ctx.params,
+                        };
+                        results.extend(arg.eval(&mut new_ctx)?);
+                    }
+                    Ok(vec![Value::Array(results)])
+                }
+                Value::Object(obj) => {
+                    let mut results = vec![];
+                    for val in obj.values() {
+                        let mut new_ctx = ExpContext {
+                            env: ctx.env,
+                            input: val,
+                            params: ctx.params,
+                        };
+                        results.extend(arg.eval(&mut new_ctx)?);
+                    }
+                    Ok(vec![Value::Array(results)])
+                }
+                _ => Err(Error::InvalidIteration),
+            },
             Self::TryCatch(lhs, rhs) => {
                 let mut new_ctx = ExpContext {
                     env: ctx.env,
@@ -963,6 +998,15 @@ mod tests {
         let exp = Exp::from_str(". >= 999").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![true.into(), false.into()]));
 
+        let exp = Exp::from_str("[1,2,3] | map(.+1)").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                Value::Array(vec![2.into(), 3.into(), 4.into()]),
+                Value::Array(vec![2.into(), 3.into(), 4.into()]),
+            ])
+        );
+
         let exp = Exp::from_str("(false, null, 1) // 42").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![1.into(), 1.into()]));
 
@@ -1002,6 +1046,8 @@ mod tests {
                 Value::Array(vec![123.into()])
             ])
         );
+
+        ctx.params.reset_exec();
 
         let exp = Exp::from_str("[.,.] | .[]").unwrap();
         assert_eq!(

@@ -20,6 +20,8 @@ pub enum Error {
     DivisionByZero,
     #[error("Invalid conversion")]
     InvalidConversion,
+    #[error("Invalid iteration")]
+    InvalidIteration,
     #[error("Error: {0}")]
     Custom(String),
 }
