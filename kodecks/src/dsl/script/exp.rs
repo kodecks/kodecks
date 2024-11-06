@@ -42,6 +42,7 @@ pub enum Exp {
     Error(Box<Self>),
     CustomFunction(String, Vec<Self>),
     Not,
+    Add,
     Empty,
 }
 
@@ -241,6 +242,7 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
             Term::Call("null", _) => Ok(Self::Value(Value::Constant(Constant::Null))),
             Term::Call("empty", _) => Ok(Self::Empty),
             Term::Call("not", _) => Ok(Self::Not),
+            Term::Call("add", _) => Ok(Self::Add),
             Term::Call("nan", _) => Ok(Self::Value(Value::Constant(Constant::F64(f64::NAN)))),
             Term::Call("infinite", _) => {
                 Ok(Self::Value(Value::Constant(Constant::F64(f64::INFINITY))))
@@ -653,6 +655,16 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                 }
             }
             Self::Empty => Ok(vec![]),
+            Self::Add => {
+                if let Value::Array(arr) = ctx.input {
+                    let result = arr
+                        .iter()
+                        .try_fold(Value::default(), |acc, v| (acc + v.clone()))?;
+                    Ok(vec![result])
+                } else {
+                    Err(Error::InvalidCalculation)
+                }
+            }
             Self::Not => Ok(vec![(!ctx.input).into()]),
         }
     }
@@ -1062,6 +1074,12 @@ mod tests {
                 55.into(),
                 246.into()
             ])
+        );
+
+        let exp = Exp::from_str("[.,.] | add").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec!["inputinput".into(), 246.into()])
         );
 
         let exp = Exp::from_str("null").unwrap();
