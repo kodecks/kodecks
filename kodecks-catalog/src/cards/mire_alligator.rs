@@ -22,7 +22,7 @@ impl Effect for CardDef {
         if id == "main" {
             ctx.push_stack("main", |ctx, action| {
                 let controller = ctx.source().controller();
-                let player = ctx.state().players().get(controller);
+                let player = ctx.state().players().get(controller)?;
                 let candidates = player
                     .field
                     .iter()

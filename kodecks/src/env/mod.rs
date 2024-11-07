@@ -116,7 +116,7 @@ impl Environment {
             .collect::<Vec<_>>();
         for side in sides {
             let abilities = self.continuous.apply_player(&self.state, side);
-            let player = self.state.players.get(side);
+            let player = self.state.players.get(side)?;
             let field_states = player
                 .field
                 .iter()
@@ -131,7 +131,7 @@ impl Environment {
                     attrs
                 })
                 .collect();
-            let player = self.state.players.get_mut(side);
+            let player = self.state.players.get_mut(side)?;
             player.abilities = abilities;
             player.field.update_computed(field_states);
             player.hand.update_computed(hand_states);
@@ -163,8 +163,9 @@ impl Environment {
     fn process_turn(&mut self, player: u8, mut action: Option<Action>) -> Report {
         let action = match action.take() {
             Some(Action::Concede) => {
-                let loser = self.state.players.get_mut(player);
-                loser.endgame = Some(PlayerEndgameState::Lose(EndgameReason::Concede));
+                if let Ok(loser) = self.state.players.get_mut(player) {
+                    loser.endgame = Some(PlayerEndgameState::Lose(EndgameReason::Concede));
+                }
                 Some(Action::Concede)
             }
             Some(Action::DebugCommand { commands })
@@ -365,7 +366,7 @@ impl Environment {
             }
         } else if let [(lost, reason)] = lost_players.as_slice() {
             EndgameState::Finished {
-                winner: Some(self.state.players.next_id(lost.id)),
+                winner: self.state.players.next_id(lost.id).ok(),
                 reason: *reason,
             }
         } else {

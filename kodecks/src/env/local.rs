@@ -50,29 +50,34 @@ impl LocalEnvironment {
         self.players.iter().flat_map(|player| player.cards())
     }
 
-    pub fn next_id(&self, player: u8) -> u8 {
+    pub fn next_id(&self, player: u8) -> Result<u8, ActionError> {
         self.players.next_id(player)
     }
 
-    pub fn next_player(&self, player: u8) -> &LocalPlayerState {
+    pub fn next_player(&self, player: u8) -> Result<&LocalPlayerState, ActionError> {
         self.players.next_player(player)
     }
 
     pub fn tick(&mut self, action: Action) -> Report {
         if let Action::CastCard { card, .. } = action {
-            let player = self.players.get_mut(self.player);
-            if let Some(card) = CardZone::remove(&mut player.hand, card) {
-                player.field.push(FieldItem {
-                    card,
-                    state: FieldState::Active,
-                    battle: None,
-                });
+            if let Ok(player) = self.players.get_mut(self.player) {
+                if let Some(card) = CardZone::remove(&mut player.hand, card) {
+                    player.field.push(FieldItem {
+                        card,
+                        state: FieldState::Active,
+                        battle: None,
+                    });
+                }
             }
             self.timestamp += 1;
         }
         Report {
             available_actions: Some(PlayerAvailableActions {
-                player: self.players.player_in_turn().id,
+                player: self
+                    .players
+                    .player_in_turn()
+                    .map(|player| player.id)
+                    .unwrap_or_default(),
                 actions: AvailableActionList::new(),
                 instructions: None,
                 message_dialog: None,
@@ -87,7 +92,11 @@ impl LocalEnvironment {
 impl Environment {
     pub fn local(&self, viewer: u8) -> LocalEnvironment {
         let players = PlayerList::new(
-            self.state.players.player_in_turn().id,
+            self.state
+                .players
+                .player_in_turn()
+                .map(|player| player.id)
+                .unwrap_or_default(),
             self.state
                 .players
                 .iter()

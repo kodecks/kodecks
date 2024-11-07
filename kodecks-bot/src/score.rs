@@ -1,5 +1,5 @@
 use kodecks::{
-    env::{Environment, EndgameState},
+    env::{EndgameState, Environment},
     score::Score,
 };
 
@@ -37,8 +37,16 @@ impl Ord for ComputedScore {
 
 pub fn get_score(env: &Environment, side: u8) -> i32 {
     let state = &env.state;
-    let player = state.players().get(side);
-    let opponent = state.players().next_player(side);
+    let player = if let Ok(player) = state.players().get(side) {
+        player
+    } else {
+        return 0;
+    };
+    let opponent = if let Ok(opponent) = state.players().next_player(side) {
+        opponent
+    } else {
+        return 0;
+    };
     let mut score = 0i32;
 
     score += player.stats.life as i32 / 100;

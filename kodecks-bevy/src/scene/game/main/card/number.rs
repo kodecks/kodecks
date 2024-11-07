@@ -49,6 +49,7 @@ pub fn update_number_overlay(
                         if let Some(item) = env
                             .players
                             .get(zone.player)
+                            .unwrap()
                             .hand
                             .iter()
                             .find(|item| item.card.id == card.id)

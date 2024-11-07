@@ -75,6 +75,8 @@ pub enum ActionError {
     CreatureAlreadyFreeCasted,
     #[error("Card not found: {id}")]
     CardNotFound { id: ObjectId },
+    #[error("Player not found: {player}")]
+    PlayerNotFound { player: u8 },
     #[error("Key not found: {key}")]
     KeyNotFound { key: String },
     #[error("Invalid value type")]

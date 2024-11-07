@@ -46,8 +46,17 @@ impl Bot for SimpleBot {
             }
 
             if let AvailableAction::Attack { attackers } = action {
-                let player = env.state.players().get(actions.player);
-                let opponent = env.state.players().next_player(actions.player);
+                let player = if let Ok(player) = env.state.players().get(actions.player) {
+                    player
+                } else {
+                    return vec![];
+                };
+                let opponent = if let Ok(opponent) = env.state.players().next_player(actions.player)
+                {
+                    opponent
+                } else {
+                    return vec![];
+                };
 
                 let blockers = opponent
                     .field
@@ -82,8 +91,17 @@ impl Bot for SimpleBot {
             }
 
             if let AvailableAction::Block { blockers } = action {
-                let player = env.state.players().get(actions.player);
-                let opponent = env.state.players().next_player(actions.player);
+                let player = if let Ok(player) = env.state.players().get(actions.player) {
+                    player
+                } else {
+                    return vec![];
+                };
+                let opponent = if let Ok(opponent) = env.state.players().next_player(actions.player)
+                {
+                    opponent
+                } else {
+                    return vec![];
+                };
                 let mut blockers = blockers
                     .iter()
                     .filter_map(|id| env.state.find_card(*id).ok())

@@ -121,7 +121,12 @@ impl Bot for DefaultBot {
             .filter(|(_, score)| score.score() > 0)
             .max_by_key(|(_, score)| *score);
 
-        let opponent = env.state.players().next_player(actions.player);
+        let opponent = if let Ok(opponent) = env.state.players().next_player(actions.player) {
+            opponent
+        } else {
+            return vec![];
+        };
+
         let attackers = opponent
             .field
             .attacking_cards()

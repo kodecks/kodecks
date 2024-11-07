@@ -51,7 +51,7 @@ impl Environment {
             }),
             Some(OpcodeList::new(vec![Opcode::ChangeTurn {
                 turn: 1,
-                player: self.state.players.player_in_turn().id,
+                player: self.state.players.player_in_turn()?.id,
                 phase: self.state.phase,
             },],)),
         ])
@@ -103,7 +103,7 @@ impl Environment {
         let player_in_turn = &self
             .state
             .players
-            .get(self.state.players.player_in_turn().id);
+            .get(self.state.players.player_in_turn()?.id)?;
         match self.state.phase {
             Phase::Standby => {
                 let next_phase = Phase::Draw;
@@ -112,7 +112,7 @@ impl Environment {
                         None
                     } else {
                         Some(OpcodeList::new(vec![Opcode::ReduceCost {
-                            player: self.state.players.player_in_turn().id,
+                            player: self.state.players.player_in_turn()?.id,
                         }]))
                     },
                     Some(OpcodeList::new(vec![Opcode::ChangePhase {
@@ -158,7 +158,7 @@ impl Environment {
                             Some(OpcodeList::new(filter_vec![
                                 if cost > 0 {
                                     Some(Opcode::ConsumeShards {
-                                        player: self.state.players.player_in_turn().id,
+                                        player: self.state.players.player_in_turn()?.id,
                                         source: item.card.id(),
                                         color: item.card.computed().color,
                                         amount: cost,
@@ -167,7 +167,7 @@ impl Environment {
                                     None
                                 },
                                 Some(Opcode::CastCard {
-                                    player: self.state.players.player_in_turn().id,
+                                    player: self.state.players.player_in_turn()?.id,
                                     card: item.card.id(),
                                     cost
                                 }),
@@ -217,7 +217,7 @@ impl Environment {
                 let active_player = &self
                     .state
                     .players
-                    .next_player(self.state.players.player_in_turn().id);
+                    .next_player(self.state.players.player_in_turn()?.id)?;
 
                 if player_in_turn.field.attacking_cards().next().is_none() {
                     Ok(vec![OpcodeList::new(filter_vec![Some(
@@ -295,7 +295,7 @@ impl Environment {
                 let target = &self
                     .state
                     .players
-                    .next_player(self.state.players.player_in_turn().id);
+                    .next_player(self.state.players.player_in_turn()?.id)?;
                 let attacker = player_in_turn.field.attacking_cards().min_by_key(|card| {
                     (
                         if target.field.find_blocker(card.id()).is_some() {
@@ -428,9 +428,9 @@ impl Environment {
                     let card = player_in_turn.hand.get(card).unwrap();
                     return Ok(vec![OpcodeList::new(vec![Opcode::MoveCard {
                         card: card.id(),
-                        from: PlayerZone::new(self.state.players.player_in_turn().id, Zone::Hand),
+                        from: PlayerZone::new(self.state.players.player_in_turn()?.id, Zone::Hand),
                         to: PlayerZone::new(
-                            self.state.players.player_in_turn().id,
+                            self.state.players.player_in_turn()?.id,
                             Zone::Graveyard,
                         ),
                         reason: MoveReason::Discarded,
@@ -441,7 +441,7 @@ impl Environment {
                 let active_player = self
                     .state
                     .players
-                    .next_id(self.state.players.player_in_turn().id);
+                    .next_id(self.state.players.player_in_turn()?.id)?;
                 let turn = self.state.turn + 1;
                 Ok(vec![OpcodeList::new(vec![Opcode::ChangeTurn {
                     turn,

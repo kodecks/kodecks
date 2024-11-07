@@ -42,13 +42,13 @@ impl Environment {
                 Ok(vec![GameLog::PhaseChanged { phase }])
             }
             Opcode::SetLife { player, life } => {
-                self.state.players.get_mut(player).stats.life = life;
+                self.state.players.get_mut(player)?.stats.life = life;
                 Ok(vec![GameLog::LifeChanged { player, life }])
             }
             Opcode::ReduceCost { player } => {
                 self.state
                     .players
-                    .get_mut(player)
+                    .get_mut(player)?
                     .hand
                     .items_mut()
                     .for_each(|item| {
@@ -62,7 +62,7 @@ impl Environment {
                 color,
                 amount,
             } => {
-                let abilities = &self.state.players.get(player).abilities;
+                let abilities = &self.state.players.get(player)?.abilities;
                 let propagate = abilities
                     .iter()
                     .find_map(|a| {
@@ -75,7 +75,7 @@ impl Environment {
                     .unwrap_or_default();
                 let source = self.state.find_card(source)?.snapshot();
                 let amount = ((amount as i32) + propagate).max(0) as u8;
-                let player = self.state.players.get_mut(player);
+                let player = self.state.players.get_mut(player)?;
                 player.shards.add(color, amount);
                 Ok(vec![GameLog::ShardsEarned {
                     player: player.id,
@@ -91,7 +91,7 @@ impl Environment {
                 amount,
             } => {
                 let source = self.state.find_card(source)?.snapshot();
-                let player = self.state.players.get_mut(player);
+                let player = self.state.players.get_mut(player)?;
                 player.shards.consume(color, amount)?;
                 Ok(vec![GameLog::ShardsSpent {
                     player: player.id,
@@ -113,12 +113,12 @@ impl Environment {
             }
             Opcode::GenerateCardToken { card } => {
                 let snapshot = card.snapshot();
-                let player = self.state.players.get_mut(card.controller());
+                let player = self.state.players.get_mut(card.controller())?;
                 player.field.push(card);
                 Ok(vec![GameLog::CardTokenGenerated { card: snapshot }])
             }
             Opcode::DrawCard { player } => {
-                let player = self.state.players.get_mut(player);
+                let player = self.state.players.get_mut(player)?;
                 if let Some(mut card) = player.deck.remove_top() {
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Hand);
@@ -143,7 +143,7 @@ impl Environment {
                 Ok(vec![])
             }
             Opcode::CastCard { player, card, cost } => {
-                let player = self.state.players.get_mut(player);
+                let player = self.state.players.get_mut(player)?;
                 if let Some(mut card) = player.hand.remove(card) {
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Field);
@@ -171,7 +171,7 @@ impl Environment {
                 to,
                 reason,
             } => {
-                let player = self.state.players.get_mut(from.player);
+                let player = self.state.players.get_mut(from.player)?;
                 let card = match from.zone {
                     Zone::Deck => player.deck.remove(card),
                     Zone::Hand => player.hand.remove(card),
@@ -189,7 +189,7 @@ impl Environment {
                     card.set_zone(to);
                     card.reset_computed();
                     let snapshot = card.snapshot();
-                    let player = self.state.players.get_mut(to.player);
+                    let player = self.state.players.get_mut(to.player)?;
                     match to.zone {
                         Zone::Deck => player.deck.push(card),
                         Zone::Hand => player.hand.push(card),
@@ -207,7 +207,7 @@ impl Environment {
                 Ok(vec![])
             }
             Opcode::ShuffleDeck { player } => {
-                let player = self.state.players.get_mut(player);
+                let player = self.state.players.get_mut(player)?;
                 player.deck.shuffle(&mut self.obj_counter, &mut self.rng);
                 Ok(vec![GameLog::DeckShuffled { player: player.id }])
             }
@@ -295,7 +295,7 @@ impl Environment {
                 }])
             }
             Opcode::InflictDamage { player, amount } => {
-                let player = self.state.players.get_mut(player);
+                let player = self.state.players.get_mut(player)?;
                 player.stats.life = player.stats.life.saturating_sub(amount);
                 Ok(vec![
                     GameLog::DamageTaken {

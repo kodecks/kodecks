@@ -36,7 +36,11 @@ pub async fn start_game(
 
     let mut env = Arc::new(Environment::new(profile, CATALOG.clone()));
     let mut available_actions: Option<PlayerAvailableActions> = None;
-    let mut player_in_action = env.state.players.player_in_turn().id;
+    let mut player_in_action = if let Ok(player) = env.state.players.player_in_turn() {
+        player.id
+    } else {
+        return;
+    };
 
     for player in &players {
         if player.bot.is_none() {

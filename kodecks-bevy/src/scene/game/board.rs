@@ -118,8 +118,8 @@ impl Board {
     }
 
     pub fn update(&mut self, env: &LocalEnvironment) {
-        let player = env.players.get(env.player);
-        let opponent = env.players.next_player(env.player);
+        let player = env.players.get(env.player).unwrap();
+        let opponent = env.players.next_player(env.player).unwrap();
 
         self.player_hand = player.hand.iter().map(|item| item.card.id).collect();
 

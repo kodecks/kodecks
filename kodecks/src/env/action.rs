@@ -24,7 +24,7 @@ impl Environment {
             return None;
         }
 
-        let active_player = self.state.players.player_in_turn();
+        let active_player = self.state.players.player_in_turn().ok()?;
         let attackers = active_player
             .field
             .active_cards()
@@ -63,7 +63,7 @@ impl Environment {
         } else if let Phase::Block = &self.state.phase {
             active_player.field.attacking_cards().next()?;
 
-            let player_in_action = self.state.players.next_player(active_player.id);
+            let player_in_action = self.state.players.next_player(active_player.id).ok()?;
             let blockers = player_in_action
                 .field
                 .active_cards()

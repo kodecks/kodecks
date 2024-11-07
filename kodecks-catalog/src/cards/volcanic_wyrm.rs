@@ -21,7 +21,7 @@ impl Effect for CardDef {
     fn trigger(&mut self, id: EffectId, ctx: &mut EffectTriggerContext) -> Result<()> {
         if id == "main" {
             ctx.push_stack("main", |ctx, _| {
-                let target = ctx.state().players.next_id(ctx.source().controller());
+                let target = ctx.state().players.next_id(ctx.source().controller())?;
                 let commands = vec![ActionCommand::InflictDamage {
                     target,
                     amount: 200,

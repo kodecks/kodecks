@@ -3,6 +3,7 @@ use crate::{
     card::{Card, CardSnapshot},
     deck::DeckList,
     env::{EndgameReason, GameState},
+    error::ActionError,
     field::{FieldItem, FieldState},
     hand::HandItem,
     id::ObjectId,
@@ -100,20 +101,20 @@ impl<T> PlayerList<T>
 where
     T: PlayerItem,
 {
-    pub fn get(&self, player: u8) -> &T {
+    pub fn get(&self, player: u8) -> Result<&T, ActionError> {
         self.players
             .iter()
             .find(|item| item.id() == player)
-            .unwrap()
+            .ok_or(ActionError::PlayerNotFound { player })
     }
 
-    pub fn get_mut(&mut self, player: u8) -> &mut T {
+    pub fn get_mut(&mut self, player: u8) -> Result<&mut T, ActionError> {
         let index = self
             .players
             .iter()
             .position(|item| item.id() == player)
-            .unwrap();
-        &mut self.players[index]
+            .ok_or(ActionError::PlayerNotFound { player })?;
+        Ok(&mut self.players[index])
     }
 
     pub fn iter(&self) -> impl Iterator<Item = &T> {
@@ -124,18 +125,21 @@ where
         PlayerListMutIter::new(self.player_in_turn, &mut self.players)
     }
 
-    pub fn next_id(&self, id: u8) -> u8 {
+    pub fn next_id(&self, id: u8) -> Result<u8, ActionError> {
+        if self.players.is_empty() {
+            return Err(ActionError::PlayerNotFound { player: id });
+        }
         let pos = self
             .players
             .iter()
             .position(|player| player.id() == id)
             .unwrap_or(0);
         let next = (pos + 1) % self.players.len();
-        self.players[next].id()
+        Ok(self.players[next].id())
     }
 
-    pub fn next_player(&self, id: u8) -> &T {
-        let next = self.next_id(id);
+    pub fn next_player(&self, id: u8) -> Result<&T, ActionError> {
+        let next = self.next_id(id)?;
         self.get(next)
     }
 
@@ -143,7 +147,7 @@ where
         self.players.push(player);
     }
 
-    pub fn player_in_turn(&self) -> &T {
+    pub fn player_in_turn(&self) -> Result<&T, ActionError> {
         self.get(self.player_in_turn)
     }
 }
