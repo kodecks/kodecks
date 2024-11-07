@@ -1,11 +1,13 @@
 use crate::{
     command::ActionCommand,
+    dsl::script::value::{CustomType, Value},
     env::Environment,
     id::ObjectId,
     message::{Message, MessageDialog},
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(tag = "name", rename_all = "snake_case")]
@@ -252,4 +254,61 @@ pub enum Action {
     Concede,
     Continue,
     DebugCommand { commands: Vec<ActionCommand> },
+}
+
+impl From<Action> for Value {
+    fn from(action: Action) -> Self {
+        let mut obj = BTreeMap::new();
+        let name = match action {
+            Action::CastCard { card } => {
+                obj.insert("card".into(), Value::Custom(CustomType::Card(card)));
+                "cast_card"
+            }
+            Action::SelectCard { card } => {
+                obj.insert("card".into(), Value::Custom(CustomType::Card(card)));
+                "select_card"
+            }
+            Action::Attack { attackers } => {
+                obj.insert(
+                    "attackers".into(),
+                    Value::Array(
+                        attackers
+                            .into_iter()
+                            .map(|card| Value::Custom(CustomType::Card(card)))
+                            .collect(),
+                    ),
+                );
+                "attack"
+            }
+            Action::Block { pairs } => {
+                obj.insert(
+                    "pairs".into(),
+                    Value::Array(
+                        pairs
+                            .into_iter()
+                            .map(|(attacker, blocker)| {
+                                let mut pair = BTreeMap::new();
+                                pair.insert(
+                                    "attacker".into(),
+                                    Value::Custom(CustomType::Card(attacker)),
+                                );
+                                pair.insert(
+                                    "blocker".into(),
+                                    Value::Custom(CustomType::Card(blocker)),
+                                );
+                                Value::Object(pair)
+                            })
+                            .collect(),
+                    ),
+                );
+                "block"
+            }
+            Action::EndTurn => "end_turn",
+            Action::Concede => "concede",
+            Action::Continue => "continue",
+            Action::DebugCommand { .. } => "debug_command",
+        };
+        obj.insert("name".into(), name.to_string().into());
+        Value::Object(obj)
+    }
 }

@@ -1,9 +1,13 @@
 use bincode::{Decode, Encode};
 use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use strum::Display;
 
-use crate::player::PlayerZone;
+use crate::{
+    dsl::script::value::{CustomType, Value},
+    player::PlayerZone,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode)]
 #[non_exhaustive]
@@ -31,6 +35,60 @@ pub enum CardEvent {
     AnyCasted,
 }
 
+impl From<CardEvent> for Value {
+    fn from(event: CardEvent) -> Value {
+        let mut obj = BTreeMap::new();
+        match event {
+            CardEvent::Casted { from } => {
+                let mut from_obj = BTreeMap::new();
+                from_obj.insert(
+                    "player".into(),
+                    Value::Custom(CustomType::Player(from.player)),
+                );
+                from_obj.insert(
+                    "zone".into(),
+                    from.zone.to_string().to_ascii_lowercase().into(),
+                );
+                obj.insert("from".into(), Value::Object(from_obj));
+            }
+            CardEvent::Destroyed { from, reason } => {
+                let mut from_obj = BTreeMap::new();
+                from_obj.insert(
+                    "player".into(),
+                    Value::Custom(CustomType::Player(from.player)),
+                );
+                from_obj.insert(
+                    "zone".into(),
+                    from.zone.to_string().to_ascii_lowercase().into(),
+                );
+                obj.insert("from".into(), Value::Object(from_obj));
+                obj.insert(
+                    "reason".into(),
+                    reason.to_string().to_ascii_lowercase().into(),
+                );
+            }
+            CardEvent::ReturnedToHand { reason } => {
+                obj.insert(
+                    "reason".into(),
+                    reason.to_string().to_ascii_lowercase().into(),
+                );
+            }
+            CardEvent::DealtDamage {
+                player,
+                amount,
+                reason,
+            } => {
+                obj.insert("player".into(), Value::Custom(CustomType::Player(player)));
+                obj.insert("amount".into(), amount.into());
+                obj.insert("reason".into(), reason.to_string().into());
+            }
+            _ => {}
+        }
+        obj.insert("name".into(), event.as_str().to_string().into());
+        Value::Object(obj)
+    }
+}
+
 impl CardEvent {
     pub fn filter(&self) -> EventFilter {
         match self {
@@ -45,10 +103,24 @@ impl CardEvent {
             CardEvent::AnyCasted => EventFilter::ANY_CASTED,
         }
     }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            CardEvent::Casted { .. } => "casted",
+            CardEvent::Destroyed { .. } => "destroyed",
+            CardEvent::ReturnedToHand { .. } => "returned_to_hand",
+            CardEvent::ReturnedToDeck => "returned_to_deck",
+            CardEvent::DealtDamage { .. } => "dealt_damage",
+            CardEvent::Attacking => "attacking",
+            CardEvent::Blocking => "blocking",
+            CardEvent::Attacked => "attacked",
+            CardEvent::AnyCasted => "any_casted",
+        }
+    }
 }
 
 bitflags! {
-    #[derive(Clone, Copy, Eq, PartialEq)]
+    #[derive(Debug, Clone, Copy, Eq, PartialEq)]
     pub struct EventFilter: u16 {
         const CASTED = 1 << 0;
         const DESTROYED = 1 << 1;
