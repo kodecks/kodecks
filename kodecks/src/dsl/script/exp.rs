@@ -686,7 +686,7 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                     for arg in args {
                         new_args.extend(arg.eval(&mut new_ctx)?);
                     }
-                    ctx.env.invoke(name, new_args)
+                    ctx.env.invoke(name, new_args, ctx.params, ctx.input)
                 }
             }
             Self::Empty => Ok(vec![]),
@@ -741,7 +741,13 @@ pub trait ExpEnv {
     fn get_var(&self, name: &str) -> Option<Value>;
     fn get_card(&self, id: ObjectId) -> Option<&Card>;
     fn get_player(&self, id: u8) -> Option<&Player>;
-    fn invoke(&self, name: &str, args: Vec<Value>) -> Result<Vec<Value>, Error>;
+    fn invoke(
+        &mut self,
+        name: &str,
+        args: Vec<Value>,
+        params: &ExpParams,
+        input: &Value,
+    ) -> Result<Vec<Value>, Error>;
 }
 
 #[derive(Debug, Clone)]
@@ -888,7 +894,13 @@ mod tests {
             None
         }
 
-        fn invoke(&self, name: &str, args: Vec<Value>) -> Result<Vec<Value>, Error> {
+        fn invoke(
+            &mut self,
+            name: &str,
+            args: Vec<Value>,
+            _params: &ExpParams,
+            _input: &Value,
+        ) -> Result<Vec<Value>, Error> {
             if name == "test_builtin_func" {
                 Ok(vec![args.get(1).cloned().unwrap_or_default()])
             } else {
