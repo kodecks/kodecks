@@ -1,5 +1,5 @@
 use crate::card_def;
-use kodecks::prelude::*;
+use kodecks::{prelude::*, target::Target};
 
 card_def!(
     CardDef,
@@ -21,7 +21,12 @@ impl Effect for CardDef {
     fn trigger(&mut self, id: EffectId, ctx: &mut EffectTriggerContext) -> Result<()> {
         if id == "main" {
             ctx.push_stack("main", |ctx, _| {
-                ctx.push_continuous(CardDef, condition::InTurn(ctx.state().turn));
+                ctx.push_continuous(
+                    Powerup {
+                        turn: ctx.state().turn,
+                    },
+                    Target::Card(ctx.source().id()),
+                );
                 Ok(EffectReport::default())
             });
         }
@@ -38,8 +43,16 @@ impl Effect for CardDef {
     }
 }
 
-impl ContinuousEffect for CardDef {
+#[derive(Clone)]
+struct Powerup {
+    turn: u16,
+}
+
+impl ContinuousEffect for Powerup {
     fn apply_card(&mut self, ctx: &mut ContinuousCardEffectContext) -> Result<bool> {
+        if ctx.state.turn != self.turn {
+            return Ok(false);
+        }
         if ctx.target.id() == ctx.source.id() {
             if let Some(power) = &mut ctx.computed.power {
                 power.add(100);

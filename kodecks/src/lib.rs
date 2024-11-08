@@ -8,7 +8,6 @@ pub mod catalog;
 pub mod color;
 pub mod command;
 pub mod computed;
-pub mod condition;
 pub mod continuous;
 pub mod deck;
 pub mod dsl;

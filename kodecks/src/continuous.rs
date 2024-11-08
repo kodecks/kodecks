@@ -2,10 +2,11 @@ use crate::{
     ability::{AbilityList, PlayerAbility},
     card::Card,
     computed::ComputedAttribute,
-    condition::Condition,
     effect::ContinuousCardEffectContext,
     env::GameState,
     id::ObjectId,
+    target::Target,
+    zone::Zone,
 };
 use core::fmt;
 use dyn_clone::DynClone;
@@ -17,7 +18,7 @@ pub struct ContinuousItem {
     source: ObjectId,
     timestamp: u32,
     func: Arc<Box<dyn ContinuousEffect>>,
-    condition: Arc<Box<dyn Condition>>,
+    target: Target,
     is_active: bool,
 }
 
@@ -48,16 +49,15 @@ pub trait ContinuousEffect: Send + Sync + DynClone {
 dyn_clone::clone_trait_object!(ContinuousEffect);
 
 impl ContinuousItem {
-    pub fn new<F, C>(source: &Card, effect: F, condition: C) -> Self
+    pub fn new<F>(source: &Card, effect: F, target: Target) -> Self
     where
         F: ContinuousEffect + 'static,
-        C: Condition + 'static,
     {
         Self {
             source: source.id(),
             timestamp: source.timestamp(),
             func: Arc::new(Box::new(effect)),
-            condition: Arc::new(Box::new(condition)),
+            target,
             is_active: true,
         }
     }
@@ -86,7 +86,18 @@ impl ContinuousEffectList {
 
     pub fn apply_card(&mut self, state: &GameState, card: &Card) -> ComputedAttribute {
         let mut computed = ComputedAttribute::from(&**card.archetype());
-        for effect in self.effects.iter_mut().rev() {
+        for effect in self
+            .effects
+            .iter_mut()
+            .filter(|effect| effect.is_active)
+            .rev()
+        {
+            if let Target::Card(target) = effect.target {
+                if state.find_zone(target).ok().map(|zone| zone.zone) != Some(Zone::Field) {
+                    effect.is_active = false;
+                    continue;
+                }
+            }
             let result = state
                 .find_card(effect.source)
                 .map_err(|err| err.into())
@@ -133,8 +144,7 @@ impl ContinuousEffectList {
         abilities
     }
 
-    pub fn update(&mut self, state: &GameState) {
-        self.effects
-            .retain(|effect| effect.is_active && effect.condition.is_met(state));
+    pub fn update(&mut self) {
+        self.effects.retain(|effect| effect.is_active);
     }
 }

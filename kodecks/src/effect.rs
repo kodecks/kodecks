@@ -2,13 +2,13 @@ use crate::{
     action::{Action, PlayerAvailableActions},
     card::Card,
     command::ActionCommand,
-    condition::Condition,
     continuous::{ContinuousEffect, ContinuousItem},
     env::GameState,
     event::{CardEvent, EventFilter},
     id::{ObjectId, ObjectIdCounter},
     prelude::ComputedAttribute,
     stack::StackItem,
+    target::Target,
 };
 use bincode::{
     de::{BorrowDecoder, Decoder},
@@ -147,13 +147,12 @@ impl<'a> EffectTriggerContext<'a> {
         self.source
     }
 
-    pub fn push_continuous<F, C>(&mut self, effect: F, condition: C)
+    pub fn push_continuous<F>(&mut self, effect: F, target: Target)
     where
         F: ContinuousEffect + 'static,
-        C: Condition + 'static,
     {
         self.continuous
-            .push(ContinuousItem::new(self.source, effect, condition));
+            .push(ContinuousItem::new(self.source, effect, target));
     }
 
     pub fn push_stack<F>(&mut self, id: &str, handler: F)

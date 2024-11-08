@@ -231,7 +231,7 @@ impl Environment {
                         }
                     }
 
-                    self.continuous.update(&self.state);
+                    self.continuous.update();
                     if let Err(err) = self.compute_effects() {
                         error!("Error computing effects: {:?}", err);
                     }
@@ -288,7 +288,7 @@ impl Environment {
             }
         }
 
-        self.continuous.update(&self.state);
+        self.continuous.update();
         if let Err(err) = self.compute_effects() {
             error!("Error computing effects: {:?}", err);
         }

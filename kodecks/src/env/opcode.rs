@@ -1,7 +1,6 @@
 use super::{EndgameReason, Environment};
 use crate::{
     ability::PlayerAbility,
-    condition,
     effect::{ContinuousCardEffectContext, EffectActivateContext, EffectTriggerContext},
     error::ActionError,
     field::{FieldBattleState, FieldState},
@@ -104,7 +103,7 @@ impl Environment {
                 self.continuous.add(ContinuousItem::new(
                     card,
                     ShieldBroken,
-                    condition::OnField(card.id()),
+                    Target::Card(card.id()),
                 ));
                 Ok(vec![GameLog::ShieldBroken {
                     card: card.snapshot(),
