@@ -315,12 +315,12 @@ impl Environment {
 struct ShieldBroken;
 
 impl ContinuousEffect for ShieldBroken {
-    fn apply_card(&mut self, ctx: &mut ContinuousCardEffectContext) -> anyhow::Result<()> {
+    fn apply_card(&mut self, ctx: &mut ContinuousCardEffectContext) -> anyhow::Result<bool> {
         if ctx.target.id() == ctx.source.id() {
             if let Some(shields) = &mut ctx.computed.shields {
                 shields.add(-1);
             }
         }
-        Ok(())
+        Ok(true)
     }
 }

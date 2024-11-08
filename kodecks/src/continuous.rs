@@ -18,6 +18,7 @@ pub struct ContinuousItem {
     timestamp: u32,
     func: Arc<Box<dyn ContinuousEffect>>,
     condition: Arc<Box<dyn Condition>>,
+    is_active: bool,
 }
 
 impl fmt::Debug for ContinuousItem {
@@ -30,8 +31,8 @@ impl fmt::Debug for ContinuousItem {
 }
 
 pub trait ContinuousEffect: Send + Sync + DynClone {
-    fn apply_card(&mut self, _ctx: &mut ContinuousCardEffectContext) -> anyhow::Result<()> {
-        Ok(())
+    fn apply_card(&mut self, _ctx: &mut ContinuousCardEffectContext) -> anyhow::Result<bool> {
+        Ok(true)
     }
 
     fn apply_player(
@@ -39,8 +40,8 @@ pub trait ContinuousEffect: Send + Sync + DynClone {
         _state: &GameState,
         _player: u8,
         _abilities: &mut AbilityList<PlayerAbility>,
-    ) -> anyhow::Result<()> {
-        Ok(())
+    ) -> anyhow::Result<bool> {
+        Ok(true)
     }
 }
 
@@ -57,6 +58,7 @@ impl ContinuousItem {
             timestamp: source.timestamp(),
             func: Arc::new(Box::new(effect)),
             condition: Arc::new(Box::new(condition)),
+            is_active: true,
         }
     }
 }
@@ -85,7 +87,7 @@ impl ContinuousEffectList {
     pub fn apply_card(&mut self, state: &GameState, card: &Card) -> ComputedAttribute {
         let mut computed = ComputedAttribute::from(&**card.archetype());
         for effect in self.effects.iter_mut().rev() {
-            if let Err(err) = state
+            let result = state
                 .find_card(effect.source)
                 .map_err(|err| err.into())
                 .and_then(|source| {
@@ -96,9 +98,15 @@ impl ContinuousEffectList {
                         computed: &mut computed,
                     };
                     dyn_clone::arc_make_mut(&mut effect.func).apply_card(&mut ctx)
-                })
-            {
-                error!("Failed to apply continuous effect: {:?}", err);
+                });
+            match result {
+                Ok(true) => {}
+                Ok(false) => {
+                    effect.is_active = false;
+                }
+                Err(err) => {
+                    error!("Failed to apply continuous effect: {:?}", err);
+                }
             }
         }
         computed
@@ -107,18 +115,26 @@ impl ContinuousEffectList {
     pub fn apply_player(&mut self, state: &GameState, player: u8) -> AbilityList<PlayerAbility> {
         let mut abilities = AbilityList::new();
         for effect in self.effects.iter_mut().rev() {
-            if let Err(err) = dyn_clone::arc_make_mut(&mut effect.func).apply_player(
+            let result = dyn_clone::arc_make_mut(&mut effect.func).apply_player(
                 state,
                 player,
                 &mut abilities,
-            ) {
-                error!("Failed to apply continuous effect: {:?}", err);
+            );
+            match result {
+                Ok(true) => {}
+                Ok(false) => {
+                    effect.is_active = false;
+                }
+                Err(err) => {
+                    error!("Failed to apply continuous effect: {:?}", err);
+                }
             }
         }
         abilities
     }
 
     pub fn update(&mut self, state: &GameState) {
-        self.effects.retain(|effect| effect.condition.is_met(state));
+        self.effects
+            .retain(|effect| effect.is_active && effect.condition.is_met(state));
     }
 }

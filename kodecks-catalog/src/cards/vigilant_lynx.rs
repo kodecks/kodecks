@@ -39,12 +39,12 @@ impl Effect for CardDef {
 }
 
 impl ContinuousEffect for CardDef {
-    fn apply_card(&mut self, ctx: &mut ContinuousCardEffectContext) -> Result<()> {
+    fn apply_card(&mut self, ctx: &mut ContinuousCardEffectContext) -> Result<bool> {
         if ctx.target.id() == ctx.source.id() {
             if let Some(power) = &mut ctx.computed.power {
                 power.add(100);
             }
         }
-        Ok(())
+        Ok(true)
     }
 }
