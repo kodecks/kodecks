@@ -2,7 +2,11 @@ use super::{
     error::Error,
     value::{Constant, Value},
 };
-use crate::{card::Card, id::ObjectId, player::Player};
+use crate::{
+    card::Card,
+    id::ObjectId,
+    player::{Player, PlayerList},
+};
 use bincode::{Decode, Encode};
 use jaq_core::{
     load::{
@@ -740,7 +744,7 @@ pub trait ExpExt<'a, I> {
 pub trait ExpEnv {
     fn get_var(&self, name: &str) -> Option<Value>;
     fn get_card(&self, id: ObjectId) -> Option<&Card>;
-    fn get_player(&self, id: u8) -> Option<&Player>;
+    fn get_players(&self) -> Option<&PlayerList<Player>>;
     fn invoke(
         &mut self,
         name: &str,
@@ -890,7 +894,7 @@ mod tests {
             None
         }
 
-        fn get_player(&self, _id: u8) -> Option<&Player> {
+        fn get_players(&self) -> Option<&PlayerList<Player>> {
             None
         }
 
