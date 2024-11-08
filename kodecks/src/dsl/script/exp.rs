@@ -403,7 +403,7 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                                 }
                             }
                             let (result, opt) = match i {
-                                LiteralPath::Str(s, opt) => (v.index_str(s, ctx.env), opt),
+                                LiteralPath::Str(s, opt) => (v.index_str(s, new_ctx.env), opt),
                                 LiteralPath::Num(n, opt) => (v.index_num(*n), opt),
                                 LiteralPath::Range(start, end, opt) => {
                                     (v.index_range(*start, *end), opt)
@@ -829,13 +829,13 @@ impl Default for ExpParams {
 }
 
 pub struct ExpContext<'a, T, I> {
-    env: &'a T,
+    env: &'a mut T,
     input: I,
     params: &'a mut ExpParams,
 }
 
 impl<'a, T, I> ExpContext<'a, T, I> {
-    pub fn new(env: &'a T, input: I, params: &'a mut ExpParams) -> Self {
+    pub fn new(env: &'a mut T, input: I, params: &'a mut ExpParams) -> Self {
         Self { env, input, params }
     }
 }
@@ -909,7 +909,7 @@ mod tests {
         )
         .unwrap();
 
-        let env = TestEnv {};
+        let mut env = TestEnv {};
         let array: Vec<Value> = vec![1.into()];
 
         let mut params = ExpParams::new();
@@ -921,7 +921,7 @@ mod tests {
             );
         }
 
-        let mut ctx = ExpContext::new(&env, array.as_slice(), &mut params);
+        let mut ctx = ExpContext::new(&mut env, array.as_slice(), &mut params);
         let exp = Exp::from_str("foo(.)").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![2.into()]));
 
@@ -937,7 +937,7 @@ mod tests {
 
     #[test]
     fn test_exp() {
-        let env = TestEnv {};
+        let mut env = TestEnv {};
         let array: Vec<Value> = vec!["input".into(), 123.into()];
 
         let mut params = ExpParams::new();
@@ -953,7 +953,7 @@ mod tests {
             Exp::Value(Value::Function(Box::new(func))),
         );
 
-        let mut ctx = ExpContext::new(&env, array.as_slice(), &mut params);
+        let mut ctx = ExpContext::new(&mut env, array.as_slice(), &mut params);
 
         let exp = Exp::from_str(".").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(array.clone()));
