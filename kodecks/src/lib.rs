@@ -23,6 +23,7 @@ pub mod linear;
 pub mod list;
 pub mod log;
 pub mod message;
+pub mod modifier;
 pub mod opcode;
 pub mod phase;
 pub mod player;

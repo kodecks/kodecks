@@ -4,6 +4,7 @@ use crate::{
     card::Card,
     color::Color,
     linear::Linear,
+    modifier::{Modifiable, Modifier},
     zone::CardZone,
 };
 use bincode::{
@@ -63,6 +64,28 @@ impl ComputedAttribute {
     pub fn current_shields(&self) -> u8 {
         self.shields.map(|shields| shields.value()).unwrap_or(0)
     }
+
+    pub fn apply_modifier(&mut self, modifier: ComputedAttributeModifier) {
+        if let Some(modifier) = modifier.cost {
+            self.cost.modify(modifier);
+        }
+        if let Some(abilities) = modifier.abilities {
+            self.abilities.modify(abilities);
+        }
+        if let Some(anon_abilities) = modifier.anon_abilities {
+            self.anon_abilities.modify(anon_abilities);
+        }
+        if let Some(modifier) = modifier.power {
+            if let Some(power) = self.power.as_mut() {
+                power.modify(modifier);
+            }
+        }
+        if let Some(modifier) = modifier.shields {
+            if let Some(shields) = self.shields.as_mut() {
+                shields.modify(modifier);
+            }
+        }
+    }
 }
 
 bitflags! {
@@ -106,3 +129,17 @@ pub trait ComputedSequence: CardZone<Item = Card> {
 }
 
 impl<T> ComputedSequence for T where T: CardZone<Item = Card> {}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ComputedAttributeModifier {
+    #[serde(default)]
+    pub cost: Option<Modifier<u8>>,
+    #[serde(default)]
+    pub abilities: Option<Modifier<KeywordAbility>>,
+    #[serde(default)]
+    pub anon_abilities: Option<Modifier<AnonymousAbility>>,
+    #[serde(default)]
+    pub power: Option<Modifier<u32>>,
+    #[serde(default)]
+    pub shields: Option<Modifier<u8>>,
+}

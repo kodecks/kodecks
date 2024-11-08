@@ -98,6 +98,18 @@ where
         }
     }
 
+    pub fn div<N>(&mut self, div: N)
+    where
+        N: NumCast,
+    {
+        *self = self.modified();
+        if let Self::Modified { mul: m, .. } = self {
+            if let Some(div) = <f64 as NumCast>::from(div) {
+                *m /= div;
+            }
+        }
+    }
+
     pub fn add<N>(&mut self, add: N)
     where
         N: NumCast,
@@ -106,6 +118,18 @@ where
         if let Self::Modified { add: a, .. } = self {
             if let Some(add) = <f64 as NumCast>::from(add) {
                 *a += add;
+            }
+        }
+    }
+
+    pub fn sub<N>(&mut self, sub: N)
+    where
+        N: NumCast,
+    {
+        *self = self.modified();
+        if let Self::Modified { add: a, .. } = self {
+            if let Some(sub) = <f64 as NumCast>::from(sub) {
+                *a -= sub;
             }
         }
     }
