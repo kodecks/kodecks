@@ -1,15 +1,14 @@
-use super::{EndgameReason, Environment, GameState};
+use super::{EndgameReason, Environment};
 use crate::{
     ability::PlayerAbility,
-    card::Card,
     condition,
-    effect::{EffectActivateContext, EffectTriggerContext},
+    effect::{ContinuousCardEffectContext, EffectActivateContext, EffectTriggerContext},
     error::ActionError,
     field::{FieldBattleState, FieldState},
     log::GameLog,
     opcode::Opcode,
     player::{PlayerEndgameState, PlayerZone},
-    prelude::{ComputedAttribute, ContinuousEffect, ContinuousItem},
+    prelude::{ContinuousEffect, ContinuousItem},
     sequence::CardSequence,
     target::Target,
     zone::{CardZone, MoveReason, Zone},
@@ -316,15 +315,9 @@ impl Environment {
 struct ShieldBroken;
 
 impl ContinuousEffect for ShieldBroken {
-    fn apply_card(
-        &mut self,
-        _state: &GameState,
-        source: &Card,
-        target: &Card,
-        computed: &mut ComputedAttribute,
-    ) -> anyhow::Result<()> {
-        if target.id() == source.id() {
-            if let Some(shields) = &mut computed.shields {
+    fn apply_card(&mut self, ctx: &mut ContinuousCardEffectContext) -> anyhow::Result<()> {
+        if ctx.target.id() == ctx.source.id() {
+            if let Some(shields) = &mut ctx.computed.shields {
                 shields.add(-1);
             }
         }

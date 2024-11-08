@@ -39,15 +39,9 @@ impl Effect for CardDef {
 }
 
 impl ContinuousEffect for CardDef {
-    fn apply_card(
-        &mut self,
-        _state: &GameState,
-        source: &Card,
-        target: &Card,
-        computed: &mut ComputedAttribute,
-    ) -> Result<()> {
-        if target.id() == source.id() {
-            if let Some(power) = &mut computed.power {
+    fn apply_card(&mut self, ctx: &mut ContinuousCardEffectContext) -> Result<()> {
+        if ctx.target.id() == ctx.source.id() {
+            if let Some(power) = &mut ctx.computed.power {
                 power.add(100);
             }
         }

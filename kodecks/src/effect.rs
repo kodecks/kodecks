@@ -7,6 +7,7 @@ use crate::{
     env::GameState,
     event::{CardEvent, EventFilter},
     id::{ObjectId, ObjectIdCounter},
+    prelude::ComputedAttribute,
     stack::StackItem,
 };
 use bincode::{
@@ -176,6 +177,12 @@ impl<'a> EffectTriggerContext<'a> {
     pub fn into_inner(self) -> (Vec<ContinuousItem>, Vec<StackItem>) {
         (self.continuous, self.stack)
     }
+}
+pub struct ContinuousCardEffectContext<'a> {
+    pub state: &'a GameState,
+    pub source: &'a Card,
+    pub target: &'a Card,
+    pub computed: &'a mut ComputedAttribute,
 }
 
 pub struct EffectActivateContext<'a> {

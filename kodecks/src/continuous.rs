@@ -3,6 +3,7 @@ use crate::{
     card::Card,
     computed::ComputedAttribute,
     condition::Condition,
+    effect::ContinuousCardEffectContext,
     env::GameState,
     id::ObjectId,
 };
@@ -29,13 +30,7 @@ impl fmt::Debug for ContinuousItem {
 }
 
 pub trait ContinuousEffect: Send + Sync + DynClone {
-    fn apply_card(
-        &mut self,
-        _state: &GameState,
-        _source: &Card,
-        _target: &Card,
-        _computed: &mut ComputedAttribute,
-    ) -> anyhow::Result<()> {
+    fn apply_card(&mut self, _ctx: &mut ContinuousCardEffectContext) -> anyhow::Result<()> {
         Ok(())
     }
 
@@ -94,12 +89,13 @@ impl ContinuousEffectList {
                 .find_card(effect.source)
                 .map_err(|err| err.into())
                 .and_then(|source| {
-                    dyn_clone::arc_make_mut(&mut effect.func).apply_card(
+                    let mut ctx = ContinuousCardEffectContext {
                         state,
                         source,
-                        card,
-                        &mut computed,
-                    )
+                        target: card,
+                        computed: &mut computed,
+                    };
+                    dyn_clone::arc_make_mut(&mut effect.func).apply_card(&mut ctx)
                 })
             {
                 error!("Failed to apply continuous effect: {:?}", err);
