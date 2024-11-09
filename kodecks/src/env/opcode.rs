@@ -219,6 +219,7 @@ impl Environment {
                 let mut ctx = EffectActivateContext::new(&self.state, source, target);
 
                 if let Err(err) = target.effect().activate(event, &mut ctx) {
+                    println!("Error activating effect: {:?}", err);
                     error!("Error triggering effect: {:?}", err);
                 };
 

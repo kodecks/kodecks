@@ -4,11 +4,13 @@ use crate::{
     color::Color,
     computed::{ComputedAttribute, ComputedFlags},
     deck::DeckItem,
+    dsl::script::exp::Module,
     effect::Effect,
     event::EventFilter,
     id::{CardId, ObjectId, ObjectIdCounter, TimedCardId, TimedObjectId},
     linear::Linear,
     player::{PlayerMask, Zone},
+    prelude::effect::EffectDef,
     score::Score,
     zone::ZoneKind,
 };
@@ -16,7 +18,7 @@ use bincode::{Decode, Encode};
 use core::fmt;
 use num::Zero;
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
 pub struct Card {
     id: ObjectId,
@@ -47,7 +49,37 @@ impl Card {
         style: u8,
         owner: u8,
     ) -> Self {
-        let effect = (archetype.effect)();
+        let effect = EffectDef::new(
+            Module::from_str(
+                r#"
+def on_casted($event):
+    # Check if the player has any shards
+    if ($source.controller.shards | map(.) | add // 0) == 0 then
+        trigger_stack("main") 
+    end |
+    debug($event);
+
+# Inflict damage to the opponent
+def stack($id; $action; $a; $b):
+    debug($id; $action, $a, $b) |
+    push_continuous($id, $source, 1, 2) |
+    { commands: [ {name: "inflict_damage", target: $source.controller.next, amount: 400 } ] };
+
+def continuous($event; $a; $b):
+    debug("cont", $event, $a, $b) |
+    { power: ["+", 600] };
+
+def on_attacking($event):
+    debug($event);
+
+def trigger($id):
+    push_stack($id, 1, 3);
+        "#,
+            )
+            .unwrap(),
+        );
+
+        let effect = Box::new(effect);
         let computed = (&*archetype).into();
         Self {
             id: counter.allocate(item.base_id),

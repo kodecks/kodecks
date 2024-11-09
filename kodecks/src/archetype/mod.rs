@@ -14,6 +14,8 @@ use serde::{Deserialize, Serialize};
 use strum::Display;
 use tinystr::TinyAsciiStr;
 
+pub mod effect;
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ArchetypeId(TinyAsciiStr<8>);

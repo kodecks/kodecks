@@ -22,6 +22,8 @@ pub enum Error {
     InvalidConversion,
     #[error("Invalid iteration")]
     InvalidIteration,
+    #[error("Invalid argument count")]
+    InvalidArgumentCount,
     #[error("Error: {0}")]
     Custom(String),
 }

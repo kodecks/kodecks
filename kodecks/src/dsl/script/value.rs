@@ -699,6 +699,31 @@ impl Value {
                 .get_card(*card)
                 .and_then(|card| match index.as_str() {
                     "name" => Some(card.archetype().name.clone().into()),
+                    "controller" => Some(Self::Custom(CustomType::Player(card.controller()))),
+                    "owner" => Some(Self::Custom(CustomType::Player(card.owner()))),
+                    _ => None,
+                })
+                .unwrap_or_default()),
+            Value::Custom(CustomType::Player(player)) => Ok(env
+                .get_players()
+                .and_then(|players| players.get(*player).ok())
+                .and_then(|player| match index {
+                    "shards" => {
+                        let mut shards = BTreeMap::new();
+                        for (color, amount) in player.shards.iter() {
+                            if amount > 0 {
+                                shards.insert(
+                                    color.to_string().to_ascii_lowercase(),
+                                    Constant::U64(amount as _).into(),
+                                );
+                            }
+                        }
+                        Some(Value::Object(shards))
+                    }
+                    "next" => env
+                        .get_players()
+                        .and_then(|p| p.next_id(player.id).ok())
+                        .map(|p| Value::Custom(CustomType::Player(p))),
                     _ => None,
                 })
                 .unwrap_or_default()),
