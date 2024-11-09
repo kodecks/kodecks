@@ -707,13 +707,15 @@ impl Value {
             Value::Custom(CustomType::Player(player)) => Ok(env
                 .get_players()
                 .and_then(|players| players.get(*player).ok())
-                .and_then(|player| match index {
+                .and_then(|player| match index.as_str() {
                     "shards" => {
                         let mut shards = BTreeMap::new();
                         for (color, amount) in player.shards.iter() {
                             if amount > 0 {
                                 shards.insert(
-                                    color.to_string().to_ascii_lowercase(),
+                                    TinyAsciiStr::from_bytes_lossy(
+                                        color.to_string().to_ascii_lowercase().as_bytes(),
+                                    ),
                                     Constant::U64(amount as _).into(),
                                 );
                             }
