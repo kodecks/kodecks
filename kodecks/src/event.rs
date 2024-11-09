@@ -3,6 +3,7 @@ use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use strum::Display;
+use tinystr::tinystr;
 
 use crate::{
     dsl::script::value::{CustomType, Value},
@@ -42,34 +43,34 @@ impl From<CardEvent> for Value {
             CardEvent::Casted { from } => {
                 let mut from_obj = BTreeMap::new();
                 from_obj.insert(
-                    "player".into(),
+                    tinystr!(32, "player"),
                     Value::Custom(CustomType::Player(from.player)),
                 );
                 from_obj.insert(
-                    "zone".into(),
+                    tinystr!(32, "zone"),
                     from.kind.to_string().to_ascii_lowercase().into(),
                 );
-                obj.insert("from".into(), Value::Object(from_obj));
+                obj.insert(tinystr!(32, "from"), Value::Object(from_obj));
             }
             CardEvent::Destroyed { from, reason } => {
                 let mut from_obj = BTreeMap::new();
                 from_obj.insert(
-                    "player".into(),
+                    tinystr!(32, "player"),
                     Value::Custom(CustomType::Player(from.player)),
                 );
                 from_obj.insert(
-                    "zone".into(),
+                    tinystr!(32, "zone"),
                     from.kind.to_string().to_ascii_lowercase().into(),
                 );
-                obj.insert("from".into(), Value::Object(from_obj));
+                obj.insert(tinystr!(32, "from"), Value::Object(from_obj));
                 obj.insert(
-                    "reason".into(),
+                    tinystr!(32, "reason"),
                     reason.to_string().to_ascii_lowercase().into(),
                 );
             }
             CardEvent::ReturnedToHand { reason } => {
                 obj.insert(
-                    "reason".into(),
+                    tinystr!(32, "reason"),
                     reason.to_string().to_ascii_lowercase().into(),
                 );
             }
@@ -78,13 +79,16 @@ impl From<CardEvent> for Value {
                 amount,
                 reason,
             } => {
-                obj.insert("player".into(), Value::Custom(CustomType::Player(player)));
-                obj.insert("amount".into(), amount.into());
-                obj.insert("reason".into(), reason.to_string().into());
+                obj.insert(
+                    tinystr!(32, "player"),
+                    Value::Custom(CustomType::Player(player)),
+                );
+                obj.insert(tinystr!(32, "amount"), amount.into());
+                obj.insert(tinystr!(32, "reason"), reason.to_string().into());
             }
             _ => {}
         }
-        obj.insert("name".into(), event.as_str().to_string().into());
+        obj.insert(tinystr!(32, "name"), event.as_str().to_string().into());
         Value::Object(obj)
     }
 }

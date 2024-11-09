@@ -9,12 +9,13 @@ use std::{
     fmt,
     ops::{Add, Div, Mul, Neg, Not, Rem, Sub},
 };
+use tinystr::TinyAsciiStr;
 
 #[derive(Debug, Clone)]
 pub enum Value {
     Constant(Constant),
     Array(Vec<Self>),
-    Object(BTreeMap<String, Self>),
+    Object(BTreeMap<TinyAsciiStr<32>, Self>),
     Function(Box<Function>),
     Custom(CustomType),
 }
@@ -39,11 +40,15 @@ impl From<serde_json::Value> for Value {
                     Value::Constant(Constant::F64(n.as_f64().unwrap()))
                 }
             }
-            serde_json::Value::String(s) => Value::Constant(Constant::String(s)),
+            serde_json::Value::String(s) => Value::Constant(Constant::String(
+                TinyAsciiStr::from_bytes_lossy(s.as_bytes()),
+            )),
             serde_json::Value::Array(a) => Value::Array(a.into_iter().map(Value::from).collect()),
-            serde_json::Value::Object(o) => {
-                Value::Object(o.into_iter().map(|(k, v)| (k, Value::from(v))).collect())
-            }
+            serde_json::Value::Object(o) => Value::Object(
+                o.into_iter()
+                    .map(|(k, v)| (TinyAsciiStr::from_bytes_lossy(k.as_bytes()), Value::from(v)))
+                    .collect(),
+            ),
         }
     }
 }
@@ -60,7 +65,7 @@ impl TryFrom<Value> for serde_json::Value {
             Value::Constant(Constant::F64(n)) => Ok(serde_json::Value::Number(
                 Number::from_f64(n).ok_or(Error::InvalidConversion)?,
             )),
-            Value::Constant(Constant::String(s)) => Ok(serde_json::Value::String(s)),
+            Value::Constant(Constant::String(s)) => Ok(serde_json::Value::String(s.to_string())),
             Value::Array(a) => Ok(serde_json::Value::Array(
                 a.into_iter()
                     .map(serde_json::Value::try_from)
@@ -68,7 +73,7 @@ impl TryFrom<Value> for serde_json::Value {
             )),
             Value::Object(o) => Ok(serde_json::Value::Object(
                 o.into_iter()
-                    .map(|(k, v)| Ok((k, serde_json::Value::try_from(v)?)))
+                    .map(|(k, v)| Ok((k.to_string(), serde_json::Value::try_from(v)?)))
                     .collect::<Result<_, _>>()?,
             )),
             Value::Custom(CustomType::Card(card)) => {
@@ -82,7 +87,7 @@ impl TryFrom<Value> for serde_json::Value {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Copy)]
 pub enum Constant {
     #[default]
     Null,
@@ -90,7 +95,7 @@ pub enum Constant {
     U64(u64),
     I64(i64),
     F64(f64),
-    String(String),
+    String(TinyAsciiStr<32>),
 }
 
 impl Constant {
@@ -128,9 +133,12 @@ impl Add for Constant {
 
     fn add(self, other: Self) -> Self::Output {
         match (self, other) {
-            (Constant::String(mut a), Constant::String(b)) => {
+            (Constant::String(a), Constant::String(b)) => {
+                let mut a = a.to_string();
                 a.push_str(&b);
-                Ok(Constant::String(a))
+                Ok(Constant::String(TinyAsciiStr::from_bytes_lossy(
+                    a.as_bytes(),
+                )))
             }
             (Constant::U64(a), Constant::U64(b)) => Ok(Constant::U64(a + b)),
             (Constant::U64(a), Constant::I64(b)) => Ok(Constant::I64(a as i64 + b)),
@@ -326,13 +334,13 @@ impl From<f64> for Constant {
 
 impl From<String> for Constant {
     fn from(value: String) -> Self {
-        Constant::String(value)
+        Constant::String(TinyAsciiStr::from_bytes_lossy(value.as_bytes()))
     }
 }
 
 impl From<&str> for Constant {
     fn from(value: &str) -> Self {
-        Constant::String(value.into())
+        Constant::String(TinyAsciiStr::from_bytes_lossy(value.as_bytes()))
     }
 }
 
@@ -450,7 +458,10 @@ impl Mul for Value {
     fn mul(self, other: Self) -> Self::Output {
         match (self, other) {
             (Value::Constant(Constant::String(a)), Value::Constant(Constant::U64(b))) => {
-                Ok(Value::Constant(Constant::String(a.repeat(b as usize))))
+                let a = a.to_string().repeat(b as usize);
+                Ok(Value::Constant(Constant::String(
+                    TinyAsciiStr::from_bytes_lossy(a.as_bytes()),
+                )))
             }
             (Value::Constant(a), Value::Constant(b)) => Ok(Value::Constant((a * b)?)),
             (Value::Object(a), Value::Object(b)) => {
@@ -469,6 +480,9 @@ impl Div for Value {
     fn div(self, other: Self) -> Self::Output {
         match (self, other) {
             (Value::Constant(Constant::String(a)), Value::Constant(Constant::String(b))) => {
+                let a = a.to_string();
+                let b = b.to_string();
+
                 Ok(Value::Array(a.split(&b).map(|s| s.into()).collect()))
             }
             (Value::Constant(a), Value::Constant(b)) => Ok(Value::Constant((a / b)?)),
@@ -570,9 +584,13 @@ impl Value {
                 let end = end.unwrap_or(len);
                 let start = if start < 0 { len + start } else { start } as usize;
                 let end = if end < 0 { len + end } else { end } as usize;
-                Ok(Value::Constant(Constant::String(
-                    s.chars().skip(start).take(end - start).collect::<String>(),
-                )))
+                Ok(Value::Constant(
+                    s.chars()
+                        .skip(start)
+                        .take(end - start)
+                        .collect::<String>()
+                        .into(),
+                ))
             }
             _ => Err(Error::InvalidKey),
         }
@@ -595,7 +613,7 @@ impl Value {
         }
     }
 
-    pub fn index_str<E>(&self, index: &str, env: &E) -> Result<Self, Error>
+    pub fn index_str<E>(&self, index: &TinyAsciiStr<32>, env: &E) -> Result<Self, Error>
     where
         E: ExpEnv,
     {
@@ -606,7 +624,7 @@ impl Value {
                 .unwrap_or(Value::Constant(Constant::Null))),
             Value::Custom(CustomType::Card(card)) => Ok(env
                 .get_card(*card)
-                .and_then(|card| match index {
+                .and_then(|card| match index.as_str() {
                     "name" => Some(card.archetype().name.clone().into()),
                     _ => None,
                 })

@@ -20,6 +20,7 @@ use std::{
     collections::{BTreeMap, HashMap},
     str::FromStr,
 };
+use tinystr::TinyAsciiStr;
 
 const EXECUTION_LIMIT: usize = 256;
 
@@ -82,7 +83,7 @@ pub enum Path {
 
 #[derive(Debug)]
 enum LiteralPath {
-    Str(String, bool),
+    Str(TinyAsciiStr<32>, bool),
     Num(i64, bool),
     Range(Option<i64>, Option<i64>, bool),
 }
@@ -206,14 +207,10 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
                 for item in parts {
                     match item {
                         StrPart::Char(c) => {
-                            args.push(Self::Value(Value::Constant(Constant::String(
-                                c.to_string(),
-                            ))));
+                            args.push(Self::Value(Value::Constant(c.to_string().into())));
                         }
                         StrPart::Str(s) => {
-                            args.push(Self::Value(Value::Constant(Constant::String(
-                                s.to_string(),
-                            ))));
+                            args.push(Self::Value(Value::Constant((*s).into())));
                         }
                         StrPart::Term(t) => {
                             args.push(Self::try_from(t)?);
@@ -449,7 +446,7 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                 let mut obj = BTreeMap::new();
                 for (lhs, rhs) in pairs {
                     for key in lhs.eval(ctx)? {
-                        let key = key.to_string();
+                        let key = TinyAsciiStr::from_bytes_lossy(key.to_string().as_bytes());
                         let mut val = if let Some(rhs) = rhs {
                             rhs.eval(ctx)?
                         } else {
@@ -1087,16 +1084,19 @@ mod tests {
             Ok(vec![
                 Value::Object(
                     vec![
-                        ("a".into(), "input".into()),
-                        ("b".into(), "inputinput".into())
+                        (TinyAsciiStr::from_str("a").unwrap(), "input".into()),
+                        (TinyAsciiStr::from_str("b").unwrap(), "inputinput".into())
                     ]
                     .into_iter()
                     .collect()
                 ),
                 Value::Object(
-                    vec![("a".into(), 123.into()), ("b".into(), 246.into())]
-                        .into_iter()
-                        .collect()
+                    vec![
+                        (TinyAsciiStr::from_str("a").unwrap(), 123.into()),
+                        (TinyAsciiStr::from_str("b").unwrap(), 246.into())
+                    ]
+                    .into_iter()
+                    .collect()
                 )
             ])
         );

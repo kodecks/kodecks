@@ -8,6 +8,7 @@ use crate::{
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+use tinystr::tinystr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(tag = "name", rename_all = "snake_case")]
@@ -271,16 +272,16 @@ impl From<Action> for Value {
         let mut obj = BTreeMap::new();
         let name = match action {
             Action::CastCard { card } => {
-                obj.insert("card".into(), Value::Custom(CustomType::Card(card)));
+                obj.insert(tinystr!(32, "card"), Value::Custom(CustomType::Card(card)));
                 "cast_card"
             }
             Action::SelectCard { card } => {
-                obj.insert("card".into(), Value::Custom(CustomType::Card(card)));
+                obj.insert(tinystr!(32, "card"), Value::Custom(CustomType::Card(card)));
                 "select_card"
             }
             Action::Attack { attackers } => {
                 obj.insert(
-                    "attackers".into(),
+                    tinystr!(32, "attackers"),
                     Value::Array(
                         attackers
                             .into_iter()
@@ -292,18 +293,18 @@ impl From<Action> for Value {
             }
             Action::Block { pairs } => {
                 obj.insert(
-                    "pairs".into(),
+                    tinystr!(32, "pairs"),
                     Value::Array(
                         pairs
                             .into_iter()
                             .map(|(attacker, blocker)| {
                                 let mut pair = BTreeMap::new();
                                 pair.insert(
-                                    "attacker".into(),
+                                    tinystr!(32, "attacker"),
                                     Value::Custom(CustomType::Card(attacker)),
                                 );
                                 pair.insert(
-                                    "blocker".into(),
+                                    tinystr!(32, "blocker"),
                                     Value::Custom(CustomType::Card(blocker)),
                                 );
                                 Value::Object(pair)
@@ -318,7 +319,7 @@ impl From<Action> for Value {
             Action::Continue => "continue",
             Action::DebugCommand { .. } => "debug_command",
         };
-        obj.insert("name".into(), name.to_string().into());
+        obj.insert(tinystr!(32, "name"), name.to_string().into());
         Value::Object(obj)
     }
 }
