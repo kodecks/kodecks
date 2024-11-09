@@ -7,7 +7,7 @@ use crate::{
     event::{CardEvent, EventReason},
     field::FieldState,
     filter_vec,
-    id::{CardId, ObjectId, TimedObjectId},
+    id::{ObjectId, TimedCardId, TimedObjectId},
     opcode::{Opcode, OpcodeList},
 };
 use bincode::{Decode, Encode};

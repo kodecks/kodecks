@@ -105,5 +105,14 @@ impl fmt::Display for TimedObjectId {
 
 pub trait CardId {
     fn id(&self) -> ObjectId;
+}
+
+pub trait TimedCardId: CardId {
     fn timed_id(&self) -> TimedObjectId;
+}
+
+impl CardId for ObjectId {
+    fn id(&self) -> ObjectId {
+        *self
+    }
 }

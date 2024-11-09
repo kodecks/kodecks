@@ -6,7 +6,7 @@ use crate::{
     deck::DeckItem,
     effect::Effect,
     event::EventFilter,
-    id::{CardId, ObjectId, ObjectIdCounter, TimedObjectId},
+    id::{CardId, ObjectId, ObjectIdCounter, TimedCardId, TimedObjectId},
     linear::Linear,
     player::{PlayerMask, PlayerZone},
     score::Score,
@@ -215,7 +215,9 @@ impl CardId for Card {
     fn id(&self) -> ObjectId {
         self.id
     }
+}
 
+impl TimedCardId for Card {
     fn timed_id(&self) -> TimedObjectId {
         TimedObjectId {
             id: self.id,
@@ -272,7 +274,9 @@ impl CardId for CardSnapshot {
     fn id(&self) -> ObjectId {
         self.id
     }
+}
 
+impl TimedCardId for CardSnapshot {
     fn timed_id(&self) -> TimedObjectId {
         TimedObjectId {
             id: self.id,

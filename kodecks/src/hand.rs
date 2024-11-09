@@ -1,6 +1,6 @@
 use crate::{
     card::Card,
-    id::{CardId, ObjectId, TimedObjectId},
+    id::{CardId, ObjectId, TimedCardId, TimedObjectId},
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
@@ -18,7 +18,12 @@ where
     fn id(&self) -> ObjectId {
         self.card.id()
     }
+}
 
+impl<T> TimedCardId for HandItem<T>
+where
+    T: TimedCardId,
+{
     fn timed_id(&self) -> TimedObjectId {
         self.card.timed_id()
     }

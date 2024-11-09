@@ -1,6 +1,6 @@
 use crate::{
     card::Card,
-    id::{CardId, ObjectId, TimedObjectId},
+    id::{CardId, ObjectId, TimedCardId, TimedObjectId},
     list::CardList,
     score::Score,
 };
@@ -76,7 +76,12 @@ where
     fn id(&self) -> ObjectId {
         self.card.id()
     }
+}
 
+impl<T> TimedCardId for FieldItem<T>
+where
+    T: TimedCardId,
+{
     fn timed_id(&self) -> TimedObjectId {
         self.card.timed_id()
     }

@@ -7,7 +7,7 @@ use crate::{
     event::{CardEvent, EventReason},
     field::{FieldBattleState, FieldState},
     filter_vec,
-    id::CardId,
+    id::TimedCardId,
     opcode::{Opcode, OpcodeList},
     phase::Phase,
     player::PlayerZone,
