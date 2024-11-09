@@ -7,7 +7,6 @@ use crate::{
     id::CardId,
     player::{Player, PlayerList},
 };
-use bincode::{Decode, Encode};
 use jaq_core::{
     load::{
         lex::StrPart,
@@ -24,7 +23,7 @@ use std::{
 
 const EXECUTION_LIMIT: usize = 256;
 
-#[derive(Debug, Default, Clone, PartialEq, Encode, Decode)]
+#[derive(Debug, Default, Clone, PartialEq)]
 pub enum Exp {
     #[default]
     Ident,
@@ -51,7 +50,7 @@ pub enum Exp {
     Empty,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Encode, Decode)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinOp {
     Add,
     Sub,
@@ -75,7 +74,7 @@ impl FromStr for Exp {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Encode, Decode)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Path {
     Index(Box<Exp>, bool),
     Range(Option<Box<Exp>>, Option<Box<Exp>>, bool),
@@ -709,7 +708,7 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Encode, Decode)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Function {
     pub name: String,
     pub args: Vec<String>,

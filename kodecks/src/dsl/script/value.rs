@@ -3,7 +3,6 @@ use super::{
     exp::{ExpEnv, Function},
 };
 use crate::id::TimedObjectId;
-use bincode::{Decode, Encode};
 use serde_json::Number;
 use std::{
     collections::BTreeMap,
@@ -11,7 +10,7 @@ use std::{
     ops::{Add, Div, Mul, Neg, Not, Rem, Sub},
 };
 
-#[derive(Debug, Clone, Encode, Decode)]
+#[derive(Debug, Clone)]
 pub enum Value {
     Constant(Constant),
     Array(Vec<Self>),
@@ -83,7 +82,7 @@ impl TryFrom<Value> for serde_json::Value {
     }
 }
 
-#[derive(Debug, Default, Clone, Encode, Decode)]
+#[derive(Debug, Default, Clone)]
 pub enum Constant {
     #[default]
     Null,
@@ -337,7 +336,7 @@ impl From<&str> for Constant {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Encode, Decode)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CustomType {
     Card(TimedObjectId),
     Player(u8),
