@@ -1,6 +1,6 @@
 use crate::{
     card::CardSnapshot, color::Color, effect::EffectId, env::EndgameReason, phase::Phase,
-    player::PlayerZone, zone::MoveReason,
+    player::Zone, zone::MoveReason,
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
@@ -54,8 +54,8 @@ pub enum GameLog {
     CardMoved {
         player: u8,
         card: CardSnapshot,
-        from: PlayerZone,
-        to: PlayerZone,
+        from: Zone,
+        to: Zone,
         reason: MoveReason,
     },
     CardTokenGenerated {

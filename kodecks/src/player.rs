@@ -10,7 +10,7 @@ use crate::{
     list::CardList,
     profile::DebugFlags,
     shard::ShardList,
-    zone::{CardZone, Zone},
+    zone::{CardZone, ZoneKind},
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
@@ -211,15 +211,15 @@ impl Player {
             .or_else(|| self.field.get_mut(card))
     }
 
-    pub fn find_zone(&self, card: ObjectId) -> Option<Zone> {
+    pub fn find_zone(&self, card: ObjectId) -> Option<ZoneKind> {
         if self.deck.contains(card) {
-            Some(Zone::Deck)
+            Some(ZoneKind::Deck)
         } else if self.hand.contains(card) {
-            Some(Zone::Hand)
+            Some(ZoneKind::Hand)
         } else if self.field.contains(card) {
-            Some(Zone::Field)
+            Some(ZoneKind::Field)
         } else if self.graveyard.contains(card) {
-            Some(Zone::Graveyard)
+            Some(ZoneKind::Graveyard)
         } else {
             None
         }
@@ -274,14 +274,14 @@ pub struct PlayerCounters {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
-pub struct PlayerZone {
+pub struct Zone {
     pub player: u8,
-    pub zone: Zone,
+    pub kind: ZoneKind,
 }
 
-impl PlayerZone {
-    pub fn new(player: u8, zone: Zone) -> Self {
-        Self { player, zone }
+impl Zone {
+    pub fn new(player: u8, kind: ZoneKind) -> Self {
+        Self { player, kind }
     }
 }
 
@@ -350,15 +350,15 @@ impl LocalPlayerState {
             .chain(self.field.iter())
     }
 
-    pub fn find_zone(&self, card: ObjectId) -> Option<Zone> {
+    pub fn find_zone(&self, card: ObjectId) -> Option<ZoneKind> {
         if self.hand.iter().any(|item| item.id == card) {
-            return Some(Zone::Hand);
+            return Some(ZoneKind::Hand);
         }
         if self.field.iter().any(|item| item.id == card) {
-            return Some(Zone::Field);
+            return Some(ZoneKind::Field);
         }
         if self.graveyard.iter().any(|item| item.id == card) {
-            return Some(Zone::Graveyard);
+            return Some(ZoneKind::Graveyard);
         }
         None
     }

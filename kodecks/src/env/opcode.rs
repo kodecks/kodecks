@@ -6,11 +6,11 @@ use crate::{
     field::{FieldBattleState, FieldState},
     log::GameLog,
     opcode::Opcode,
-    player::{PlayerEndgameState, PlayerZone},
+    player::{PlayerEndgameState, Zone},
     prelude::{ContinuousEffect, ContinuousItem},
     sequence::CardSequence,
     target::Target,
-    zone::{CardZone, MoveReason, Zone},
+    zone::{CardZone, MoveReason, ZoneKind},
 };
 use tracing::error;
 
@@ -119,7 +119,7 @@ impl Environment {
                 let player = self.state.players.get_mut(player)?;
                 if let Some(mut card) = player.deck.remove_top() {
                     let from = *card.zone();
-                    let to = PlayerZone::new(player.id, Zone::Hand);
+                    let to = Zone::new(player.id, ZoneKind::Hand);
                     let controller = card.controller();
                     card.increment_timestamp();
                     card.set_zone(to);
@@ -144,7 +144,7 @@ impl Environment {
                 let player = self.state.players.get_mut(player)?;
                 if let Some(mut card) = player.hand.remove(card) {
                     let from = *card.zone();
-                    let to = PlayerZone::new(player.id, Zone::Field);
+                    let to = Zone::new(player.id, ZoneKind::Field);
                     let controller = card.controller();
                     card.increment_timestamp();
                     card.set_zone(to);
@@ -170,15 +170,15 @@ impl Environment {
                 reason,
             } => {
                 let player = self.state.players.get_mut(from.player)?;
-                let card = match from.zone {
-                    Zone::Deck => player.deck.remove(card),
-                    Zone::Hand => player.hand.remove(card),
-                    Zone::Field => player.field.remove(card),
-                    Zone::Graveyard => player.graveyard.remove(card),
+                let card = match from.kind {
+                    ZoneKind::Deck => player.deck.remove(card),
+                    ZoneKind::Hand => player.hand.remove(card),
+                    ZoneKind::Field => player.field.remove(card),
+                    ZoneKind::Graveyard => player.graveyard.remove(card),
                 };
                 if let Some(mut card) = card {
                     let controller = card.controller();
-                    if card.is_token() && to.zone != Zone::Field {
+                    if card.is_token() && to.kind != ZoneKind::Field {
                         return Ok(vec![GameLog::CardTokenDestroyed {
                             card: card.snapshot(),
                         }]);
@@ -188,11 +188,11 @@ impl Environment {
                     card.reset_computed();
                     let snapshot = card.snapshot();
                     let player = self.state.players.get_mut(to.player)?;
-                    match to.zone {
-                        Zone::Deck => player.deck.push(card),
-                        Zone::Hand => player.hand.push(card),
-                        Zone::Field => player.field.push(card),
-                        Zone::Graveyard => player.graveyard.push(card),
+                    match to.kind {
+                        ZoneKind::Deck => player.deck.push(card),
+                        ZoneKind::Hand => player.hand.push(card),
+                        ZoneKind::Field => player.field.push(card),
+                        ZoneKind::Graveyard => player.graveyard.push(card),
                     }
                     return Ok(vec![GameLog::CardMoved {
                         player: controller,

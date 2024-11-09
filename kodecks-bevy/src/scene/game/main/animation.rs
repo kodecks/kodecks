@@ -8,9 +8,9 @@ use bevy::ecs::system::SystemParam;
 use bevy::ecs::world::Command;
 use bevy::prelude::*;
 use bevy::utils::hashbrown::HashSet;
-use kodecks::player::PlayerZone;
+use kodecks::player::Zone;
 use kodecks::target::Target;
-use kodecks::zone::Zone;
+use kodecks::zone::ZoneKind;
 use std::f32::consts::PI;
 
 pub struct AnimationPlugin;
@@ -277,9 +277,9 @@ fn start_move_animation(
                     (zone, moved.contains(&card.id))
                 } else {
                     (
-                        PlayerZone {
+                        Zone {
                             player: card.owner,
-                            zone: Zone::Deck,
+                            kind: ZoneKind::Deck,
                         },
                         false,
                     )
@@ -334,7 +334,7 @@ fn start_move_animation(
 
                 for child in children.iter_descendants(entity) {
                     if let Ok((name, transform, size)) = size_query.get(child) {
-                        let frame_scale = if zone.zone == Zone::Field {
+                        let frame_scale = if zone.kind == ZoneKind::Field {
                             if *size == CardSize::Large {
                                 0.0
                             } else {

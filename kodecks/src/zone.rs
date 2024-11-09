@@ -18,7 +18,7 @@ pub enum MoveReason {
 
 #[derive(Debug, Clone, Copy, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(rename_all = "snake_case")]
-pub enum Zone {
+pub enum ZoneKind {
     Deck,
     Hand,
     Field,

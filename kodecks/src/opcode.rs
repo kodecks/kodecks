@@ -5,7 +5,7 @@ use crate::{
     field::{FieldBattleState, FieldState},
     id::ObjectId,
     phase::Phase,
-    player::PlayerZone,
+    player::Zone,
     target::Target,
     zone::MoveReason,
 };
@@ -57,8 +57,8 @@ pub enum Opcode {
     },
     MoveCard {
         card: ObjectId,
-        from: PlayerZone,
-        to: PlayerZone,
+        from: Zone,
+        to: Zone,
         reason: MoveReason,
     },
     ShuffleDeck {

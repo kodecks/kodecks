@@ -7,7 +7,7 @@ use crate::{
     field::{FieldItem, FieldState},
     id::ObjectId,
     phase::Phase,
-    player::{LocalPlayerState, PlayerList, PlayerZone},
+    player::{LocalPlayerState, PlayerList, Zone},
     stack::{LocalStackItem, Stack},
     zone::CardZone,
 };
@@ -34,12 +34,12 @@ impl LocalEnvironment {
             .ok_or(ActionError::CardNotFound { id: card })
     }
 
-    pub fn find_zone(&self, card: ObjectId) -> Result<PlayerZone, ActionError> {
+    pub fn find_zone(&self, card: ObjectId) -> Result<Zone, ActionError> {
         for player in self.players.iter() {
             if let Some(zone) = player.find_zone(card) {
-                return Ok(PlayerZone {
+                return Ok(Zone {
                     player: player.id,
-                    zone,
+                    kind: zone,
                 });
             }
         }

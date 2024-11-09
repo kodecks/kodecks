@@ -25,7 +25,7 @@ use image::{DynamicImage, RgbaImage};
 use kodecks::archetype::{ArchetypeId, CardArchetype};
 use kodecks::card::CardSnapshot;
 use kodecks::id::{ObjectId, TimedCardId};
-use kodecks::zone::Zone;
+use kodecks::zone::ZoneKind;
 use number::{NumberOverlay, NumberOverlayKey};
 use std::cmp::Ordering;
 use std::f32::consts::PI;
@@ -157,7 +157,7 @@ fn update_card(
             }
         }
 
-        if env.find_zone(card.id).map(|zone| zone.zone) != Ok(Zone::Graveyard) {
+        if env.find_zone(card.id).map(|zone| zone.kind) != Ok(ZoneKind::Graveyard) {
             if let Ok(mut transform) = transform_query.get_mut(entity) {
                 if transform.translation.y < 0.0 {
                     let z = if card.owner == env.player { 2.5 } else { -2.5 };

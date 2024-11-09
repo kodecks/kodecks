@@ -1,7 +1,7 @@
 use super::Card;
 use crate::{assets::AssetServerExt, scene::game::board::Environment};
 use bevy::{prelude::*, utils::HashMap};
-use kodecks::{ability::KeywordAbility, zone::Zone};
+use kodecks::{ability::KeywordAbility, zone::ZoneKind};
 use strum::IntoEnumIterator;
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,7 +61,7 @@ pub fn update_ability_overlay(
                     let ability = computed.abilities.as_ref().get(overlay.index);
 
                     if let Ok(zone) = env.find_zone(card.id) {
-                        overlay.ability = ability.cloned().filter(|_| zone.zone == Zone::Field);
+                        overlay.ability = ability.cloned().filter(|_| zone.kind == ZoneKind::Field);
 
                         if let Some(ability) = overlay.ability {
                             *material = assets.materials[&ability].clone();

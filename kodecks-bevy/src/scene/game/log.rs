@@ -5,7 +5,7 @@ use kodecks::{
     catalog::Catalog,
     env::LocalEnvironment,
     log::GameLog,
-    zone::{MoveReason, Zone},
+    zone::{MoveReason, ZoneKind},
 };
 use std::borrow::Cow;
 
@@ -119,7 +119,7 @@ pub fn translate_log<'a>(
             match reason {
                 MoveReason::Draw => "log-card-drawn",
                 MoveReason::Casted => "log-card-played",
-                MoveReason::Destroyed if to.zone == Zone::Graveyard => {
+                MoveReason::Destroyed if to.kind == ZoneKind::Graveyard => {
                     "log-card-destroyed-to-graveyard"
                 }
                 MoveReason::Discarded => "log-card-discarded",
@@ -132,7 +132,7 @@ pub fn translate_log<'a>(
                             "opponent"
                         },
                     );
-                    args.set("from-zone", from.zone.to_string().to_ascii_lowercase());
+                    args.set("from-zone", from.kind.to_string().to_ascii_lowercase());
                     args.set(
                         "to-player",
                         if to.player == env.player {
@@ -141,7 +141,7 @@ pub fn translate_log<'a>(
                             "opponent"
                         },
                     );
-                    args.set("to-zone", to.zone.to_string().to_ascii_lowercase());
+                    args.set("to-zone", to.kind.to_string().to_ascii_lowercase());
                     "log-card-moved"
                 }
             }

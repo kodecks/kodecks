@@ -12,11 +12,11 @@ use crate::{
     log::GameLog,
     opcode::OpcodeList,
     phase::Phase,
-    player::{Player, PlayerEndgameState, PlayerList, PlayerZone},
+    player::{Player, PlayerEndgameState, PlayerList, Zone},
     profile::{DebugFlags, GameProfile},
     sequence::CardSequence,
     stack::{Stack, StackItem},
-    zone::{CardZone, Zone},
+    zone::{CardZone, ZoneKind},
 };
 use bincode::{Decode, Encode};
 use rand::rngs::SmallRng;
@@ -386,7 +386,7 @@ impl Environment {
     pub fn generate_card_token(&self, player: u8, token: ObjectId, archetype: ArchetypeId) -> Card {
         let archetype = &self.catalog[archetype];
         let mut card = Card::new_token(token, archetype.clone(), player);
-        card.set_zone(PlayerZone::new(player, Zone::Field));
+        card.set_zone(Zone::new(player, ZoneKind::Field));
         card
     }
 }

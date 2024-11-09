@@ -10,10 +10,10 @@ use crate::{
     id::TimedCardId,
     opcode::{Opcode, OpcodeList},
     phase::Phase,
-    player::PlayerZone,
+    player::Zone,
     profile::DebugFlags,
     target::Target,
-    zone::{CardZone, MoveReason, Zone},
+    zone::{CardZone, MoveReason, ZoneKind},
 };
 use std::{iter, vec};
 
@@ -93,7 +93,7 @@ impl Environment {
                     OpcodeList::new(vec![Opcode::MoveCard {
                         card: card.id(),
                         from: *zone,
-                        to: PlayerZone::new(card.owner(), Zone::Graveyard),
+                        to: Zone::new(card.owner(), ZoneKind::Graveyard),
                         reason: MoveReason::Move,
                     }])
                 })
@@ -153,7 +153,7 @@ impl Environment {
                         {
                             return Err(ActionError::CreatureAlreadyFreeCasted);
                         }
-                        let from = PlayerZone::new(player_in_turn.id, Zone::Hand);
+                        let from = Zone::new(player_in_turn.id, ZoneKind::Hand);
                         filter_vec![
                             Some(OpcodeList::new(filter_vec![
                                 if cost > 0 {
@@ -259,7 +259,7 @@ impl Environment {
                     {
                         return Err(ActionError::CreatureAlreadyFreeCasted);
                     }
-                    let from = PlayerZone::new(active_player.id, Zone::Hand);
+                    let from = Zone::new(active_player.id, ZoneKind::Hand);
                     Ok(filter_vec![
                         Some(OpcodeList::new(filter_vec![
                             if cost > 0 {
@@ -428,11 +428,8 @@ impl Environment {
                     let card = player_in_turn.hand.get(card).unwrap();
                     return Ok(vec![OpcodeList::new(vec![Opcode::MoveCard {
                         card: card.id(),
-                        from: PlayerZone::new(self.state.players.player_in_turn()?.id, Zone::Hand),
-                        to: PlayerZone::new(
-                            self.state.players.player_in_turn()?.id,
-                            Zone::Graveyard,
-                        ),
+                        from: Zone::new(self.state.players.player_in_turn()?.id, ZoneKind::Hand),
+                        to: Zone::new(self.state.players.player_in_turn()?.id, ZoneKind::Graveyard),
                         reason: MoveReason::Discarded,
                     }])]);
                 } else if player_in_turn.hand.len() > self.state.regulation.max_hand_size as usize {

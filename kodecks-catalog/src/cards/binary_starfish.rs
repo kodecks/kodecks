@@ -34,7 +34,7 @@ impl Effect for CardDef {
 
     fn activate(&mut self, event: CardEvent, ctx: &mut EffectActivateContext) -> Result<()> {
         if let CardEvent::Casted { from } = event {
-            if from.zone == Zone::Hand {
+            if from.kind == ZoneKind::Hand {
                 ctx.trigger_stack("main");
             }
         }

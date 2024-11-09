@@ -5,7 +5,7 @@ use super::{Card, CardBundleBuilder};
 use crate::scene::game::board::Environment;
 use bevy::prelude::*;
 use image::Rgba;
-use kodecks::zone::Zone;
+use kodecks::zone::ZoneKind;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum NumberOverlayKey {
@@ -59,7 +59,7 @@ pub fn update_number_overlay(
                         } else {
                             *visibility = Visibility::Hidden;
                         }
-                        if zone.zone == Zone::Hand {
+                        if zone.kind == ZoneKind::Hand {
                             *visibility = Visibility::Visible;
                         } else {
                             *visibility = Visibility::Hidden;
@@ -67,7 +67,7 @@ pub fn update_number_overlay(
                         *material = builder.number(overlay, card);
                     }
                 } else if let Ok(zone) = env.find_zone(card.id) {
-                    if zone.zone == Zone::Field {
+                    if zone.kind == ZoneKind::Field {
                         *visibility = Visibility::Visible;
                     } else {
                         *visibility = Visibility::Hidden;

@@ -6,7 +6,7 @@ use crate::{
     env::GameState,
     id::ObjectId,
     target::Target,
-    zone::Zone,
+    zone::ZoneKind,
 };
 use core::fmt;
 use dyn_clone::DynClone;
@@ -93,7 +93,7 @@ impl ContinuousEffectList {
             .rev()
         {
             if let Target::Card(target) = effect.target {
-                if state.find_zone(target).ok().map(|zone| zone.zone) != Some(Zone::Field) {
+                if state.find_zone(target).ok().map(|zone| zone.kind) != Some(ZoneKind::Field) {
                     effect.is_active = false;
                     continue;
                 }

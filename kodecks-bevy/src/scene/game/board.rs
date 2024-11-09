@@ -6,8 +6,8 @@ use kodecks::{
     field::{FieldBattleState, FieldState},
     id::{ObjectId, TimedCardId, TimedObjectId},
     phase::Phase,
-    player::PlayerZone,
-    zone::Zone,
+    player::Zone,
+    zone::ZoneKind,
 };
 use std::{f32::consts::PI, ops::Deref};
 
@@ -252,12 +252,12 @@ impl Board {
     pub fn get_zone_transform(
         &self,
         card: ObjectId,
-        zone: PlayerZone,
+        zone: Zone,
         viewer: u8,
         camera_pos: Vec3,
     ) -> Option<Transform> {
         if zone.player == viewer {
-            if zone.zone == Zone::Hand {
+            if zone.kind == ZoneKind::Hand {
                 if let Some(index) = self.player_hand.iter().position(|&y| y.id == card) {
                     let x_offset = index as f32 - (self.player_hand.len() - 1) as f32 / 2.0;
                     let x = 1.1 * x_offset;
@@ -272,7 +272,7 @@ impl Board {
                     transform.rotate_local_y(std::f32::consts::PI);
                     return Some(transform);
                 }
-            } else if zone.zone == Zone::Field {
+            } else if zone.kind == ZoneKind::Field {
                 let x_base = 0.0;
                 if let Some((index, _)) =
                     self.player_field.iter().enumerate().find_map(|(i, item)| {
@@ -289,16 +289,16 @@ impl Board {
                     let transform = Transform::from_xyz(x, y, 0.8);
                     return Some(transform);
                 }
-            } else if zone.zone == Zone::Deck {
+            } else if zone.kind == ZoneKind::Deck {
                 let transform = Transform::from_rotation(Quat::from_rotation_z(PI))
                     .with_translation(Vec3::new(5.0, 0.0, 3.0))
                     .with_scale(Vec3::splat(0.0));
                 return Some(transform);
-            } else if zone.zone == Zone::Graveyard {
+            } else if zone.kind == ZoneKind::Graveyard {
                 let transform = Transform::from_xyz(3.9, -0.5, 3.0).with_scale(Vec3::splat(0.8));
                 return Some(transform);
             }
-        } else if zone.zone == Zone::Hand {
+        } else if zone.kind == ZoneKind::Hand {
             if let Some(index) = self.opponent_hand.iter().position(|&y| y.id == card) {
                 let x_offset = index as f32 - (self.opponent_hand.len() - 1) as f32 / 2.0;
                 let x = 1.1 * x_offset;
@@ -313,7 +313,7 @@ impl Board {
                 transform.rotate_local_y(std::f32::consts::PI * 2.0);
                 return Some(transform);
             }
-        } else if zone.zone == Zone::Field {
+        } else if zone.kind == ZoneKind::Field {
             let x_base = 0.0;
             if let Some((index, _)) =
                 self.opponent_field
@@ -333,14 +333,14 @@ impl Board {
                 let transform = Transform::from_xyz(x, y, -0.5);
                 return Some(transform);
             }
-        } else if zone.zone == Zone::Deck {
+        } else if zone.kind == ZoneKind::Deck {
             let mut transform =
                 Transform::from_rotation(Quat::from_rotation_z(std::f32::consts::PI))
                     .with_translation(Vec3::new(5.0, 0.0, -1.5))
                     .with_scale(Vec3::splat(0.0));
             transform.rotate_local_y(std::f32::consts::PI);
             return Some(transform);
-        } else if zone.zone == Zone::Graveyard {
+        } else if zone.kind == ZoneKind::Graveyard {
             let mut transform = Transform::from_xyz(3.9, -0.5, -1.5).with_scale(Vec3::splat(0.8));
             transform.rotate_local_y(std::f32::consts::PI);
             return Some(transform);

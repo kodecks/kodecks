@@ -6,7 +6,7 @@ use crate::{
     },
 };
 use bevy::prelude::*;
-use kodecks::zone::Zone;
+use kodecks::zone::ZoneKind;
 
 pub struct BattlePlugin;
 
@@ -74,7 +74,7 @@ fn update_battle(
         } else {
             continue;
         };
-        if attacker_zone.zone == Zone::Field && defender_zone.zone == Zone::Field {
+        if attacker_zone.kind == ZoneKind::Field && defender_zone.kind == ZoneKind::Field {
             let mut attacker_pos = board
                 .get_zone_transform(attacker.id, attacker_zone, env.player, camera_pos)
                 .map(|transform| transform.translation)

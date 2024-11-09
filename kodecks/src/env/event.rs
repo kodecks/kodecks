@@ -6,8 +6,8 @@ use crate::{
     event::CardEvent,
     filter_vec,
     opcode::{Opcode, OpcodeList},
-    player::PlayerZone,
-    zone::{CardZone, MoveReason, Zone},
+    player::Zone,
+    zone::{CardZone, MoveReason, ZoneKind},
 };
 
 impl Environment {
@@ -30,7 +30,7 @@ impl Environment {
         match event {
             CardEvent::Destroyed { .. } => {
                 let from = *target.zone();
-                let to = PlayerZone::new(target.owner(), Zone::Graveyard);
+                let to = Zone::new(target.owner(), ZoneKind::Graveyard);
                 let volatile = target
                     .computed()
                     .abilities
@@ -64,7 +64,7 @@ impl Environment {
             }
             CardEvent::ReturnedToHand { .. } => {
                 let from = *target.zone();
-                let to = PlayerZone::new(target.owner(), Zone::Hand);
+                let to = Zone::new(target.owner(), ZoneKind::Hand);
                 Ok(filter_vec![Some(OpcodeList::new(filter_vec![
                     Some(Opcode::MoveCard {
                         card: target.id(),
@@ -77,7 +77,7 @@ impl Environment {
             }
             CardEvent::ReturnedToDeck => {
                 let from = *target.zone();
-                let to = PlayerZone::new(target.owner(), Zone::Deck);
+                let to = Zone::new(target.owner(), ZoneKind::Deck);
                 Ok(filter_vec![Some(OpcodeList::new(filter_vec![
                     Some(Opcode::MoveCard {
                         card: target.id(),

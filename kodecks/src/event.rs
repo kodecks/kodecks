@@ -6,7 +6,7 @@ use strum::Display;
 
 use crate::{
     dsl::script::value::{CustomType, Value},
-    player::PlayerZone,
+    player::Zone,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, Serialize, Deserialize, Encode, Decode)]
@@ -14,10 +14,10 @@ use crate::{
 #[serde(tag = "name", rename_all = "snake_case")]
 pub enum CardEvent {
     Casted {
-        from: PlayerZone,
+        from: Zone,
     },
     Destroyed {
-        from: PlayerZone,
+        from: Zone,
         reason: EventReason,
     },
     ReturnedToHand {
@@ -47,7 +47,7 @@ impl From<CardEvent> for Value {
                 );
                 from_obj.insert(
                     "zone".into(),
-                    from.zone.to_string().to_ascii_lowercase().into(),
+                    from.kind.to_string().to_ascii_lowercase().into(),
                 );
                 obj.insert("from".into(), Value::Object(from_obj));
             }
@@ -59,7 +59,7 @@ impl From<CardEvent> for Value {
                 );
                 from_obj.insert(
                     "zone".into(),
-                    from.zone.to_string().to_ascii_lowercase().into(),
+                    from.kind.to_string().to_ascii_lowercase().into(),
                 );
                 obj.insert("from".into(), Value::Object(from_obj));
                 obj.insert(

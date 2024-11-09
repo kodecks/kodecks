@@ -8,9 +8,9 @@ use crate::{
     event::EventFilter,
     id::{CardId, ObjectId, ObjectIdCounter, TimedCardId, TimedObjectId},
     linear::Linear,
-    player::{PlayerMask, PlayerZone},
+    player::{PlayerMask, Zone},
     score::Score,
-    zone::Zone,
+    zone::ZoneKind,
 };
 use bincode::{Decode, Encode};
 use core::fmt;
@@ -21,7 +21,7 @@ use std::sync::Arc;
 pub struct Card {
     id: ObjectId,
     owner: u8,
-    zone: PlayerZone,
+    zone: Zone,
     controller: u8,
     archetype: Arc<CardArchetype>,
     style: u8,
@@ -53,7 +53,7 @@ impl Card {
         Self {
             id: counter.allocate(item.base_id),
             owner,
-            zone: PlayerZone::new(owner, Zone::Deck),
+            zone: Zone::new(owner, ZoneKind::Deck),
             controller: owner,
             archetype,
             style,
@@ -73,7 +73,7 @@ impl Card {
         Self {
             id,
             owner,
-            zone: PlayerZone::new(owner, Zone::Deck),
+            zone: Zone::new(owner, ZoneKind::Deck),
             controller: owner,
             archetype,
             style: 0,
@@ -99,17 +99,17 @@ impl Card {
         self.controller
     }
 
-    pub fn zone(&self) -> &PlayerZone {
+    pub fn zone(&self) -> &Zone {
         &self.zone
     }
 
-    pub fn set_zone(&mut self, zone: PlayerZone) {
+    pub fn set_zone(&mut self, zone: Zone) {
         self.zone = zone;
-        match zone.zone {
-            Zone::Hand => {
+        match zone.kind {
+            ZoneKind::Hand => {
                 self.revealed.set(zone.player, true);
             }
-            Zone::Field | Zone::Graveyard => {
+            ZoneKind::Field | ZoneKind::Graveyard => {
                 self.revealed.set_all(true);
             }
             _ => (),
@@ -128,7 +128,7 @@ impl Card {
         self.computed = computed;
 
         let mut flags = ComputedFlags::empty();
-        let stealth = self.zone.zone == Zone::Field
+        let stealth = self.zone.kind == ZoneKind::Field
             && self.computed.abilities.contains(&KeywordAbility::Stealth);
         flags.set(ComputedFlags::TARGETABLE, !stealth);
         self.flags = flags;
