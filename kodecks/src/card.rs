@@ -288,7 +288,7 @@ impl TimedCardId for CardSnapshot {
 impl CardSnapshot {
     pub fn new(archetype: &CardArchetype) -> Self {
         Self {
-            id: 1.try_into().unwrap(),
+            id: 1u32.try_into().unwrap(),
             archetype_id: archetype.id,
             style: 0,
             controller: 0,
