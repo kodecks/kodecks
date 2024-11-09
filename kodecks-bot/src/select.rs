@@ -3,7 +3,7 @@ use crate::{
     score::{get_score, ComputedScore},
     Bot, SimpleBot,
 };
-use kodecks::{action::Action, id::ObjectId, phase::Phase};
+use kodecks::{action::Action, id::TimedObjectId, phase::Phase};
 use std::sync::Arc;
 
 #[cfg(feature = "rayon")]
@@ -11,8 +11,8 @@ use rayon::prelude::*;
 
 pub fn find_select_combination(
     ctx: BotContext,
-    cards: Vec<ObjectId>,
-) -> Vec<(ObjectId, ComputedScore)> {
+    cards: Vec<TimedObjectId>,
+) -> Vec<(TimedObjectId, ComputedScore)> {
     let nop_score = evaluate_select(ctx.clone(), None);
 
     #[cfg(feature = "rayon")]

@@ -2,6 +2,7 @@ use crate::{score::ComputedScore, Bot};
 use kodecks::{
     action::{Action, AvailableAction, PlayerAvailableActions},
     env::Environment,
+    id::TimedCardId,
     score::Score,
 };
 use std::sync::Arc;
@@ -26,7 +27,7 @@ impl Bot for SimpleBot {
                     .filter_map(|id| env.state.find_card(*id).ok())
                     .map(|card| {
                         (
-                            card.id(),
+                            card.timed_id(),
                             ComputedScore {
                                 base: 0,
                                 action: card.score()
@@ -83,7 +84,7 @@ impl Bot for SimpleBot {
                             .unwrap_or_default();
                         power > 0 && power > max_blocker_power
                     })
-                    .map(|card| card.id())
+                    .map(|card| card.timed_id())
                     .collect::<Vec<_>>();
                 if !attackers.is_empty() {
                     return vec![(Action::Attack { attackers }, ComputedScore::default())];
@@ -154,7 +155,7 @@ impl Bot for SimpleBot {
                         });
                         if let Some(index) = blocker {
                             let blocker = blockers.remove(index);
-                            pairs.push((attacker.id(), blocker.id()));
+                            pairs.push((attacker.timed_id(), blocker.timed_id()));
                         }
                     }
                 }
@@ -167,7 +168,7 @@ impl Bot for SimpleBot {
                     .filter_map(|id| env.state.find_card(*id).ok())
                     .map(|card| {
                         (
-                            card.id(),
+                            card.timed_id(),
                             ComputedScore {
                                 base: 0,
                                 action: card.score(),

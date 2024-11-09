@@ -53,7 +53,7 @@ impl ObjectIdCounter {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Encode, Decode)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Encode, Decode)]
 pub struct TimedObjectId {
     pub id: ObjectId,
     pub timestamp: u16,
@@ -113,6 +113,18 @@ pub trait TimedCardId: CardId {
 
 impl CardId for ObjectId {
     fn id(&self) -> ObjectId {
+        *self
+    }
+}
+
+impl CardId for TimedObjectId {
+    fn id(&self) -> ObjectId {
+        self.id
+    }
+}
+
+impl TimedCardId for TimedObjectId {
+    fn timed_id(&self) -> TimedObjectId {
         *self
     }
 }

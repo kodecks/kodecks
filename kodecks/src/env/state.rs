@@ -5,7 +5,7 @@ use crate::{
     action::PlayerAvailableActions,
     card::Card,
     error::ActionError,
-    id::ObjectId,
+    id::{CardId, ObjectId},
     log::GameLog,
     phase::Phase,
     player::{Player, PlayerList, PlayerZone},
@@ -25,12 +25,15 @@ pub struct GameState {
 }
 
 impl GameState {
-    pub fn find_card(&self, card: ObjectId) -> Result<&Card, ActionError> {
+    pub fn find_card<T>(&self, card: T) -> Result<&Card, ActionError>
+    where
+        T: CardId + Copy,
+    {
         self.players
             .iter()
             .filter_map(|player| player.find_card(card))
             .next()
-            .ok_or(ActionError::CardNotFound { id: card })
+            .ok_or(ActionError::CardNotFound { id: card.id() })
     }
 
     pub fn find_card_mut(&mut self, card: ObjectId) -> Result<&mut Card, ActionError> {

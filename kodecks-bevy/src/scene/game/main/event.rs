@@ -5,7 +5,7 @@ use crate::scene::game::server::SendCommand;
 use crate::scene::GlobalState;
 use bevy::prelude::*;
 use kodecks::action::{Action, AvailableAction};
-use kodecks::id::ObjectId;
+use kodecks::id::{ObjectId, TimedCardId};
 use leafwing_input_manager::prelude::*;
 
 pub struct EventPlugin;
@@ -63,26 +63,41 @@ fn handle_player_events(
             }),
         },
         PlayerEvent::CardDroppedOnField(dropped) => {
-            if list.castable_cards().iter().any(|card| *card == *dropped) {
-                Some(Action::CastCard { card: *dropped })
-            } else {
-                None
-            }
+            list
+                .castable_cards()
+                .iter()
+                .find(|card| card.id == *dropped).map(|card| Action::CastCard { card: *card })
         }
         PlayerEvent::CardDropped(dropped, target) => {
-            if list.castable_cards().iter().any(|card| *card == *dropped) {
-                Some(Action::CastCard { card: *dropped })
+            if let Some(card) = list
+                .castable_cards()
+                .iter()
+                .find(|card| card.id == *dropped)
+            {
+                Some(Action::CastCard { card: *card })
             } else {
-                board.toggle_blocker(*dropped, Some(*target));
+                if let Ok(dropped) = env.find_card(*dropped) {
+                    if let Ok(target) = env.find_card(*target) {
+                        board.toggle_blocker(dropped.timed_id(), Some(target.timed_id()));
+                    }
+                }
                 None
             }
         }
         PlayerEvent::CardClicked(card) => {
-            if list.attackers().contains(card) {
+            if let Some(card) = list
+                .attackers()
+                .iter()
+                .find(|attacker| attacker.id == *card)
+            {
                 board.toggle_attacker(*card);
-            } else if list.blockers().contains(card) {
+            } else if let Some(card) = list.blockers().iter().find(|blocker| blocker.id == *card) {
                 board.toggle_blocker(*card, None);
-            } else if list.selectable_cards().contains(card) {
+            } else if let Some(card) = list
+                .selectable_cards()
+                .iter()
+                .find(|candidate| candidate.id == *card)
+            {
                 return Some(Action::SelectCard { card: *card });
             }
             None

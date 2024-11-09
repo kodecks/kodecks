@@ -2,7 +2,7 @@ use crate::{
     command::ActionCommand,
     dsl::script::value::{CustomType, Value},
     env::Environment,
-    id::ObjectId,
+    id::{TimedCardId, TimedObjectId},
     message::{Message, MessageDialog},
 };
 use bincode::{Decode, Encode};
@@ -13,17 +13,17 @@ use std::collections::BTreeMap;
 #[serde(tag = "name", rename_all = "snake_case")]
 pub enum AvailableAction {
     SelectCard {
-        cards: Vec<ObjectId>,
+        cards: Vec<TimedObjectId>,
         score_factor: i32,
     },
     Attack {
-        attackers: Vec<ObjectId>,
+        attackers: Vec<TimedObjectId>,
     },
     Block {
-        blockers: Vec<ObjectId>,
+        blockers: Vec<TimedObjectId>,
     },
     CastCard {
-        cards: Vec<ObjectId>,
+        cards: Vec<TimedObjectId>,
     },
     EndTurn,
     Continue,
@@ -131,7 +131,7 @@ impl AvailableActionList {
             .any(|action| matches!(action, AvailableAction::EndTurn))
     }
 
-    pub fn attackers(&self) -> Vec<ObjectId> {
+    pub fn attackers(&self) -> Vec<TimedObjectId> {
         self.iter()
             .filter_map(|action| {
                 if let AvailableAction::Attack { attackers } = action {
@@ -145,7 +145,7 @@ impl AvailableActionList {
             .collect()
     }
 
-    pub fn blockers(&self) -> Vec<ObjectId> {
+    pub fn blockers(&self) -> Vec<TimedObjectId> {
         self.iter()
             .filter_map(|action| {
                 if let AvailableAction::Block { blockers } = action {
@@ -159,7 +159,7 @@ impl AvailableActionList {
             .collect()
     }
 
-    pub fn castable_cards(&self) -> Vec<ObjectId> {
+    pub fn castable_cards(&self) -> Vec<TimedObjectId> {
         self.iter()
             .flat_map(|action| {
                 if let AvailableAction::CastCard { cards } = action {
@@ -172,7 +172,7 @@ impl AvailableActionList {
             .collect()
     }
 
-    pub fn selectable_cards(&self) -> Vec<ObjectId> {
+    pub fn selectable_cards(&self) -> Vec<TimedObjectId> {
         self.iter()
             .flat_map(|action| {
                 if let AvailableAction::SelectCard { cards, .. } = action {
@@ -198,7 +198,7 @@ impl AvailableActionList {
                         .iter()
                         .filter_map(|card| env.state.find_card(*card).ok())
                         .min_by_key(|card| card.timestamp())
-                        .map(|card| card.id());
+                        .map(|card| card.timed_id());
                     if let Some(card) = oldest_card {
                         return Some(Action::SelectCard { card });
                     }
@@ -246,14 +246,24 @@ impl IntoIterator for AvailableActionList {
 #[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
 #[serde(tag = "name", rename_all = "snake_case")]
 pub enum Action {
-    CastCard { card: ObjectId },
-    SelectCard { card: ObjectId },
-    Attack { attackers: Vec<ObjectId> },
-    Block { pairs: Vec<(ObjectId, ObjectId)> },
+    CastCard {
+        card: TimedObjectId,
+    },
+    SelectCard {
+        card: TimedObjectId,
+    },
+    Attack {
+        attackers: Vec<TimedObjectId>,
+    },
+    Block {
+        pairs: Vec<(TimedObjectId, TimedObjectId)>,
+    },
     EndTurn,
     Concede,
     Continue,
-    DebugCommand { commands: Vec<ActionCommand> },
+    DebugCommand {
+        commands: Vec<ActionCommand>,
+    },
 }
 
 impl From<Action> for Value {

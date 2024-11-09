@@ -229,7 +229,7 @@ impl Environment {
                     Ok(vec![OpcodeList::new(filter_vec![
                         pairs.iter().flat_map(|(attacker, blocker)| {
                             vec![Opcode::SetBattleState {
-                                card: *blocker,
+                                card: blocker.id,
                                 state: Some(FieldBattleState::Blocking {
                                     attacker: *attacker,
                                 }),

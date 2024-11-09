@@ -2,7 +2,7 @@ use super::{
     error::Error,
     exp::{ExpEnv, Function},
 };
-use crate::id::ObjectId;
+use crate::id::TimedObjectId;
 use bincode::{Decode, Encode};
 use serde_json::Number;
 use std::{
@@ -73,7 +73,7 @@ impl TryFrom<Value> for serde_json::Value {
                     .collect::<Result<_, _>>()?,
             )),
             Value::Custom(CustomType::Card(card)) => {
-                Ok(serde_json::Value::Number(Into::<u32>::into(card).into()))
+                Ok(serde_json::Value::Number(Into::<u64>::into(card).into()))
             }
             Value::Custom(CustomType::Player(player)) => {
                 Ok(serde_json::Value::Number(player.into()))
@@ -339,7 +339,7 @@ impl From<&str> for Constant {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Encode, Decode)]
 pub enum CustomType {
-    Card(ObjectId),
+    Card(TimedObjectId),
     Player(u8),
 }
 
@@ -403,8 +403,8 @@ where
     }
 }
 
-impl From<ObjectId> for Value {
-    fn from(value: ObjectId) -> Self {
+impl From<TimedObjectId> for Value {
+    fn from(value: TimedObjectId) -> Self {
         Value::Custom(CustomType::Card(value))
     }
 }

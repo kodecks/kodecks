@@ -3,7 +3,7 @@ use crate::{
     score::{get_score, ComputedScore},
     Bot, SimpleBot,
 };
-use kodecks::{action::Action, env::Environment, id::ObjectId, phase::Phase};
+use kodecks::{action::Action, env::Environment, id::TimedObjectId, phase::Phase};
 use std::sync::Arc;
 
 #[cfg(feature = "rayon")]
@@ -11,8 +11,8 @@ use rayon::prelude::*;
 
 pub fn find_attacker_combination(
     ctx: BotContext,
-    attackers: &[ObjectId],
-) -> Vec<(Vec<ObjectId>, ComputedScore)> {
+    attackers: &[TimedObjectId],
+) -> Vec<(Vec<TimedObjectId>, ComputedScore)> {
     if attackers.is_empty() {
         return vec![];
     }
@@ -42,7 +42,7 @@ pub fn find_attacker_combination(
         .collect()
 }
 
-fn possible_attacker_combinations(attackers: &[ObjectId]) -> Vec<Vec<ObjectId>> {
+fn possible_attacker_combinations(attackers: &[TimedObjectId]) -> Vec<Vec<TimedObjectId>> {
     let mut combinations = vec![];
     for k in 0..=attackers.len() {
         let mut result = Vec::new();
@@ -74,9 +74,9 @@ fn backtrack<T: Clone>(
 
 pub fn find_blocker_combination(
     ctx: BotContext,
-    attackers: &[ObjectId],
-    blockers: &[ObjectId],
-) -> Vec<(Vec<(ObjectId, ObjectId)>, ComputedScore)> {
+    attackers: &[TimedObjectId],
+    blockers: &[TimedObjectId],
+) -> Vec<(Vec<(TimedObjectId, TimedObjectId)>, ComputedScore)> {
     if attackers.is_empty() || blockers.is_empty() {
         return vec![];
     }
@@ -103,9 +103,9 @@ pub fn find_blocker_combination(
 }
 
 fn possible_battle_combinations(
-    attackers: &[ObjectId],
-    blockers: &[ObjectId],
-) -> Vec<Vec<(ObjectId, ObjectId)>> {
+    attackers: &[TimedObjectId],
+    blockers: &[TimedObjectId],
+) -> Vec<Vec<(TimedObjectId, TimedObjectId)>> {
     let mut pairs = vec![];
     for attacker in attackers {
         for blocker in blockers {
@@ -125,11 +125,11 @@ fn possible_battle_combinations(
 }
 
 fn backtrack_pair(
-    arr: &[(ObjectId, ObjectId)],
+    arr: &[(TimedObjectId, TimedObjectId)],
     k: usize,
     start: usize,
-    current: &mut Vec<(ObjectId, ObjectId)>,
-    result: &mut Vec<Vec<(ObjectId, ObjectId)>>,
+    current: &mut Vec<(TimedObjectId, TimedObjectId)>,
+    result: &mut Vec<Vec<(TimedObjectId, TimedObjectId)>>,
 ) {
     if current.len() == k {
         result.push(current.clone());

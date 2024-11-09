@@ -24,7 +24,7 @@ use frame::CardFrame;
 use image::{DynamicImage, RgbaImage};
 use kodecks::archetype::{ArchetypeId, CardArchetype};
 use kodecks::card::CardSnapshot;
-use kodecks::id::ObjectId;
+use kodecks::id::{ObjectId, TimedCardId};
 use kodecks::zone::Zone;
 use number::{NumberOverlay, NumberOverlayKey};
 use std::cmp::Ordering;
@@ -801,7 +801,9 @@ pub fn handle_card_events(
 
     if let Some(drag) = drag {
         if let Ok((_, card, _)) = card_query.get(drag.entity) {
-            if !board.player_hand.contains(&card.id) && !list.blockers().contains(&card.id) {
+            if !board.player_hand.contains(&card.timed_id())
+                && !list.blockers().contains(&card.timed_id())
+            {
                 return;
             }
         }

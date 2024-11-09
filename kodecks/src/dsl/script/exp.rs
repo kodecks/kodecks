@@ -4,7 +4,7 @@ use super::{
 };
 use crate::{
     card::Card,
-    id::ObjectId,
+    id::CardId,
     player::{Player, PlayerList},
 };
 use bincode::{Decode, Encode};
@@ -743,7 +743,9 @@ pub trait ExpExt<'a, I> {
 
 pub trait ExpEnv {
     fn get_var(&self, name: &str) -> Option<Value>;
-    fn get_card(&self, id: ObjectId) -> Option<&Card>;
+    fn get_card<T>(&self, id: T) -> Option<&Card>
+    where
+        T: CardId;
     fn get_players(&self) -> Option<&PlayerList<Player>>;
     fn invoke(
         &mut self,
@@ -890,7 +892,10 @@ mod tests {
             }
         }
 
-        fn get_card(&self, _id: ObjectId) -> Option<&Card> {
+        fn get_card<T>(&self, _id: T) -> Option<&Card>
+        where
+            T: CardId,
+        {
             None
         }
 

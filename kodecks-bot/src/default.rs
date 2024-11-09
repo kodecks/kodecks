@@ -4,6 +4,7 @@ use crate::{
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::Environment,
+    id::TimedCardId,
     score::Score,
 };
 use rand::{rngs::SmallRng, SeedableRng};
@@ -130,7 +131,7 @@ impl Bot for DefaultBot {
         let attackers = opponent
             .field
             .attacking_cards()
-            .map(|card| card.id())
+            .map(|card| card.timed_id())
             .collect::<Vec<_>>();
         let block =
             battle::find_blocker_combination(ctx.clone(), &attackers, &actions.actions.blockers());

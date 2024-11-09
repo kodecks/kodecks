@@ -1,4 +1,4 @@
-use crate::id::{CardId, ObjectId};
+use crate::id::CardId;
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use strum::Display;
@@ -34,18 +34,29 @@ pub trait CardZone {
     fn iter(&self) -> impl DoubleEndedIterator<Item = &Self::Item>;
     fn iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut Self::Item>;
 
-    fn get(&self, id: ObjectId) -> Option<&Self::Item> {
-        self.iter().find(|card| card.id() == id)
+    fn get<T>(&self, id: T) -> Option<&Self::Item>
+    where
+        T: CardId,
+    {
+        self.iter().find(|card| card.id() == id.id())
     }
 
-    fn get_mut(&mut self, id: ObjectId) -> Option<&mut Self::Item> {
-        self.iter_mut().find(|card| card.id() == id)
+    fn get_mut<T>(&mut self, id: T) -> Option<&mut Self::Item>
+    where
+        T: CardId,
+    {
+        self.iter_mut().find(|card| card.id() == id.id())
     }
 
-    fn contains(&self, id: ObjectId) -> bool {
-        self.iter().any(|card| card.id() == id)
+    fn contains<T>(&self, id: T) -> bool
+    where
+        T: CardId,
+    {
+        self.iter().any(|card| card.id() == id.id())
     }
 
     fn push(&mut self, card: Self::Item);
-    fn remove(&mut self, id: ObjectId) -> Option<Self::Item>;
+    fn remove<T>(&mut self, id: T) -> Option<Self::Item>
+    where
+        T: CardId;
 }

@@ -2,6 +2,7 @@ use super::Environment;
 use crate::{
     action::{AvailableAction, PlayerAvailableActions},
     filter_vec,
+    id::TimedCardId,
     message::Message,
     phase::Phase,
     variable::VariableList,
@@ -28,7 +29,7 @@ impl Environment {
         let attackers = active_player
             .field
             .active_cards()
-            .map(|c| c.id())
+            .map(|c| c.timed_id())
             .collect::<Vec<_>>();
         if let Phase::Main = &self.state.phase {
             if !self.stack.is_empty() {
@@ -67,7 +68,7 @@ impl Environment {
             let blockers = player_in_action
                 .field
                 .active_cards()
-                .map(|card| card.id())
+                .map(|card| card.timed_id())
                 .collect::<Vec<_>>();
             let castable_cards = player_in_action
                 .castable_cards(&self.state)
@@ -96,7 +97,11 @@ impl Environment {
             Some(PlayerAvailableActions {
                 player: active_player.id,
                 actions: vec![AvailableAction::SelectCard {
-                    cards: active_player.hand.iter().map(|card| card.id()).collect(),
+                    cards: active_player
+                        .hand
+                        .iter()
+                        .map(|card| card.timed_id())
+                        .collect(),
                     score_factor: -1,
                 }]
                 .into_iter()

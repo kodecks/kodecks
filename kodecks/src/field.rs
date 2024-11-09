@@ -31,7 +31,7 @@ impl CardList<FieldItem<Card>> {
 
     pub fn find_blocker(&self, attacker: ObjectId) -> Option<&Card> {
         self.items().find_map(|field_card| match field_card.battle {
-            Some(FieldBattleState::Blocking { attacker: id }) if id == attacker => {
+            Some(FieldBattleState::Blocking { attacker: id }) if id.id == attacker => {
                 Some(&field_card.card)
             }
             _ => None,
@@ -142,6 +142,6 @@ pub enum FieldState {
 #[serde(rename_all = "snake_case")]
 pub enum FieldBattleState {
     Attacking,
-    Blocking { attacker: ObjectId },
+    Blocking { attacker: TimedObjectId },
     Attacked,
 }

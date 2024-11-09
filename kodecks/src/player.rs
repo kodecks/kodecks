@@ -6,7 +6,7 @@ use crate::{
     error::ActionError,
     field::{FieldItem, FieldState},
     hand::HandItem,
-    id::ObjectId,
+    id::{CardId, ObjectId, TimedCardId, TimedObjectId},
     list::CardList,
     profile::DebugFlags,
     shard::ShardList,
@@ -192,7 +192,10 @@ impl Player {
         }
     }
 
-    pub fn find_card(&self, card: ObjectId) -> Option<&Card> {
+    pub fn find_card<T>(&self, card: T) -> Option<&Card>
+    where
+        T: CardId + Copy,
+    {
         self.deck
             .get(card)
             .or_else(|| self.hand.get(card))
@@ -229,7 +232,7 @@ impl Player {
     pub fn castable_cards<'a>(
         &'a self,
         state: &'a GameState,
-    ) -> impl Iterator<Item = ObjectId> + 'a {
+    ) -> impl Iterator<Item = TimedObjectId> + 'a {
         self.hand
             .items()
             .filter(|item| {
@@ -242,7 +245,7 @@ impl Player {
                         || self.counters.free_casted == 0);
                 item.card.effect().is_castable(state, &item.card, castable)
             })
-            .map(|item| item.card.id())
+            .map(|item| item.card.timed_id())
     }
 }
 
@@ -376,13 +379,19 @@ impl CardZone for Vec<CardSnapshot> {
         self.push(card);
     }
 
-    fn remove(&mut self, id: ObjectId) -> Option<Self::Item> {
-        let index = self.iter().position(|card| card.id == id)?;
+    fn remove<T>(&mut self, id: T) -> Option<Self::Item>
+    where
+        T: CardId,
+    {
+        let index = self.iter().position(|card| card.id == id.id())?;
         Some(self.remove(index))
     }
 
-    fn get(&self, id: ObjectId) -> Option<&Self::Item> {
-        self.iter().find(|card| card.id == id)
+    fn get<T>(&self, id: T) -> Option<&Self::Item>
+    where
+        T: CardId,
+    {
+        self.iter().find(|card| card.id == id.id())
     }
 
     fn iter(&self) -> impl DoubleEndedIterator<Item = &Self::Item> {
@@ -413,13 +422,19 @@ impl CardZone for Vec<FieldItem<CardSnapshot>> {
         });
     }
 
-    fn remove(&mut self, id: ObjectId) -> Option<Self::Item> {
-        let index = self.iter().position(|card| card.id == id)?;
+    fn remove<T>(&mut self, id: T) -> Option<Self::Item>
+    where
+        T: CardId,
+    {
+        let index = self.iter().position(|card| card.id == id.id())?;
         Some(self.remove(index).card)
     }
 
-    fn get(&self, id: ObjectId) -> Option<&Self::Item> {
-        self.iter().find(|card| card.id == id)
+    fn get<T>(&self, id: T) -> Option<&Self::Item>
+    where
+        T: CardId,
+    {
+        self.iter().find(|card| card.id == id.id())
     }
 
     fn iter(&self) -> impl DoubleEndedIterator<Item = &Self::Item> {
@@ -453,13 +468,19 @@ impl CardZone for Vec<HandItem<CardSnapshot>> {
         });
     }
 
-    fn remove(&mut self, id: ObjectId) -> Option<Self::Item> {
-        let index = self.iter().position(|item| item.id == id)?;
+    fn remove<T>(&mut self, id: T) -> Option<Self::Item>
+    where
+        T: CardId,
+    {
+        let index = self.iter().position(|item| item.id == id.id())?;
         Some(self.remove(index).card)
     }
 
-    fn get(&self, id: ObjectId) -> Option<&Self::Item> {
-        self.iter().find(|item| item.id == id)
+    fn get<T>(&self, id: T) -> Option<&Self::Item>
+    where
+        T: CardId,
+    {
+        self.iter().find(|item| item.id == id.id())
     }
 
     fn iter(&self) -> impl DoubleEndedIterator<Item = &Self::Item> {

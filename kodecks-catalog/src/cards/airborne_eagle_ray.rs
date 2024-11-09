@@ -27,7 +27,7 @@ impl Effect for CardDef {
                     .iter()
                     .flat_map(|player| player.field.iter())
                     .filter(|card| card.flags().is_targetable())
-                    .map(|card| card.id())
+                    .map(|card| card.timed_id())
                     .collect::<Vec<_>>();
                 if candidates.is_empty() {
                     return Ok(EffectReport::default());

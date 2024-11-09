@@ -1,7 +1,7 @@
 use crate::{
     card::Card,
     error::ActionError,
-    id::{CardId, ObjectId, ObjectIdCounter},
+    id::{CardId, ObjectIdCounter},
     sequence::CardSequence,
     zone::CardZone,
 };
@@ -29,11 +29,14 @@ impl<T> CardList<T>
 where
     T: CardId,
 {
-    pub fn get_item(&self, id: ObjectId) -> Result<&T, ActionError> {
+    pub fn get_item<I>(&self, id: I) -> Result<&T, ActionError>
+    where
+        I: CardId,
+    {
         self.cards
             .iter()
-            .find(|item| item.id() == id)
-            .ok_or(ActionError::CardNotFound { id })
+            .find(|item| item.id() == id.id())
+            .ok_or(ActionError::CardNotFound { id: id.id() })
     }
 }
 
@@ -69,8 +72,11 @@ where
         self.cards.push(card.into());
     }
 
-    fn remove(&mut self, id: ObjectId) -> Option<Card> {
-        let index = self.cards.iter().position(|card| card.id() == id)?;
+    fn remove<I>(&mut self, id: I) -> Option<Card>
+    where
+        I: CardId,
+    {
+        let index = self.cards.iter().position(|card| card.id() == id.id())?;
         Some(self.cards.remove(index).into())
     }
 }

@@ -142,10 +142,10 @@ pub fn update_frame_overlay(
             .player_field
             .iter()
             .chain(board.opponent_field.iter())
-            .any(|(card, state)| card == &id && state == &FieldState::Exhausted);
-        let selectable = list.selectable_cards().iter().any(|card| *card == id);
+            .any(|(card, state)| card.id == id && state == &FieldState::Exhausted);
+        let selectable = list.selectable_cards().iter().any(|card| card.id == id);
         if *frame == CardFrame::Shadow {
-            let castable = list.castable_cards().iter().any(|card| *card == id);
+            let castable = list.castable_cards().iter().any(|card| card.id == id);
             *material = if castable {
                 assets.card_active.clone()
             } else if selectable {
@@ -156,13 +156,13 @@ pub fn update_frame_overlay(
         } else {
             *material = if selectable {
                 assets.card_select_small.clone()
-            } else if board.attackers().any(|attacker| *attacker == id) {
+            } else if board.attackers().any(|attacker| attacker.id == id) {
                 assets.card_attack_active.clone()
-            } else if list.attackers().contains(&id) {
+            } else if list.attackers().iter().any(|attacker| attacker.id == id) {
                 assets.card_attack.clone()
-            } else if board.blocking_pairs().any(|(_, blocker)| *blocker == id) {
+            } else if board.blocking_pairs().any(|(_, blocker)| blocker.id == id) {
                 assets.card_block_active.clone()
-            } else if list.blockers().contains(&id) {
+            } else if list.blockers().iter().any(|blocker| blocker.id == id) {
                 assets.card_block.clone()
             } else if exhausted {
                 assets.card_exhausted.clone()

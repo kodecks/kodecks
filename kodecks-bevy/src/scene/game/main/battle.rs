@@ -64,25 +64,25 @@ fn update_battle(
 
     let camera_pos = camera.single().translation;
     for (attacker, blocker) in board.blocking_pairs() {
-        let attacker_zone = if let Ok(zone) = env.find_zone(*attacker) {
+        let attacker_zone = if let Ok(zone) = env.find_zone(attacker.id) {
             zone
         } else {
             continue;
         };
-        let defender_zone = if let Ok(zone) = env.find_zone(*blocker) {
+        let defender_zone = if let Ok(zone) = env.find_zone(blocker.id) {
             zone
         } else {
             continue;
         };
         if attacker_zone.zone == Zone::Field && defender_zone.zone == Zone::Field {
             let mut attacker_pos = board
-                .get_zone_transform(*attacker, attacker_zone, env.player, camera_pos)
+                .get_zone_transform(attacker.id, attacker_zone, env.player, camera_pos)
                 .map(|transform| transform.translation)
                 .unwrap_or_default();
             attacker_pos.y = 0.5;
 
             let mut defender_pos = board
-                .get_zone_transform(*blocker, defender_zone, env.player, camera_pos)
+                .get_zone_transform(blocker.id, defender_zone, env.player, camera_pos)
                 .map(|transform| transform.translation)
                 .unwrap_or_default();
             defender_pos.y = 0.5;

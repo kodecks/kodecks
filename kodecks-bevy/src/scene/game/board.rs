@@ -4,7 +4,7 @@ use kodecks::{
     action,
     env::LocalEnvironment,
     field::{FieldBattleState, FieldState},
-    id::ObjectId,
+    id::{ObjectId, TimedCardId, TimedObjectId},
     phase::Phase,
     player::PlayerZone,
     zone::Zone,
@@ -63,19 +63,19 @@ impl Deref for AvailableActionList {
 
 #[derive(Resource, Default)]
 pub struct Board {
-    pub player_hand: Vec<ObjectId>,
-    pub player_field: Vec<(ObjectId, FieldState)>,
-    pub opponent_hand: Vec<ObjectId>,
-    pub opponent_field: Vec<(ObjectId, FieldState)>,
+    pub player_hand: Vec<TimedObjectId>,
+    pub player_field: Vec<(TimedObjectId, FieldState)>,
+    pub opponent_hand: Vec<TimedObjectId>,
+    pub opponent_field: Vec<(TimedObjectId, FieldState)>,
 
-    attackers: Vec<ObjectId>,
-    blocking_pairs: Vec<(ObjectId, ObjectId)>,
-    temp_attackers: Vec<ObjectId>,
-    temp_blocking_pairs: Vec<(ObjectId, ObjectId)>,
+    attackers: Vec<TimedObjectId>,
+    blocking_pairs: Vec<(TimedObjectId, TimedObjectId)>,
+    temp_attackers: Vec<TimedObjectId>,
+    temp_blocking_pairs: Vec<(TimedObjectId, TimedObjectId)>,
 }
 
 impl Board {
-    pub fn toggle_attacker(&mut self, card: ObjectId) {
+    pub fn toggle_attacker(&mut self, card: TimedObjectId) {
         if self.temp_attackers.contains(&card) {
             self.temp_attackers.retain(|&c| c != card);
         } else {
@@ -84,7 +84,7 @@ impl Board {
         self.update_battle_layout();
     }
 
-    pub fn attackers(&self) -> impl Iterator<Item = &ObjectId> {
+    pub fn attackers(&self) -> impl Iterator<Item = &TimedObjectId> {
         self.temp_attackers.iter().chain(
             self.attackers
                 .iter()
@@ -92,7 +92,7 @@ impl Board {
         )
     }
 
-    pub fn toggle_blocker(&mut self, blocker: ObjectId, attacker: Option<ObjectId>) {
+    pub fn toggle_blocker(&mut self, blocker: TimedObjectId, attacker: Option<TimedObjectId>) {
         self.temp_blocking_pairs.retain(|(_, b)| *b != blocker);
         if let Some(attacker) = attacker {
             if self.attackers.contains(&attacker) {
@@ -109,7 +109,7 @@ impl Board {
         self.update_battle_layout();
     }
 
-    pub fn blocking_pairs(&self) -> impl Iterator<Item = &(ObjectId, ObjectId)> {
+    pub fn blocking_pairs(&self) -> impl Iterator<Item = &(TimedObjectId, TimedObjectId)> {
         self.temp_blocking_pairs.iter().chain(
             self.blocking_pairs
                 .iter()
@@ -121,7 +121,11 @@ impl Board {
         let player = env.players.get(env.player).unwrap();
         let opponent = env.players.next_player(env.player).unwrap();
 
-        self.player_hand = player.hand.iter().map(|item| item.card.id).collect();
+        self.player_hand = player
+            .hand
+            .iter()
+            .map(|item| item.card.timed_id())
+            .collect();
 
         let old_player_orders = self
             .player_field
@@ -131,7 +135,7 @@ impl Board {
         self.player_field = player
             .field
             .iter()
-            .map(|card| (card.card.id, card.state))
+            .map(|card| (card.card.timed_id(), card.state))
             .collect();
         self.player_field.sort_by_key(|(id, _)| {
             old_player_orders
@@ -140,7 +144,11 @@ impl Board {
                 .unwrap_or(old_player_orders.len())
         });
 
-        self.opponent_hand = opponent.hand.iter().map(|item| item.card.id).collect();
+        self.opponent_hand = opponent
+            .hand
+            .iter()
+            .map(|item| item.card.timed_id())
+            .collect();
 
         let old_opponent_orders = self
             .opponent_field
@@ -150,7 +158,7 @@ impl Board {
         self.opponent_field = opponent
             .field
             .iter()
-            .map(|card| (card.card.id, card.state))
+            .map(|card| (card.card.timed_id(), card.state))
             .collect();
         self.opponent_field.sort_by_key(|(id, _)| {
             old_opponent_orders
@@ -164,7 +172,7 @@ impl Board {
             .iter()
             .flat_map(|player| player.field.iter())
             .filter(|item| item.battle == Some(FieldBattleState::Attacking))
-            .map(|item| item.card.id)
+            .map(|item| item.card.timed_id())
             .collect();
 
         self.blocking_pairs = env
@@ -173,7 +181,7 @@ impl Board {
             .flat_map(|player| player.field.iter())
             .filter_map(|item| {
                 if let Some(FieldBattleState::Blocking { attacker }) = item.battle {
-                    Some((attacker, item.card.id))
+                    Some((attacker, item.card.timed_id()))
                 } else {
                     None
                 }
@@ -250,7 +258,7 @@ impl Board {
     ) -> Option<Transform> {
         if zone.player == viewer {
             if zone.zone == Zone::Hand {
-                if let Some(index) = self.player_hand.iter().position(|&y| y == card) {
+                if let Some(index) = self.player_hand.iter().position(|&y| y.id == card) {
                     let x_offset = index as f32 - (self.player_hand.len() - 1) as f32 / 2.0;
                     let x = 1.1 * x_offset;
                     let y = 2.0 + 0.01 * index as f32;
@@ -268,7 +276,7 @@ impl Board {
                 let x_base = 0.0;
                 if let Some((index, _)) =
                     self.player_field.iter().enumerate().find_map(|(i, item)| {
-                        if item.0 == card {
+                        if item.0.id == card {
                             Some((i, item))
                         } else {
                             None
@@ -291,7 +299,7 @@ impl Board {
                 return Some(transform);
             }
         } else if zone.zone == Zone::Hand {
-            if let Some(index) = self.opponent_hand.iter().position(|&y| y == card) {
+            if let Some(index) = self.opponent_hand.iter().position(|&y| y.id == card) {
                 let x_offset = index as f32 - (self.opponent_hand.len() - 1) as f32 / 2.0;
                 let x = 1.1 * x_offset;
                 let y = 3.0 + 0.01 * index as f32;
@@ -312,7 +320,7 @@ impl Board {
                     .iter()
                     .enumerate()
                     .find_map(|(i, item)| {
-                        if item.0 == card {
+                        if item.0.id == card {
                             Some((i, item))
                         } else {
                             None
