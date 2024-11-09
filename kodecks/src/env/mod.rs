@@ -386,7 +386,6 @@ impl Environment {
     pub fn generate_card_token(&self, player: u8, token: ObjectId, archetype: ArchetypeId) -> Card {
         let archetype = &self.catalog[archetype];
         let mut card = Card::new_token(token, archetype.clone(), player);
-        card.set_timestamp(self.timestamp);
         card.set_zone(PlayerZone::new(player, Zone::Field));
         card
     }

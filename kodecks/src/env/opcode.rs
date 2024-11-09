@@ -121,7 +121,7 @@ impl Environment {
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Hand);
                     let controller = card.controller();
-                    card.set_timestamp(self.timestamp);
+                    card.increment_timestamp();
                     card.set_zone(to);
                     let snapshot = card.snapshot();
                     player.hand.push(card);
@@ -146,7 +146,7 @@ impl Environment {
                     let from = *card.zone();
                     let to = PlayerZone::new(player.id, Zone::Field);
                     let controller = card.controller();
-                    card.set_timestamp(self.timestamp);
+                    card.increment_timestamp();
                     card.set_zone(to);
                     let snapshot = card.snapshot();
                     player.field.push(card);
@@ -183,7 +183,7 @@ impl Environment {
                             card: card.snapshot(),
                         }]);
                     }
-                    card.set_timestamp(self.timestamp);
+                    card.increment_timestamp();
                     card.set_zone(to);
                     card.reset_computed();
                     let snapshot = card.snapshot();

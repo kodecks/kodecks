@@ -16,7 +16,7 @@ use tracing::error;
 #[derive(Clone)]
 pub struct ContinuousItem {
     source: ObjectId,
-    timestamp: u32,
+    timestamp: u16,
     func: Arc<Box<dyn ContinuousEffect>>,
     target: Target,
     is_active: bool,

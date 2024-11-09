@@ -1,6 +1,7 @@
+use crate::error::ActionError;
 use bincode::{Decode, Encode};
 use core::fmt;
-use serde::{Deserialize, Serialize};
+use serde::{de, ser, Deserialize, Serialize};
 use std::num::NonZeroU32;
 
 const MAX_RESERVED_ID: u32 = 100;
@@ -52,10 +53,48 @@ impl ObjectIdCounter {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash, Encode, Decode)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Encode, Decode)]
 pub struct TimedObjectId {
     pub id: ObjectId,
-    pub timestamp: u32,
+    pub timestamp: u16,
+}
+
+impl From<TimedObjectId> for u64 {
+    fn from(id: TimedObjectId) -> Self {
+        (u64::from(id.timestamp) << 32) | u64::from(id.id.0.get())
+    }
+}
+
+impl TryFrom<u64> for TimedObjectId {
+    type Error = ActionError;
+
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        let id = value as u32;
+        let timestamp = (value >> 32) as u16;
+        Ok(TimedObjectId {
+            id: ObjectId(NonZeroU32::new(id).ok_or(ActionError::InvalidObjectId)?),
+            timestamp,
+        })
+    }
+}
+
+impl ser::Serialize for TimedObjectId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: ser::Serializer,
+    {
+        Into::<u64>::into(*self).serialize(serializer)
+    }
+}
+
+impl<'de> de::Deserialize<'de> for TimedObjectId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        let id = u64::deserialize(deserializer)?;
+        id.try_into().map_err(de::Error::custom)
+    }
 }
 
 impl fmt::Display for TimedObjectId {

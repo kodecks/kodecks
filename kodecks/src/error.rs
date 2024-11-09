@@ -81,6 +81,8 @@ pub enum ActionError {
     KeyNotFound { key: String },
     #[error("Invalid value type")]
     InvalidValueType,
+    #[error("Invalid object id")]
+    InvalidObjectId,
     #[error("Target lost: {target}")]
     TargetLost { target: TimedObjectId },
 }
