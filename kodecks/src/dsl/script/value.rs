@@ -641,7 +641,7 @@ fn merge_values(a: &mut Value, b: &Value) {
                 match a.get_mut(key) {
                     Some(a_value) => merge_values(a_value, b_value),
                     None => {
-                        a.insert(key.clone(), b_value.clone());
+                        a.insert(*key, b_value.clone());
                     }
                 }
             }
