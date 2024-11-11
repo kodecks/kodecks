@@ -1,3 +1,5 @@
+use tinystr::TinyAsciiStr;
+
 use crate::dsl::script::exp::Module;
 use crate::dsl::script::value::Value;
 use crate::effect::{Effect, EffectActivateContext};
@@ -56,7 +58,8 @@ impl Effect for EffectDef {
         event: CardEvent,
         ctx: &mut EffectActivateContext,
     ) -> anyhow::Result<()> {
-        let name = format!("on_{}", event.as_str());
+        let id: TinyAsciiStr<32> = event.into();
+        let name = format!("on_{}", id.as_str());
         let event: Value = event.into();
         let _: serde_json::Value = self.module.call(ctx, &name, vec![event])?;
         Ok(())
