@@ -332,6 +332,12 @@ impl From<f64> for Constant {
     }
 }
 
+impl From<TinyAsciiStr<32>> for Constant {
+    fn from(value: TinyAsciiStr<32>) -> Self {
+        Constant::String(value)
+    }
+}
+
 impl From<String> for Constant {
     fn from(value: String) -> Self {
         Constant::String(TinyAsciiStr::from_bytes_lossy(value.as_bytes()))

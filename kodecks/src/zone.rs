@@ -2,6 +2,7 @@ use crate::id::CardId;
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use strum::Display;
+use tinystr::{tinystr, TinyAsciiStr};
 
 #[derive(
     Debug, Clone, Copy, Default, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode,
@@ -23,6 +24,17 @@ pub enum ZoneKind {
     Hand,
     Field,
     Graveyard,
+}
+
+impl From<ZoneKind> for TinyAsciiStr<32> {
+    fn from(kind: ZoneKind) -> Self {
+        match kind {
+            ZoneKind::Deck => tinystr!(32, "deck"),
+            ZoneKind::Hand => tinystr!(32, "hand"),
+            ZoneKind::Field => tinystr!(32, "field"),
+            ZoneKind::Graveyard => tinystr!(32, "graveyard"),
+        }
+    }
 }
 
 pub trait CardZone {

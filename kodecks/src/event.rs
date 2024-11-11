@@ -3,10 +3,10 @@ use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use strum::Display;
-use tinystr::tinystr;
+use tinystr::{tinystr, TinyAsciiStr};
 
 use crate::{
-    dsl::script::value::{CustomType, Value},
+    dsl::script::value::{Constant, CustomType, Value},
     player::Zone,
 };
 
@@ -48,7 +48,7 @@ impl From<CardEvent> for Value {
                 );
                 from_obj.insert(
                     tinystr!(32, "zone"),
-                    from.kind.to_string().to_ascii_lowercase().into(),
+                    Constant::String(from.kind.into()).into(),
                 );
                 obj.insert(tinystr!(32, "from"), Value::Object(from_obj));
             }
@@ -60,18 +60,18 @@ impl From<CardEvent> for Value {
                 );
                 from_obj.insert(
                     tinystr!(32, "zone"),
-                    from.kind.to_string().to_ascii_lowercase().into(),
+                    Constant::String(from.kind.into()).into(),
                 );
                 obj.insert(tinystr!(32, "from"), Value::Object(from_obj));
                 obj.insert(
                     tinystr!(32, "reason"),
-                    reason.to_string().to_ascii_lowercase().into(),
+                    Constant::String(reason.into()).into(),
                 );
             }
             CardEvent::ReturnedToHand { reason } => {
                 obj.insert(
                     tinystr!(32, "reason"),
-                    reason.to_string().to_ascii_lowercase().into(),
+                    Constant::String(reason.into()).into(),
                 );
             }
             CardEvent::DealtDamage {
@@ -84,11 +84,14 @@ impl From<CardEvent> for Value {
                     Value::Custom(CustomType::Player(player)),
                 );
                 obj.insert(tinystr!(32, "amount"), amount.into());
-                obj.insert(tinystr!(32, "reason"), reason.to_string().into());
+                obj.insert(
+                    tinystr!(32, "reason"),
+                    Constant::String(reason.into()).into(),
+                );
             }
             _ => {}
         }
-        obj.insert(tinystr!(32, "name"), event.as_str().to_string().into());
+        obj.insert(tinystr!(32, "name"), event.into());
         Value::Object(obj)
     }
 }
@@ -107,18 +110,20 @@ impl CardEvent {
             CardEvent::AnyCasted => EventFilter::ANY_CASTED,
         }
     }
+}
 
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            CardEvent::Casted { .. } => "casted",
-            CardEvent::Destroyed { .. } => "destroyed",
-            CardEvent::ReturnedToHand { .. } => "returned_to_hand",
-            CardEvent::ReturnedToDeck => "returned_to_deck",
-            CardEvent::DealtDamage { .. } => "dealt_damage",
-            CardEvent::Attacking => "attacking",
-            CardEvent::Blocking => "blocking",
-            CardEvent::Attacked => "attacked",
-            CardEvent::AnyCasted => "any_casted",
+impl From<CardEvent> for TinyAsciiStr<32> {
+    fn from(event: CardEvent) -> TinyAsciiStr<32> {
+        match event {
+            CardEvent::Casted { .. } => tinystr!(32, "casted"),
+            CardEvent::Destroyed { .. } => tinystr!(32, "destroyed"),
+            CardEvent::ReturnedToHand { .. } => tinystr!(32, "returned_to_hand"),
+            CardEvent::ReturnedToDeck => tinystr!(32, "returned_to_deck"),
+            CardEvent::DealtDamage { .. } => tinystr!(32, "dealt_damage"),
+            CardEvent::Attacking => tinystr!(32, "attacking"),
+            CardEvent::Blocking => tinystr!(32, "blocking"),
+            CardEvent::Attacked => tinystr!(32, "attacked"),
+            CardEvent::AnyCasted => tinystr!(32, "any_casted"),
         }
     }
 }
@@ -143,4 +148,13 @@ bitflags! {
 pub enum EventReason {
     Battle,
     Effect,
+}
+
+impl From<EventReason> for TinyAsciiStr<32> {
+    fn from(reason: EventReason) -> TinyAsciiStr<32> {
+        match reason {
+            EventReason::Battle => tinystr!(32, "battle"),
+            EventReason::Effect => tinystr!(32, "effect"),
+        }
+    }
 }
