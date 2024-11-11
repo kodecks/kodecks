@@ -91,7 +91,7 @@ impl From<CardEvent> for Value {
             }
             _ => {}
         }
-        obj.insert(tinystr!(32, "name"), event.into());
+        obj.insert(tinystr!(32, "name"), Constant::String(event.into()).into());
         Value::Object(obj)
     }
 }
