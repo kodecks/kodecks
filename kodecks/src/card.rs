@@ -63,7 +63,7 @@ def on_casted($event):
 def stack($id; $action; $a; $b):
     debug($id; $action, $a, $b) |
     push_continuous($id, $source, 1, 2) |
-    { commands: [ {name: "inflict_damage", target: $source.controller.next, amount: 400 } ] };
+    { commands: [ {name: "inflict_damage", target: $source.controller.next, amount: $source.controller.deck | length } ] };
 
 def continuous($event; $a; $b):
     debug("cont", $event, $a, $b) |

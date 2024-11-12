@@ -2,7 +2,11 @@ use super::{
     error::Error,
     exp::{ExpEnv, Function},
 };
-use crate::{dsl::SmallStr, id::TimedObjectId};
+use crate::{
+    dsl::SmallStr,
+    id::{TimedCardId, TimedObjectId},
+    zone::CardZone,
+};
 use serde_json::Number;
 use std::{
     collections::BTreeMap,
@@ -708,6 +712,35 @@ impl Value {
                 .get_players()
                 .and_then(|players| players.get(*player).ok())
                 .and_then(|player| match index.as_str() {
+                    "deck" => Some(Value::Array(
+                        player
+                            .deck
+                            .iter()
+                            .map(|card| Value::Custom(CustomType::Card(card.timed_id())))
+                            .collect(),
+                    )),
+                    "hand" => Some(Value::Array(
+                        player
+                            .hand
+                            .iter()
+                            .map(|card| Value::Custom(CustomType::Card(card.timed_id())))
+                            .collect(),
+                    )),
+                    "graveyard" => Some(Value::Array(
+                        player
+                            .graveyard
+                            .iter()
+                            .map(|card| Value::Custom(CustomType::Card(card.timed_id())))
+                            .collect(),
+                    )),
+                    "field" => Some(Value::Array(
+                        player
+                            .field
+                            .iter()
+                            .map(|card| Value::Custom(CustomType::Card(card.timed_id())))
+                            .collect(),
+                    )),
+                    "life" => Some(Value::Constant(Constant::U64(player.stats.life as _))),
                     "shards" => {
                         let mut shards = BTreeMap::new();
                         for (color, amount) in player.shards.iter() {
