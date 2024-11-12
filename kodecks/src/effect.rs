@@ -245,7 +245,7 @@ impl ExpEnv for EffectTriggerContext<'_> {
                 Ok(vec![input.clone()])
             }
             "push_continuous" => {
-                if args.len() < 1 {
+                if args.is_empty() {
                     return Err(Error::InvalidArgumentCount);
                 }
                 let target = match args[1] {
