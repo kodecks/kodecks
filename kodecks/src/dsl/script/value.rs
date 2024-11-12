@@ -5,6 +5,7 @@ use super::{
 use crate::{
     dsl::SmallStr,
     id::{TimedCardId, TimedObjectId},
+    prelude::ComputedFlags,
     zone::CardZone,
 };
 use serde_json::Number;
@@ -703,8 +704,13 @@ impl Value {
                 .get_card(*card)
                 .and_then(|card| match index.as_str() {
                     "name" => Some(card.archetype().name.clone().into()),
+                    "zone" => Some(Constant::String(card.zone().kind.into()).into()),
                     "controller" => Some(Self::Custom(CustomType::Player(card.controller()))),
                     "owner" => Some(Self::Custom(CustomType::Player(card.owner()))),
+                    "is_token" => Some(card.is_token().into()),
+                    "is_targetable" => {
+                        Some(card.flags().contains(ComputedFlags::TARGETABLE).into())
+                    }
                     _ => None,
                 })
                 .unwrap_or_default()),
