@@ -22,9 +22,15 @@ bitflags! {
 
 impl Color {
     pub fn iter_all() -> impl Iterator<Item = Color> {
-        [Color::RED, Color::YELLOW, Color::GREEN, Color::BLUE]
-            .iter()
-            .copied()
+        [
+            Color::RED,
+            Color::YELLOW,
+            Color::GREEN,
+            Color::BLUE,
+            Color::COLORLESS,
+        ]
+        .iter()
+        .copied()
     }
 }
 

@@ -22,7 +22,6 @@ pub struct Card {
     id: ObjectId,
     owner: u8,
     zone: Zone,
-    controller: u8,
     archetype: Arc<CardArchetype>,
     style: u8,
     computed: ComputedAttribute,
@@ -54,7 +53,6 @@ impl Card {
             id: counter.allocate(item.base_id),
             owner,
             zone: Zone::new(owner, ZoneKind::Deck),
-            controller: owner,
             archetype,
             style,
             computed,
@@ -74,7 +72,6 @@ impl Card {
             id,
             owner,
             zone: Zone::new(owner, ZoneKind::Deck),
-            controller: owner,
             archetype,
             style: 0,
             computed,
@@ -96,7 +93,7 @@ impl Card {
     }
 
     pub fn controller(&self) -> u8 {
-        self.controller
+        self.zone.player
     }
 
     pub fn zone(&self) -> &Zone {
@@ -176,7 +173,7 @@ impl Card {
             id: self.id,
             archetype_id: self.archetype.id,
             style: self.style,
-            controller: self.controller,
+            zone: self.zone,
             owner: self.owner,
             revealed: self.revealed,
             computed: Some(self.computed.clone()),
@@ -197,7 +194,6 @@ impl Clone for Card {
             id: self.id,
             owner: self.owner,
             zone: self.zone,
-            controller: self.controller,
             archetype: self.archetype.clone(),
             style: self.style,
             computed: self.computed.clone(),
@@ -262,7 +258,7 @@ pub struct CardSnapshot {
     pub id: ObjectId,
     pub archetype_id: ArchetypeId,
     pub style: u8,
-    pub controller: u8,
+    pub zone: Zone,
     pub owner: u8,
     pub revealed: PlayerMask,
     pub computed: Option<ComputedAttribute>,
@@ -291,7 +287,10 @@ impl CardSnapshot {
             id: 1u32.try_into().unwrap(),
             archetype_id: archetype.id,
             style: 0,
-            controller: 0,
+            zone: Zone {
+                player: 0,
+                kind: ZoneKind::Deck,
+            },
             owner: 0,
             revealed: PlayerMask::default(),
             computed: Some(archetype.into()),
