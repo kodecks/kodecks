@@ -17,6 +17,7 @@ use jaq_core::{
 };
 use serde::Deserialize;
 use std::{
+    cmp::Ordering,
     collections::{BTreeMap, HashMap},
     str::FromStr,
 };
@@ -44,10 +45,20 @@ pub enum Exp {
     Str(Vec<Self>),
     Select(Box<Self>),
     Map(Box<Self>),
+    Any(Option<Box<Self>>),
+    All(Option<Box<Self>>),
     Error(Box<Self>),
     CustomFunction(String, Vec<Self>),
+    Length,
+    Keys,
+    Abs,
     Not,
     Add,
+    Reverse,
+    Sort(Vec<Self>),
+    Unique(Vec<Self>),
+    Max(Vec<Self>),
+    Min(Vec<Self>),
     Empty,
 }
 
@@ -241,6 +252,9 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
                 Ok(Self::Obj(obj))
             }
             Term::Call("null", _) => Ok(Self::Value(Value::Constant(Constant::Null))),
+            Term::Call("length", _) => Ok(Self::Length),
+            Term::Call("keys", _) => Ok(Self::Keys),
+            Term::Call("abs", _) => Ok(Self::Abs),
             Term::Call("empty", _) => Ok(Self::Empty),
             Term::Call("not", _) => Ok(Self::Not),
             Term::Call("add", _) => Ok(Self::Add),
@@ -270,6 +284,49 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
                 } else {
                     Err(Error::InvalidSyntax)
                 }
+            }
+            Term::Call("any", exp) => {
+                if let Some(exp) = exp.first() {
+                    Ok(Self::Any(Some(Box::new(Self::try_from(exp)?))))
+                } else {
+                    Ok(Self::Any(None))
+                }
+            }
+            Term::Call("all", exp) => {
+                if let Some(exp) = exp.first() {
+                    Ok(Self::All(Some(Box::new(Self::try_from(exp)?))))
+                } else {
+                    Ok(Self::All(None))
+                }
+            }
+            Term::Call("reverse", _) => Ok(Self::Reverse),
+            Term::Call("sort" | "sort_by", exp) => {
+                let exp = exp
+                    .iter()
+                    .map(Self::try_from)
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(Self::Sort(exp))
+            }
+            Term::Call("unique" | "unique_by", exp) => {
+                let exp = exp
+                    .iter()
+                    .map(Self::try_from)
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(Self::Unique(exp))
+            }
+            Term::Call("max" | "max_by", exp) => {
+                let exp = exp
+                    .iter()
+                    .map(Self::try_from)
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(Self::Max(exp))
+            }
+            Term::Call("min" | "min_by", exp) => {
+                let exp = exp
+                    .iter()
+                    .map(Self::try_from)
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(Self::Min(exp))
             }
             Term::Call(name, args) => {
                 let args = args.iter().map(Self::try_from).collect::<Result<_, _>>()?;
@@ -569,33 +626,47 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                     .map(|_| ctx.input.clone())
                     .collect())
             }
-            Self::Map(arg) => match ctx.input {
-                Value::Array(arr) => {
-                    let mut results = vec![];
-                    for item in arr {
-                        let mut new_ctx = ExpContext {
-                            env: ctx.env,
-                            input: item,
-                            params: ctx.params,
-                        };
-                        results.extend(arg.eval(&mut new_ctx)?);
+            Self::Map(_) | Self::Any(_) | Self::All(_) => {
+                let arg = match self {
+                    Self::Map(arg) => arg.as_ref(),
+                    Self::Any(arg) | Self::All(arg) => {
+                        arg.as_ref().map(|a| a.as_ref()).unwrap_or(&Self::Ident)
                     }
-                    Ok(vec![Value::Array(results)])
-                }
-                Value::Object(obj) => {
-                    let mut results = vec![];
-                    for val in obj.values() {
-                        let mut new_ctx = ExpContext {
-                            env: ctx.env,
-                            input: val,
-                            params: ctx.params,
-                        };
-                        results.extend(arg.eval(&mut new_ctx)?);
+                    _ => unreachable!(),
+                };
+                let array = match ctx.input {
+                    Value::Array(arr) => {
+                        let mut results = vec![];
+                        for item in arr {
+                            let mut new_ctx = ExpContext {
+                                env: ctx.env,
+                                input: item,
+                                params: ctx.params,
+                            };
+                            results.extend(arg.eval(&mut new_ctx)?);
+                        }
+                        results
                     }
-                    Ok(vec![Value::Array(results)])
+                    Value::Object(obj) => {
+                        let mut results = vec![];
+                        for val in obj.values() {
+                            let mut new_ctx = ExpContext {
+                                env: ctx.env,
+                                input: val,
+                                params: ctx.params,
+                            };
+                            results.extend(arg.eval(&mut new_ctx)?);
+                        }
+                        results
+                    }
+                    _ => return Err(Error::InvalidIteration),
+                };
+                match self {
+                    Self::Any(_) => Ok(vec![array.into_iter().any(|v| !!v).into()]),
+                    Self::All(_) => Ok(vec![array.into_iter().all(|v| !!v).into()]),
+                    _ => Ok(vec![Value::Array(array)]),
                 }
-                _ => Err(Error::InvalidIteration),
-            },
+            }
             Self::TryCatch(lhs, rhs) => {
                 let mut new_ctx = ExpContext {
                     env: ctx.env,
@@ -690,6 +761,20 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                 }
             }
             Self::Empty => Ok(vec![]),
+            Self::Length => Ok(vec![ctx.input.length()?.into()]),
+            Self::Keys => match ctx.input {
+                Value::Array(arr) => Ok(vec![Value::Array(
+                    arr.iter()
+                        .enumerate()
+                        .map(|(i, _)| (i as u64).into())
+                        .collect(),
+                )]),
+                Value::Object(obj) => Ok(vec![Value::Array(
+                    obj.keys().map(|k| k.as_str().into()).collect(),
+                )]),
+                _ => Err(Error::InvalidIteration),
+            },
+            Self::Abs => Ok(vec![ctx.input.abs()?]),
             Self::Add => {
                 if let Value::Array(arr) = ctx.input {
                     let result = arr
@@ -698,6 +783,65 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                     Ok(vec![result])
                 } else {
                     Err(Error::InvalidCalculation)
+                }
+            }
+            Self::Reverse => match ctx.input {
+                Value::Array(arr) => Ok(vec![Value::Array(arr.iter().rev().cloned().collect())]),
+                _ => Err(Error::InvalidIteration),
+            },
+            Self::Sort(args) | Self::Unique(args) | Self::Max(args) | Self::Min(args) => {
+                match ctx.input {
+                    Value::Array(arr) => {
+                        let mut arr = arr.iter().enumerate().collect::<Vec<_>>();
+
+                        for arg in args
+                            .iter()
+                            .chain(Some(&Exp::Ident).filter(|_| args.is_empty()))
+                        {
+                            let mut values = vec![];
+                            for (_, v) in &arr {
+                                let mut new_ctx = ExpContext {
+                                    env: ctx.env,
+                                    input: *v,
+                                    params: ctx.params,
+                                };
+                                values.push(arg.eval(&mut new_ctx)?.pop().unwrap_or_default());
+                            }
+                            arr.sort_by(|(a, _), (b, _)| {
+                                values[*a]
+                                    .partial_cmp(&values[*b])
+                                    .unwrap_or(Ordering::Equal)
+                            });
+
+                            if let Self::Unique(_) = self {
+                                arr.dedup_by(|(a, _), (b, _)| values[*a] == values[*b]);
+                            }
+                        }
+
+                        match self {
+                            Self::Max(_) => {
+                                return Ok(arr
+                                    .last()
+                                    .map(|(_, v)| *v)
+                                    .cloned()
+                                    .into_iter()
+                                    .collect());
+                            }
+                            Self::Min(_) => {
+                                return Ok(arr
+                                    .first()
+                                    .map(|(_, v)| *v)
+                                    .cloned()
+                                    .into_iter()
+                                    .collect());
+                            }
+                            _ => (),
+                        }
+
+                        let arr = arr.into_iter().map(|(_, v)| v.clone()).collect();
+                        Ok(vec![Value::Array(arr)])
+                    }
+                    _ => Err(Error::InvalidIteration),
                 }
             }
             Self::Not => Ok(vec![(!ctx.input).into()]),
@@ -1015,12 +1159,48 @@ mod tests {
         let exp = Exp::from_str(". >= 999").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![true.into(), false.into()]));
 
+        let exp = Exp::from_str("length").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![5.into(), 123.into()]));
+
+        let exp = Exp::from_str("[-10, -1.1, -1e-1] | map(abs)").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                Value::Array(vec![10.into(), (1.1).into(), (0.1).into()]),
+                Value::Array(vec![10.into(), (1.1).into(), (0.1).into()]),
+            ])
+        );
+
         let exp = Exp::from_str("[1,2,3] | map(.+1)").unwrap();
         assert_eq!(
             exp.eval(&mut ctx),
             Ok(vec![
                 Value::Array(vec![2.into(), 3.into(), 4.into()]),
                 Value::Array(vec![2.into(), 3.into(), 4.into()]),
+            ])
+        );
+
+        let exp = Exp::from_str("[false, \"\"] | all").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![false.into(), false.into()]));
+
+        let exp = Exp::from_str("[false, \"\"] | any").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![true.into(), true.into()]));
+
+        let exp = Exp::from_str("[false, \"\"] | keys").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                Value::Array(vec![0.into(), 1.into()]),
+                Value::Array(vec![0.into(), 1.into()])
+            ])
+        );
+
+        let exp = Exp::from_str("{abc: 1, abcd: 2, Foo: 3} | keys").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                Value::Array(vec!["Foo".into(), "abc".into(), "abcd".into()]),
+                Value::Array(vec!["Foo".into(), "abc".into(), "abcd".into()]),
             ])
         );
 
@@ -1046,6 +1226,8 @@ mod tests {
             ])
         );
 
+        ctx.params.reset_exec();
+
         let exp = Exp::from_str("5|foo(.*2; .*2)").unwrap();
         assert_eq!(
             exp.eval(&mut ctx),
@@ -1064,7 +1246,60 @@ mod tests {
             ])
         );
 
+        let exp = Exp::from_str("[0, 1, 2] | reverse").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                Value::Array(vec![2.into(), 1.into(), 0.into()]),
+                Value::Array(vec![2.into(), 1.into(), 0.into()]),
+            ])
+        );
+
+        let exp = Exp::from_str("[8,3,null,6] | sort").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                Value::Array(vec![Constant::Null.into(), 3.into(), 6.into(), 8.into()]),
+                Value::Array(vec![Constant::Null.into(), 3.into(), 6.into(), 8.into()]),
+            ])
+        );
+
         ctx.params.reset_exec();
+
+        let exp = Exp::from_str("[8,3,null,6] | sort_by(-(5+.))").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                Value::Array(vec![8.into(), 6.into(), 3.into(), Constant::Null.into()]),
+                Value::Array(vec![8.into(), 6.into(), 3.into(), Constant::Null.into()]),
+            ])
+        );
+
+        let exp = Exp::from_str("[1,2,5,3,5,3,1,3] | unique").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                Value::Array(vec![1.into(), 2.into(), 3.into(), 5.into()]),
+                Value::Array(vec![1.into(), 2.into(), 3.into(), 5.into()]),
+            ])
+        );
+
+        let exp = Exp::from_str("[1,2,5,3,5,3,1,3] | unique_by(.%2)").unwrap();
+        assert_eq!(
+            exp.eval(&mut ctx),
+            Ok(vec![
+                Value::Array(vec![2.into(), 1.into()]),
+                Value::Array(vec![2.into(), 1.into()]),
+            ])
+        );
+
+        ctx.params.reset_exec();
+
+        let exp = Exp::from_str("[5,4,2,7] | min").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![2.into(), 2.into()]));
+
+        let exp = Exp::from_str("[5,4,2,7] | max").unwrap();
+        assert_eq!(exp.eval(&mut ctx), Ok(vec![7.into(), 7.into()]));
 
         let exp = Exp::from_str("[.,.] | .[]").unwrap();
         assert_eq!(
@@ -1100,6 +1335,8 @@ mod tests {
                 )
             ])
         );
+
+        ctx.params.reset_exec();
 
         let exp = Exp::from_str("{a: 100} | .[]").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![100.into(), 100.into()]));

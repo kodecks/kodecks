@@ -126,6 +126,27 @@ impl Constant {
             _ => None,
         }
     }
+
+    pub fn abs(&self) -> Result<Self, Error> {
+        match self {
+            Constant::U64(_) => Ok(*self),
+            Constant::I64(n) => Ok(Constant::U64(n.unsigned_abs())),
+            Constant::F64(n) => Ok(Constant::F64(n.abs())),
+            Constant::Null => Err(Error::InvalidCalculation),
+            _ => Ok(*self),
+        }
+    }
+
+    pub fn length(&self) -> Result<u64, Error> {
+        match self {
+            Constant::Null => Ok(0),
+            Constant::F64(n) => Ok(n.abs() as u64),
+            Constant::U64(n) => Ok(*n),
+            Constant::I64(n) => Ok(n.unsigned_abs()),
+            Constant::String(s) => Ok(s.len() as u64),
+            Constant::Bool(_) => Err(Error::InvalidCalculation),
+        }
+    }
 }
 
 impl Add for Constant {
@@ -557,6 +578,22 @@ impl Value {
             Value::Object(_) => ValueKind::Object,
             Value::Function(_) => ValueKind::Function,
             Value::Custom(_) => ValueKind::Custom,
+        }
+    }
+
+    pub fn abs(&self) -> Result<Self, Error> {
+        match self {
+            Value::Constant(constant) => Ok(Value::Constant(constant.abs()?)),
+            _ => Ok(self.clone()),
+        }
+    }
+
+    pub fn length(&self) -> Result<u64, Error> {
+        match self {
+            Value::Array(array) => Ok(array.len() as u64),
+            Value::Object(object) => Ok(object.len() as u64),
+            Value::Constant(constant) => constant.length(),
+            _ => Err(Error::InvalidCalculation),
         }
     }
 
