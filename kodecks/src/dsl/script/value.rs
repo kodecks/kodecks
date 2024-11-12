@@ -707,6 +707,26 @@ impl Value {
                     "zone" => Some(Constant::String(card.zone().kind.into()).into()),
                     "controller" => Some(Self::Custom(CustomType::Player(card.controller()))),
                     "owner" => Some(Self::Custom(CustomType::Player(card.owner()))),
+                    "cost" => Some(card.computed().cost.value().into()),
+                    "power" => card.computed().power.map(|power| power.value().into()),
+                    "shields" => card
+                        .computed()
+                        .shields
+                        .map(|shields| shields.value().into()),
+                    "abilities" => Some(Value::Array(
+                        card.computed()
+                            .abilities
+                            .iter()
+                            .map(|k| (*k).into())
+                            .collect(),
+                    )),
+                    "anon_abilities" => Some(Value::Array(
+                        card.computed()
+                            .anon_abilities
+                            .iter()
+                            .map(|k| (*k).into())
+                            .collect(),
+                    )),
                     "is_token" => Some(card.is_token().into()),
                     "is_targetable" => {
                         Some(card.flags().contains(ComputedFlags::TARGETABLE).into())

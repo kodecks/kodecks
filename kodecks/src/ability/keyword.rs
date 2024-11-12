@@ -1,12 +1,17 @@
 use super::Ability;
-use crate::score::Score;
+use crate::{
+    dsl::script::value::{Constant, Value},
+    score::Score,
+};
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::{
+    collections::BTreeMap,
     mem,
     ops::{Add, Sub},
 };
 use strum::{Display, EnumIter, EnumString, IntoStaticStr};
+use tinystr::tinystr;
 
 #[derive(
     Debug,
@@ -71,5 +76,20 @@ impl Sub for KeywordAbility {
         } else {
             Some(self)
         }
+    }
+}
+
+impl From<KeywordAbility> for Value {
+    fn from(ability: KeywordAbility) -> Value {
+        let name = match ability {
+            KeywordAbility::Toxic => tinystr!(32, "toxic"),
+            KeywordAbility::Volatile => tinystr!(32, "volatile"),
+            KeywordAbility::Stealth => tinystr!(32, "stealth"),
+            KeywordAbility::Devour => tinystr!(32, "devour"),
+            KeywordAbility::Piercing => tinystr!(32, "piercing"),
+        };
+        let mut obj = BTreeMap::new();
+        obj.insert(tinystr!(32, "name"), Constant::String(name).into());
+        Value::Object(obj)
     }
 }
