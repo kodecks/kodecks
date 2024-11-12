@@ -2,7 +2,7 @@ use super::{
     error::Error,
     exp::{ExpEnv, Function},
 };
-use crate::id::TimedObjectId;
+use crate::{dsl::SmallStr, id::TimedObjectId};
 use serde_json::Number;
 use std::{
     collections::BTreeMap,
@@ -15,7 +15,7 @@ use tinystr::TinyAsciiStr;
 pub enum Value {
     Constant(Constant),
     Array(Vec<Self>),
-    Object(BTreeMap<TinyAsciiStr<32>, Self>),
+    Object(BTreeMap<SmallStr, Self>),
     Function(Box<Function>),
     Custom(CustomType),
 }
@@ -95,7 +95,7 @@ pub enum Constant {
     U64(u64),
     I64(i64),
     F64(f64),
-    String(TinyAsciiStr<32>),
+    String(SmallStr),
 }
 
 impl Constant {
@@ -353,8 +353,8 @@ impl From<f64> for Constant {
     }
 }
 
-impl From<TinyAsciiStr<32>> for Constant {
-    fn from(value: TinyAsciiStr<32>) -> Self {
+impl From<SmallStr> for Constant {
+    fn from(value: SmallStr) -> Self {
         Constant::String(value)
     }
 }
@@ -656,7 +656,7 @@ impl Value {
         }
     }
 
-    pub fn index_str<E>(&self, index: &TinyAsciiStr<32>, env: &E) -> Result<Self, Error>
+    pub fn index_str<E>(&self, index: &SmallStr, env: &E) -> Result<Self, Error>
     where
         E: ExpEnv,
     {

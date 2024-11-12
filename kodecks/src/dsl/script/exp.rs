@@ -4,6 +4,7 @@ use super::{
 };
 use crate::{
     card::Card,
+    dsl::SmallStr,
     id::CardId,
     player::{Player, PlayerList},
 };
@@ -94,7 +95,7 @@ pub enum Path {
 
 #[derive(Debug)]
 enum LiteralPath {
-    Str(TinyAsciiStr<32>, bool),
+    Str(SmallStr, bool),
     Num(i64, bool),
     Range(Option<i64>, Option<i64>, bool),
 }

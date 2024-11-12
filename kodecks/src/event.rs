@@ -3,10 +3,13 @@ use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use strum::Display;
-use tinystr::{tinystr, TinyAsciiStr};
+use tinystr::tinystr;
 
 use crate::{
-    dsl::script::value::{Constant, CustomType, Value},
+    dsl::{
+        script::value::{Constant, CustomType, Value},
+        SmallStr,
+    },
     player::Zone,
 };
 
@@ -112,8 +115,8 @@ impl CardEvent {
     }
 }
 
-impl From<CardEvent> for TinyAsciiStr<32> {
-    fn from(event: CardEvent) -> TinyAsciiStr<32> {
+impl From<CardEvent> for SmallStr {
+    fn from(event: CardEvent) -> SmallStr {
         match event {
             CardEvent::Casted { .. } => tinystr!(32, "casted"),
             CardEvent::Destroyed { .. } => tinystr!(32, "destroyed"),
@@ -150,8 +153,8 @@ pub enum EventReason {
     Effect,
 }
 
-impl From<EventReason> for TinyAsciiStr<32> {
-    fn from(reason: EventReason) -> TinyAsciiStr<32> {
+impl From<EventReason> for SmallStr {
+    fn from(reason: EventReason) -> SmallStr {
         match reason {
             EventReason::Battle => tinystr!(32, "battle"),
             EventReason::Effect => tinystr!(32, "effect"),

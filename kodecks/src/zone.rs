@@ -1,8 +1,8 @@
-use crate::id::CardId;
+use crate::{dsl::SmallStr, id::CardId};
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use strum::Display;
-use tinystr::{tinystr, TinyAsciiStr};
+use tinystr::tinystr;
 
 #[derive(
     Debug, Clone, Copy, Default, Display, PartialEq, Eq, Serialize, Deserialize, Encode, Decode,
@@ -26,7 +26,7 @@ pub enum ZoneKind {
     Graveyard,
 }
 
-impl From<ZoneKind> for TinyAsciiStr<32> {
+impl From<ZoneKind> for SmallStr {
     fn from(kind: ZoneKind) -> Self {
         match kind {
             ZoneKind::Deck => tinystr!(32, "deck"),
