@@ -323,6 +323,30 @@ impl From<bool> for Constant {
     }
 }
 
+impl From<u8> for Constant {
+    fn from(value: u8) -> Self {
+        Constant::U64(value.into())
+    }
+}
+
+impl From<i8> for Constant {
+    fn from(value: i8) -> Self {
+        Constant::I64(value.into())
+    }
+}
+
+impl From<u16> for Constant {
+    fn from(value: u16) -> Self {
+        Constant::U64(value.into())
+    }
+}
+
+impl From<i16> for Constant {
+    fn from(value: i16) -> Self {
+        Constant::I64(value.into())
+    }
+}
+
 impl From<u32> for Constant {
     fn from(value: u32) -> Self {
         Constant::U64(value.into())
@@ -350,6 +374,12 @@ impl From<i64> for Constant {
 impl From<f64> for Constant {
     fn from(value: f64) -> Self {
         Constant::F64(value)
+    }
+}
+
+impl From<f32> for Constant {
+    fn from(value: f32) -> Self {
+        Constant::F64(value as f64)
     }
 }
 
