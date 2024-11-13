@@ -1,6 +1,12 @@
 #![forbid(unsafe_code)]
 
-use bevy::{asset::AssetMetaCheck, log::LogPlugin, prelude::*, window::WindowTheme};
+use bevy::{
+    asset::AssetMetaCheck,
+    log::{tracing_subscriber::Layer, BoxedLayer, LogPlugin},
+    prelude::*,
+    window::WindowTheme,
+};
+use debugger::LogCollector;
 
 mod assets;
 mod config;
@@ -34,6 +40,7 @@ fn main() {
         })
         .set(LogPlugin {
             filter: "wgpu_hal::auxil::dxgi::exception=off".to_string(),
+            custom_layer,
             ..Default::default()
         })
         .set(WindowPlugin {
@@ -62,6 +69,12 @@ fn main() {
         save_data::SaveDataPlugin,
     ))
     .run();
+}
+
+fn custom_layer(app: &mut App) -> Option<BoxedLayer> {
+    let collector = egui_tracing::tracing::EventCollector::new();
+    app.insert_resource(LogCollector::new(collector.clone()));
+    Some(Box::new(vec![collector.boxed()]))
 }
 
 pub fn app_version() -> String {
