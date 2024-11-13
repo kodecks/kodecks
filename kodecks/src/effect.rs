@@ -3,10 +3,16 @@ use crate::{
     card::Card,
     command::ActionCommand,
     continuous::{ContinuousEffect, ContinuousItem},
+    dsl::script::{
+        error::Error,
+        exp::{ExpEnv, ExpParams, Module},
+        value::{CustomType, Value},
+    },
     env::GameState,
     event::{CardEvent, EventFilter},
-    id::{ObjectId, ObjectIdCounter},
-    prelude::ComputedAttribute,
+    id::{CardId, ObjectId, ObjectIdCounter, TimedCardId},
+    player::{Player, PlayerList},
+    prelude::{ComputedAttribute, ComputedAttributeModifier},
     stack::StackItem,
     target::Target,
 };
@@ -29,9 +35,11 @@ pub type StackEffectHandler = dyn Fn(&mut EffectTriggerContext, Option<Action>) 
     + Sync
     + 'static;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct EffectReport {
+    #[serde(default)]
     pub available_actions: Option<PlayerAvailableActions>,
+    #[serde(default)]
     pub commands: Vec<ActionCommand>,
 }
 
@@ -177,11 +185,116 @@ impl<'a> EffectTriggerContext<'a> {
         (self.continuous, self.stack)
     }
 }
+
+impl ExpEnv for EffectTriggerContext<'_> {
+    fn get_var(&self, name: &str) -> Option<Value> {
+        match name {
+            "$source" => Some(self.source.timed_id().into()),
+            _ => self.state.get_var(name),
+        }
+    }
+
+    fn get_card<T>(&self, id: T) -> Option<&Card>
+    where
+        T: CardId + Copy,
+    {
+        self.state.find_card(id).ok()
+    }
+
+    fn get_players(&self) -> Option<&PlayerList<Player>> {
+        Some(self.state.players())
+    }
+
+    fn invoke(
+        &mut self,
+        name: &str,
+        args: Vec<Value>,
+        params: &ExpParams,
+        input: &Value,
+    ) -> Result<Vec<Value>, Error> {
+        match name {
+            "push_stack" => {
+                if args.is_empty() {
+                    return Err(Error::InvalidArgumentCount);
+                }
+                let id = args[0].to_string();
+                let params = Arc::new(params.clone());
+                let args = args.into_iter().skip(1).collect::<Vec<_>>();
+                self.push_stack(&id.clone(), move |ctx, action| {
+                    let event: Value = if let Some(action) = action {
+                        action.into()
+                    } else {
+                        Default::default()
+                    };
+                    let mut new_args: Vec<Value> = vec![id.clone().into(), event];
+                    new_args.extend(args.clone());
+                    let module = Module::new(params.clone());
+                    let report: Option<EffectReport> = module.call(ctx, "stack", new_args)?;
+                    Ok(report.unwrap_or_default())
+                });
+                Ok(vec![input.clone()])
+            }
+            "push_continuous" => {
+                if args.is_empty() {
+                    return Err(Error::InvalidArgumentCount);
+                }
+                let target = match args[1] {
+                    Value::Custom(CustomType::Card(card)) => Target::Card(card.id),
+                    Value::Custom(CustomType::Player(player)) => Target::Player(player),
+                    _ => return Err(Error::InvalidConversion),
+                };
+                let params = Arc::new(params.clone());
+                let module = Module::new(params.clone());
+                let args = args
+                    .into_iter()
+                    .enumerate()
+                    .filter_map(|(i, v)| if i == 1 { None } else { Some(v) })
+                    .collect::<Vec<_>>();
+                let effect = ModuleContinuousEffect { module, args };
+                self.push_continuous(effect, target);
+                Ok(vec![input.clone()])
+            }
+            _ => self.state.invoke(name, args, params, input),
+        }
+    }
+}
+
 pub struct ContinuousCardEffectContext<'a> {
     pub state: &'a GameState,
     pub source: &'a Card,
     pub target: &'a Card,
     pub computed: &'a mut ComputedAttribute,
+}
+
+impl ExpEnv for ContinuousCardEffectContext<'_> {
+    fn get_var(&self, name: &str) -> Option<Value> {
+        match name {
+            "$source" => Some(self.source.timed_id().into()),
+            "$target" => Some(self.target.timed_id().into()),
+            _ => self.state.get_var(name),
+        }
+    }
+
+    fn get_card<T>(&self, id: T) -> Option<&Card>
+    where
+        T: CardId + Copy,
+    {
+        self.state.find_card(id).ok()
+    }
+
+    fn get_players(&self) -> Option<&PlayerList<Player>> {
+        Some(&self.state.players)
+    }
+
+    fn invoke(
+        &mut self,
+        name: &str,
+        args: Vec<Value>,
+        params: &ExpParams,
+        input: &Value,
+    ) -> Result<Vec<Value>, Error> {
+        self.state.invoke(name, args, params, input)
+    }
 }
 
 pub struct EffectActivateContext<'a> {
@@ -234,6 +347,47 @@ impl<'a> EffectActivateContext<'a> {
     }
 }
 
+impl ExpEnv for EffectActivateContext<'_> {
+    fn get_var(&self, name: &str) -> Option<Value> {
+        match name {
+            "$source" => Some(self.source.timed_id().into()),
+            "$target" => Some(self.target.timed_id().into()),
+            _ => self.state.get_var(name),
+        }
+    }
+
+    fn get_card<T>(&self, id: T) -> Option<&Card>
+    where
+        T: CardId + Copy,
+    {
+        self.state.find_card(id).ok()
+    }
+
+    fn get_players(&self) -> Option<&PlayerList<Player>> {
+        Some(&self.state.players)
+    }
+
+    fn invoke(
+        &mut self,
+        name: &str,
+        args: Vec<Value>,
+        params: &ExpParams,
+        input: &Value,
+    ) -> Result<Vec<Value>, Error> {
+        match name {
+            "trigger_stack" => {
+                if args.len() != 1 {
+                    return Err(Error::InvalidArgumentCount);
+                }
+                let id = args[0].to_string();
+                self.trigger_stack(id);
+                Ok(vec![input.clone()])
+            }
+            _ => self.state.invoke(name, args, params, input),
+        }
+    }
+}
+
 pub trait Effect: Send + Sync + DynClone {
     fn event_filter(&self) -> EventFilter {
         EventFilter::empty()
@@ -253,5 +407,35 @@ pub trait Effect: Send + Sync + DynClone {
         _ctx: &mut EffectActivateContext,
     ) -> anyhow::Result<()> {
         Ok(())
+    }
+}
+#[derive(Debug, Clone)]
+struct ModuleContinuousEffect {
+    module: Module,
+    args: Vec<Value>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
+enum ModifierOrBool {
+    Bool(bool),
+    Modifier(ComputedAttributeModifier),
+}
+
+impl ContinuousEffect for ModuleContinuousEffect {
+    fn apply_card(&mut self, ctx: &mut ContinuousCardEffectContext) -> anyhow::Result<bool> {
+        let modifier: Option<ModifierOrBool> =
+            self.module.call(ctx, "continuous", self.args.clone())?;
+        if let Some(modifier) = modifier {
+            match modifier {
+                ModifierOrBool::Modifier(modifier) => {
+                    ctx.computed.apply_modifier(modifier);
+                }
+                ModifierOrBool::Bool(value) => {
+                    return Ok(value);
+                }
+            }
+        }
+        Ok(true)
     }
 }

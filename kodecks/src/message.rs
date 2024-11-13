@@ -12,6 +12,7 @@ pub struct MessageDialog {
 #[derive(Debug, Clone, Default, Serialize, Deserialize, Encode, Decode)]
 pub struct Message {
     pub id: String,
+    #[serde(default)]
     pub variables: VariableList,
 }
 

@@ -2,14 +2,20 @@ use super::{
     error::Error,
     exp::{ExpEnv, Function},
 };
-use crate::{dsl::SmallStr, id::TimedObjectId};
+use crate::{
+    color::Color,
+    dsl::SmallStr,
+    id::{TimedCardId, TimedObjectId},
+    prelude::ComputedFlags,
+    zone::CardZone,
+};
 use serde_json::Number;
 use std::{
     collections::BTreeMap,
     fmt,
     ops::{Add, Div, Mul, Neg, Not, Rem, Sub},
 };
-use tinystr::TinyAsciiStr;
+use tinystr::{tinystr, TinyAsciiStr};
 
 #[derive(Debug, Clone)]
 pub enum Value {
@@ -699,6 +705,118 @@ impl Value {
                 .get_card(*card)
                 .and_then(|card| match index.as_str() {
                     "name" => Some(card.archetype().name.clone().into()),
+                    "zone" => Some(Constant::String(card.zone().kind.into()).into()),
+                    "controller" => Some(Self::Custom(CustomType::Player(card.controller()))),
+                    "owner" => Some(Self::Custom(CustomType::Player(card.owner()))),
+                    "color" => {
+                        let mut map = BTreeMap::new();
+                        let color = card.computed().color;
+                        if color.contains(Color::RED) {
+                            map.insert(tinystr!(32, "red"), true.into());
+                        }
+                        if color.contains(Color::GREEN) {
+                            map.insert(tinystr!(32, "green"), true.into());
+                        }
+                        if color.contains(Color::BLUE) {
+                            map.insert(tinystr!(32, "blue"), true.into());
+                        }
+                        if color.contains(Color::YELLOW) {
+                            map.insert(tinystr!(32, "yellow"), true.into());
+                        }
+                        if color == Color::COLORLESS {
+                            map.insert(tinystr!(32, "colorless"), true.into());
+                        }
+                        Some(Value::Object(map))
+                    }
+                    "cost" => Some(card.computed().cost.value().into()),
+                    "power" => card.computed().power.map(|power| power.value().into()),
+                    "shields" => card
+                        .computed()
+                        .shields
+                        .map(|shields| shields.value().into()),
+                    "abilities" => Some(Value::Array(
+                        card.computed()
+                            .abilities
+                            .iter()
+                            .map(|k| (*k).into())
+                            .collect(),
+                    )),
+                    "anon_abilities" => Some(Value::Array(
+                        card.computed()
+                            .anon_abilities
+                            .iter()
+                            .map(|k| (*k).into())
+                            .collect(),
+                    )),
+                    "revealed" => {
+                        let mut array = Vec::new();
+                        if let Some(players) = env.get_players() {
+                            for plyer in players.iter() {
+                                if card.revealed().contains(plyer.id) {
+                                    array.push(Value::Custom(CustomType::Player(plyer.id)));
+                                }
+                            }
+                        }
+                        Some(Value::Array(array))
+                    }
+                    "is_token" => Some(card.is_token().into()),
+                    "is_targetable" => {
+                        Some(card.flags().contains(ComputedFlags::TARGETABLE).into())
+                    }
+                    _ => None,
+                })
+                .unwrap_or_default()),
+            Value::Custom(CustomType::Player(player)) => Ok(env
+                .get_players()
+                .and_then(|players| players.get(*player).ok())
+                .and_then(|player| match index.as_str() {
+                    "deck" => Some(Value::Array(
+                        player
+                            .deck
+                            .iter()
+                            .map(|card| Value::Custom(CustomType::Card(card.timed_id())))
+                            .collect(),
+                    )),
+                    "hand" => Some(Value::Array(
+                        player
+                            .hand
+                            .iter()
+                            .map(|card| Value::Custom(CustomType::Card(card.timed_id())))
+                            .collect(),
+                    )),
+                    "graveyard" => Some(Value::Array(
+                        player
+                            .graveyard
+                            .iter()
+                            .map(|card| Value::Custom(CustomType::Card(card.timed_id())))
+                            .collect(),
+                    )),
+                    "field" => Some(Value::Array(
+                        player
+                            .field
+                            .iter()
+                            .map(|card| Value::Custom(CustomType::Card(card.timed_id())))
+                            .collect(),
+                    )),
+                    "life" => Some(Value::Constant(Constant::U64(player.stats.life as _))),
+                    "shards" => {
+                        let mut shards = BTreeMap::new();
+                        for (color, amount) in player.shards.iter() {
+                            if amount > 0 {
+                                shards.insert(
+                                    TinyAsciiStr::from_bytes_lossy(
+                                        color.to_string().to_ascii_lowercase().as_bytes(),
+                                    ),
+                                    Constant::U64(amount as _).into(),
+                                );
+                            }
+                        }
+                        Some(Value::Object(shards))
+                    }
+                    "next" => env
+                        .get_players()
+                        .and_then(|p| p.next_id(player.id).ok())
+                        .map(|p| Value::Custom(CustomType::Player(p))),
                     _ => None,
                 })
                 .unwrap_or_default()),

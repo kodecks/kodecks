@@ -1,9 +1,15 @@
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
+use tracing::debug;
 
 use crate::{
     action::PlayerAvailableActions,
     card::Card,
+    dsl::script::{
+        error::Error,
+        exp::ExpParams,
+        value::{Constant, Value},
+    },
     error::ActionError,
     id::{CardId, ObjectId},
     log::GameLog,
@@ -58,6 +64,39 @@ impl GameState {
 
     pub fn players(&self) -> &PlayerList<Player> {
         &self.players
+    }
+
+    pub fn get_var(&self, name: &str) -> Option<Value> {
+        match name {
+            "$turn" => Some(self.turn.into()),
+            "$phase" => Some(Constant::String(self.phase.into()).into()),
+            "$player_in_turn" => Some(self.players.player_in_turn().ok()?.id.into()),
+            "$players" => Some(Value::Array(
+                self.players.iter().map(|p| p.id.into()).collect(),
+            )),
+            _ => None,
+        }
+    }
+
+    pub fn invoke(
+        &self,
+        name: &str,
+        args: Vec<Value>,
+        _params: &ExpParams,
+        input: &Value,
+    ) -> Result<Vec<Value>, Error> {
+        match name {
+            "debug" => {
+                let args = args
+                    .iter()
+                    .map(|v| v.to_string())
+                    .collect::<Vec<_>>()
+                    .join(" ");
+                debug!("{args}");
+                Ok(vec![input.clone()])
+            }
+            _ => Err(Error::UndefinedFilter),
+        }
     }
 }
 

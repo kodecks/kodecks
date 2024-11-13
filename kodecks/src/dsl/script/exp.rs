@@ -16,11 +16,12 @@ use jaq_core::{
     ops::{Cmp, Math},
     path::{Opt, Part},
 };
-use serde::Deserialize;
+use serde::{de::DeserializeOwned, Deserialize};
 use std::{
     cmp::Ordering,
     collections::{BTreeMap, HashMap},
     str::FromStr,
+    sync::Arc,
 };
 use tinystr::TinyAsciiStr;
 
@@ -36,7 +37,7 @@ pub enum Exp {
     Arr(Option<Box<Self>>),
     Obj(Vec<(Box<Self>, Option<Box<Self>>)>),
     Assign(String, Box<Self>),
-    Pipe(Box<Self>, Box<Self>),
+    Pipe(Box<Self>, Option<String>, Box<Self>),
     Comma(Box<Self>, Box<Self>),
     TryCatch(Box<Self>, Box<Self>),
     IfThenElse(Vec<(Self, Self)>, Option<Box<Self>>),
@@ -180,10 +181,11 @@ impl<'a> TryFrom<&'a Term<&'a str>> for Exp {
                 )),
             },
             Term::Neg(exp) => Ok(Self::Neg(Box::new(Self::try_from(&**exp)?))),
-            Term::Pipe(lhs, None, rhs) => {
+            Term::Pipe(lhs, var, rhs) => {
                 let lhs = Self::try_from(&**lhs)?;
                 let rhs = Self::try_from(&**rhs)?;
-                Ok(Self::Pipe(Box::new(lhs), Box::new(rhs)))
+                let var = var.as_ref().map(|s| s.to_string());
+                Ok(Self::Pipe(Box::new(lhs), var, Box::new(rhs)))
             }
             Term::Num(n) => Ok(Self::Value(if let Ok(n) = n.parse::<u64>() {
                 Value::Constant(Constant::U64(n))
@@ -576,13 +578,18 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                 }
                 Ok(results)
             }
-            Self::Pipe(lhs, rhs) => {
+            Self::Pipe(lhs, var, rhs) => {
                 let mut new_ctx = ExpContext {
                     env: ctx.env,
                     input: ctx.input,
                     params: ctx.params,
                 };
                 let val = lhs.eval(&mut new_ctx)?;
+                if let Some(var) = var {
+                    if let Some(last) = val.last() {
+                        new_ctx.params.set_var(var, last.clone());
+                    }
+                }
                 let mut new_ctx = ExpContext {
                     env: ctx.env,
                     input: val.as_slice(),
@@ -727,27 +734,29 @@ impl<'a> ExpExt<'a, &'a Value> for Exp {
                 Ok(vec![])
             }
             Self::CustomFunction(name, args) => {
-                if let Some(Exp::Value(Value::Function(func))) =
-                    ctx.params.get_def(name, args.len())
-                {
-                    let func = func.clone();
-                    let mut new_args = vec![];
-                    for (name, exp) in func.args.iter().zip(args) {
-                        if name.starts_with('$') {
-                            let mut val = exp.eval(ctx)?;
-                            if let Some(last) = val.pop() {
-                                new_args.push(last);
+                if let Ok(Exp::Value(value)) = ctx.params.get_def(name, args.len()) {
+                    if let Value::Function(func) = value {
+                        let func = func.clone();
+                        let mut new_args = vec![];
+                        for (name, exp) in func.args.iter().zip(args) {
+                            if name.starts_with('$') {
+                                let mut val = exp.eval(ctx)?;
+                                if let Some(last) = val.pop() {
+                                    new_args.push(last);
+                                }
+                            } else {
+                                let func = Function {
+                                    name: "".to_string(),
+                                    args: vec![],
+                                    body: exp.clone(),
+                                };
+                                new_args.push(Value::Function(Box::new(func)));
                             }
-                        } else {
-                            let func = Function {
-                                name: "".to_string(),
-                                args: vec![],
-                                body: exp.clone(),
-                            };
-                            new_args.push(Value::Function(Box::new(func)));
                         }
+                        func.invoke(ctx, new_args)
+                    } else {
+                        Ok(vec![value.clone()])
                     }
-                    func.invoke(ctx, new_args)
                 } else {
                     let mut new_ctx = ExpContext {
                         env: ctx.env,
@@ -886,7 +895,7 @@ pub trait ExpEnv {
     fn get_var(&self, name: &str) -> Option<Value>;
     fn get_card<T>(&self, id: T) -> Option<&Card>
     where
-        T: CardId;
+        T: CardId + Copy;
     fn get_players(&self) -> Option<&PlayerList<Player>>;
     fn invoke(
         &mut self,
@@ -899,13 +908,17 @@ pub trait ExpEnv {
 
 #[derive(Debug, Clone)]
 pub struct ExpParams {
+    pub parent: Option<Arc<Self>>,
     pub vars: Vec<HashMap<String, Exp>>,
     pub execution_limit: usize,
 }
 
 impl ExpParams {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(parent: Option<Arc<Self>>) -> Self {
+        Self {
+            parent,
+            ..Self::default()
+        }
     }
 
     pub fn consume_exec(&mut self, n: usize) -> Result<(), Error> {
@@ -937,7 +950,11 @@ impl ExpParams {
                 return Some(val.clone());
             }
         }
-        None
+        if let Some(parent) = &self.parent {
+            parent.get_var(name)
+        } else {
+            None
+        }
     }
 
     pub fn set_var(&mut self, name: &str, val: Value) {
@@ -946,7 +963,7 @@ impl ExpParams {
         }
     }
 
-    pub fn get_def(&self, name: &str, arity: usize) -> Option<&Exp> {
+    pub fn get_def(&self, name: &str, arity: usize) -> Result<&Exp, Error> {
         let id = if arity > 0 {
             format!("{name}/{arity}")
         } else {
@@ -954,10 +971,14 @@ impl ExpParams {
         };
         for vars in self.vars.iter().rev() {
             if let Some(val) = vars.get(&id) {
-                return Some(val);
+                return Ok(val);
             }
         }
-        None
+        if let Some(parent) = &self.parent {
+            parent.get_def(name, arity)
+        } else {
+            Err(Error::UndefinedFilter)
+        }
     }
 
     pub fn set_def(&mut self, name: &str, arity: usize, val: Exp) {
@@ -975,6 +996,7 @@ impl ExpParams {
 impl Default for ExpParams {
     fn default() -> Self {
         Self {
+            parent: None,
             vars: vec![HashMap::new()],
             execution_limit: EXECUTION_LIMIT,
         }
@@ -993,8 +1015,40 @@ impl<'a, T, I> ExpContext<'a, T, I> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Module {
-    pub funcs: HashMap<String, Function>,
+    params: Arc<ExpParams>,
+}
+
+impl Module {
+    pub fn new(params: Arc<ExpParams>) -> Self {
+        Self { params }
+    }
+
+    pub fn call<T, C>(&self, env: &mut T, name: &str, args: Vec<Value>) -> Result<C, Error>
+    where
+        T: ExpEnv,
+        C: DeserializeOwned + Default,
+    {
+        if let Ok(Exp::Value(Value::Function(func))) = self.params.get_def(name, args.len()) {
+            let input = Value::default();
+            let mut params = ExpParams::new(Some(self.params.clone()));
+            let mut ctx = ExpContext::new(env, &input, &mut params);
+            let mut val = func.invoke(&mut ctx, args)?;
+            if let Some(last) = val.pop() {
+                Ok(serde_json::from_value(last.try_into()?)
+                    .map_err(|_| Error::InvalidConversion)?)
+            } else {
+                Ok(Default::default())
+            }
+        } else {
+            Err(Error::UndefinedFilter)
+        }
+    }
+
+    pub fn has_def(&self, name: &str, arity: usize) -> bool {
+        self.params.get_def(name, arity).is_ok()
+    }
 }
 
 impl FromStr for Module {
@@ -1002,19 +1056,23 @@ impl FromStr for Module {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let defs = jaq_core::load::parse(s, |p| p.defs()).ok_or(Error::InvalidSyntax)?;
-        let mut funcs = HashMap::new();
+        let mut params = ExpParams::default();
         for def in defs {
             let name = def.name.to_string();
-            funcs.insert(
-                name.to_string(),
-                Function {
-                    name: name.to_string(),
-                    args: def.args.iter().map(|s| s.to_string()).collect(),
-                    body: (&def.body).try_into()?,
-                },
+            let func = Function {
+                name: name.to_string(),
+                args: def.args.iter().map(|s| s.to_string()).collect(),
+                body: (&def.body).try_into()?,
+            };
+            params.set_def(
+                &name,
+                func.args.len(),
+                Exp::Value(Value::Function(Box::new(func))),
             );
         }
-        Ok(Self { funcs })
+        Ok(Self {
+            params: Arc::new(params),
+        })
     }
 }
 
@@ -1074,15 +1132,7 @@ mod tests {
         let mut env = TestEnv {};
         let array: Vec<Value> = vec![1.into()];
 
-        let mut params = ExpParams::new();
-        for (name, func) in module.funcs {
-            params.set_def(
-                &name,
-                func.args.len(),
-                Exp::Value(Value::Function(Box::new(func))),
-            );
-        }
-
+        let mut params = ExpParams::new(Some(module.params.clone()));
         let mut ctx = ExpContext::new(&mut env, array.as_slice(), &mut params);
         let exp = Exp::from_str("foo(.)").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![2.into()]));
@@ -1095,6 +1145,9 @@ mod tests {
 
         let exp = Exp::from_str("5|bar(foo2)").unwrap();
         assert_eq!(exp.eval(&mut ctx), Ok(vec![205.into()]));
+
+        let n: Option<u32> = module.call(&mut env, "foo", vec![1.into()]).unwrap();
+        assert_eq!(n, Some(2));
     }
 
     #[test]
@@ -1102,7 +1155,7 @@ mod tests {
         let mut env = TestEnv {};
         let array: Vec<Value> = vec!["input".into(), 123.into()];
 
-        let mut params = ExpParams::new();
+        let mut params = ExpParams::default();
 
         let func = Function {
             name: "foo".to_string(),

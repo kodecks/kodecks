@@ -15,6 +15,7 @@ use tinystr::tinystr;
 pub enum AvailableAction {
     SelectCard {
         cards: Vec<TimedObjectId>,
+        #[serde(default)]
         score_factor: i32,
     },
     Attack {
