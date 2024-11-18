@@ -15,12 +15,11 @@ impl Environment {
             return None;
         }
 
-        let used_hexes = self.state.players.iter().any(|player| {
-            player
-                .field
-                .items()
-                .any(|item| item.card.computed().is_hex())
-        });
+        let used_hexes = self
+            .state
+            .players
+            .iter()
+            .any(|player| player.field.items().any(|card| card.computed().is_hex()));
         if used_hexes {
             return None;
         }

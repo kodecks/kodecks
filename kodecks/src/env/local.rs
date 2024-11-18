@@ -4,7 +4,6 @@ use crate::{
     card::CardSnapshot,
     env::Report,
     error::ActionError,
-    field::{FieldItem, FieldState},
     id::ObjectId,
     phase::Phase,
     player::{LocalPlayerState, PlayerList, Zone},
@@ -62,11 +61,7 @@ impl LocalEnvironment {
         if let Action::CastCard { card, .. } = action {
             if let Ok(player) = self.players.get_mut(self.player) {
                 if let Some(card) = CardZone::remove(&mut player.hand, card) {
-                    player.field.push(FieldItem {
-                        card,
-                        state: FieldState::Active,
-                        battle: None,
-                    });
+                    player.field.push(card);
                 }
             }
             self.timestamp += 1;

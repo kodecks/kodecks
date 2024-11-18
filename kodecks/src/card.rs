@@ -6,6 +6,7 @@ use crate::{
     deck::DeckItem,
     effect::Effect,
     event::EventFilter,
+    field::{FieldBattleState, FieldState},
     id::{CardId, ObjectId, ObjectIdCounter, TimedCardId, TimedObjectId},
     linear::Linear,
     player::{PlayerMask, Zone},
@@ -30,6 +31,8 @@ pub struct Card {
     effect: Box<dyn Effect>,
     revealed: PlayerMask,
     timestamp: u16,
+    field_state: FieldState,
+    battle_state: Option<FieldBattleState>,
     hand_cost_delta: i8,
     is_token: bool,
 }
@@ -62,6 +65,8 @@ impl Card {
             effect,
             revealed: PlayerMask::default(),
             timestamp: 0,
+            field_state: FieldState::Active,
+            battle_state: None,
             hand_cost_delta: 0,
             is_token: false,
         }
@@ -82,6 +87,8 @@ impl Card {
             revealed: PlayerMask::default(),
             effect,
             timestamp: 0,
+            field_state: FieldState::Active,
+            battle_state: None,
             hand_cost_delta: 0,
             is_token: true,
         }
@@ -120,6 +127,8 @@ impl Card {
         if self.zone.kind != ZoneKind::Field || zone.kind != ZoneKind::Field {
             self.increment_timestamp();
             self.reset_computed();
+            self.set_field_state(FieldState::Active);
+            self.set_battle_state(None);
         }
         self.zone = zone;
     }
@@ -179,6 +188,22 @@ impl Card {
         self.is_token
     }
 
+    pub fn set_field_state(&mut self, state: FieldState) {
+        self.field_state = state;
+    }
+
+    pub fn field_state(&self) -> FieldState {
+        self.field_state
+    }
+
+    pub fn set_battle_state(&mut self, state: Option<FieldBattleState>) {
+        self.battle_state = state;
+    }
+
+    pub fn battle_state(&self) -> Option<FieldBattleState> {
+        self.battle_state
+    }
+
     pub fn hand_cost_delta(&self) -> i8 {
         self.hand_cost_delta
     }
@@ -197,6 +222,8 @@ impl Card {
             revealed: self.revealed,
             computed: Some(self.computed.clone()),
             timestamp: self.timestamp,
+            field_state: self.field_state,
+            battle_state: self.battle_state,
             is_token: self.is_token,
         }
     }
@@ -222,6 +249,8 @@ impl Clone for Card {
             revealed: self.revealed,
             timestamp: self.timestamp,
             hand_cost_delta: self.hand_cost_delta,
+            field_state: self.field_state,
+            battle_state: self.battle_state,
             is_token: self.is_token,
         }
     }
@@ -282,6 +311,8 @@ pub struct CardSnapshot {
     pub owner: u8,
     pub revealed: PlayerMask,
     pub computed: Option<ComputedAttribute>,
+    pub field_state: FieldState,
+    pub battle_state: Option<FieldBattleState>,
     pub timestamp: u16,
     pub is_token: bool,
 }
@@ -314,6 +345,8 @@ impl CardSnapshot {
             owner: 0,
             revealed: PlayerMask::default(),
             computed: Some(archetype.into()),
+            field_state: FieldState::Active,
+            battle_state: None,
             timestamp: 0,
             is_token: false,
         }

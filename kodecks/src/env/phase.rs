@@ -73,14 +73,11 @@ impl Environment {
                 player
                     .field
                     .items()
-                    .filter(|item| {
-                        item.card.computed().is_hex()
-                            && !self
-                                .stack
-                                .iter()
-                                .any(|stack| stack.source == item.card.id())
+                    .filter(|card| {
+                        card.computed().is_hex()
+                            && !self.stack.iter().any(|stack| stack.source == card.id())
                     })
-                    .map(|item| item.card.id())
+                    .map(|card| card.id())
             })
             .collect::<Vec<_>>();
 

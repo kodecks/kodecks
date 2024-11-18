@@ -131,7 +131,7 @@ impl Board {
         self.player_field = player
             .field
             .iter()
-            .map(|card| (card.card.timed_id(), card.state))
+            .map(|card| (card.timed_id(), card.field_state))
             .collect();
         self.player_field.sort_by_key(|(id, _)| {
             old_player_orders
@@ -150,7 +150,7 @@ impl Board {
         self.opponent_field = opponent
             .field
             .iter()
-            .map(|card| (card.card.timed_id(), card.state))
+            .map(|card| (card.timed_id(), card.field_state))
             .collect();
         self.opponent_field.sort_by_key(|(id, _)| {
             old_opponent_orders
@@ -163,17 +163,17 @@ impl Board {
             .players
             .iter()
             .flat_map(|player| player.field.iter())
-            .filter(|item| item.battle == Some(FieldBattleState::Attacking))
-            .map(|item| item.card.timed_id())
+            .filter(|card| card.battle_state == Some(FieldBattleState::Attacking))
+            .map(|card| card.timed_id())
             .collect();
 
         self.blocking_pairs = env
             .players
             .iter()
             .flat_map(|player| player.field.iter())
-            .filter_map(|item| {
-                if let Some(FieldBattleState::Blocking { attacker }) = item.battle {
-                    Some((attacker, item.card.timed_id()))
+            .filter_map(|card| {
+                if let Some(FieldBattleState::Blocking { attacker }) = card.battle_state {
+                    Some((attacker, card.timed_id()))
                 } else {
                     None
                 }

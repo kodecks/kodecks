@@ -4,7 +4,6 @@ use crate::{
     deck::DeckList,
     env::{EndgameReason, GameState},
     error::ActionError,
-    field::{FieldItem, FieldState},
     id::{CardId, ObjectId, TimedCardId, TimedObjectId},
     list::CardList,
     profile::DebugFlags,
@@ -161,7 +160,7 @@ pub struct Player {
     pub deck: CardList<Card>,
     pub hand: CardList<Card>,
     pub graveyard: CardList<Card>,
-    pub field: CardList<FieldItem<Card>>,
+    pub field: CardList<Card>,
     pub shards: ShardList,
     pub stats: PlayerStats,
     pub counters: PlayerCounters,
@@ -289,7 +288,7 @@ pub struct LocalPlayerState {
     pub deck: usize,
     pub hand: Vec<CardSnapshot>,
     pub graveyard: Vec<CardSnapshot>,
-    pub field: Vec<FieldItem<CardSnapshot>>,
+    pub field: Vec<CardSnapshot>,
     pub shards: ShardList,
     pub stats: PlayerStats,
 }
@@ -318,11 +317,7 @@ impl LocalPlayerState {
             field: state
                 .field
                 .items()
-                .map(|item| FieldItem {
-                    card: item.card.snapshot().redacted(viewer),
-                    state: item.state,
-                    battle: item.battle,
-                })
+                .map(|card| card.snapshot().redacted(viewer))
                 .collect(),
             shards: state.shards.clone(),
             stats: state.stats,
@@ -394,53 +389,6 @@ impl CardZone for Vec<CardSnapshot> {
 
     fn iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut Self::Item> {
         (self as &mut [CardSnapshot]).iter_mut()
-    }
-}
-
-impl CardZone for Vec<FieldItem<CardSnapshot>> {
-    type Item = CardSnapshot;
-
-    fn len(&self) -> usize {
-        self.len()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.is_empty()
-    }
-
-    fn push(&mut self, card: CardSnapshot) {
-        self.push(FieldItem {
-            card,
-            state: FieldState::Active,
-            battle: None,
-        });
-    }
-
-    fn remove<T>(&mut self, id: T) -> Option<Self::Item>
-    where
-        T: CardId,
-    {
-        let index = self.iter().position(|card| card.id == id.id())?;
-        Some(self.remove(index).card)
-    }
-
-    fn get<T>(&self, id: T) -> Option<&Self::Item>
-    where
-        T: CardId,
-    {
-        self.iter().find(|card| card.id == id.id())
-    }
-
-    fn iter(&self) -> impl DoubleEndedIterator<Item = &Self::Item> {
-        (self as &[FieldItem<CardSnapshot>])
-            .iter()
-            .map(|item| &item.card)
-    }
-
-    fn iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut Self::Item> {
-        (self as &mut [FieldItem<CardSnapshot>])
-            .iter_mut()
-            .map(|item| &mut item.card)
     }
 }
 

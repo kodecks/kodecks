@@ -1,130 +1,47 @@
 use crate::{
     card::Card,
-    id::{CardId, ObjectId, TimedCardId, TimedObjectId},
+    id::{ObjectId, TimedObjectId},
     list::CardList,
-    score::Score,
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
-impl CardList<FieldItem<Card>> {
+impl CardList<Card> {
     pub fn active_cards(&self) -> impl Iterator<Item = &Card> {
-        self.items().filter_map(|field_card| {
-            if field_card.state == FieldState::Active {
-                Some(&field_card.card)
-            } else {
-                None
-            }
-        })
+        self.items()
+            .filter(|card| card.field_state() == FieldState::Active)
     }
 
     pub fn attacking_cards(&self) -> impl Iterator<Item = &Card> {
-        self.items().filter_map(|field_card| {
-            if let Some(FieldBattleState::Attacking) = field_card.battle {
-                Some(&field_card.card)
-            } else {
-                None
-            }
-        })
+        self.items()
+            .filter(|card| Some(FieldBattleState::Attacking) == card.battle_state())
     }
 
     pub fn find_blocker(&self, attacker: ObjectId) -> Option<&Card> {
-        self.items().find_map(|field_card| match field_card.battle {
-            Some(FieldBattleState::Blocking { attacker: id }) if id.id == attacker => {
-                Some(&field_card.card)
+        self.items().find(|card| {
+            if let Some(FieldBattleState::Blocking { attacker: id }) = card.battle_state() {
+                id.id == attacker
+            } else {
+                false
             }
-            _ => None,
         })
     }
 
-    pub fn set_card_state(&mut self, id: ObjectId, state: FieldState) {
-        if let Some(field_card) = self
-            .items_mut()
-            .find(|field_card| field_card.card.id() == id)
-        {
-            field_card.state = state;
+    pub fn set_card_field_state(&mut self, id: ObjectId, state: FieldState) {
+        if let Some(card) = self.items_mut().find(|card| card.id() == id) {
+            card.set_field_state(state);
         }
     }
 
     pub fn set_card_battle_state(&mut self, id: ObjectId, state: Option<FieldBattleState>) -> bool {
-        if let Some(field_card) = self
-            .items_mut()
-            .find(|field_card| field_card.card.id() == id)
-        {
-            if field_card.battle != state {
-                field_card.battle = state;
+        if let Some(card) = self.items_mut().find(|card| card.id() == id) {
+            if card.battle_state() != state {
+                card.set_battle_state(state);
                 return true;
             }
         }
         false
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Encode, Decode)]
-pub struct FieldItem<T: CardId> {
-    pub card: T,
-    pub state: FieldState,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub battle: Option<FieldBattleState>,
-}
-
-impl<T> CardId for FieldItem<T>
-where
-    T: CardId,
-{
-    fn id(&self) -> ObjectId {
-        self.card.id()
-    }
-}
-
-impl<T> TimedCardId for FieldItem<T>
-where
-    T: TimedCardId,
-{
-    fn timed_id(&self) -> TimedObjectId {
-        self.card.timed_id()
-    }
-}
-
-impl AsRef<Card> for FieldItem<Card> {
-    fn as_ref(&self) -> &Card {
-        &self.card
-    }
-}
-
-impl AsMut<Card> for FieldItem<Card> {
-    fn as_mut(&mut self) -> &mut Card {
-        &mut self.card
-    }
-}
-
-impl From<Card> for FieldItem<Card> {
-    fn from(card: Card) -> Self {
-        Self {
-            card,
-            state: FieldState::Active,
-            battle: None,
-        }
-    }
-}
-
-impl From<FieldItem<Card>> for Card {
-    fn from(item: FieldItem<Card>) -> Self {
-        item.card
-    }
-}
-
-impl<T> Score for FieldItem<T>
-where
-    T: CardId + Score,
-{
-    fn score(&self) -> i32 {
-        self.card.score()
-            + match self.state {
-                FieldState::Active => 1,
-                FieldState::Exhausted => 0,
-            }
     }
 }
 

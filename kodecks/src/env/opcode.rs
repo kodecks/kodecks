@@ -243,7 +243,7 @@ impl Environment {
             }
             Opcode::SetFieldState { card, state } => {
                 for player in self.state.players.iter_mut() {
-                    player.field.set_card_state(card, state);
+                    player.field.set_card_field_state(card, state);
                 }
                 Ok(vec![])
             }
@@ -263,11 +263,11 @@ impl Environment {
             }
             Opcode::ResetBattleState => {
                 for player in self.state.players.iter_mut() {
-                    for item in player.field.items_mut() {
-                        if item.battle.is_none() {
-                            item.state = FieldState::Active;
+                    for card in player.field.items_mut() {
+                        if card.battle_state().is_none() {
+                            card.set_field_state(FieldState::Active);
                         }
-                        item.battle = None;
+                        card.set_battle_state(None);
                     }
                 }
                 Ok(vec![])
