@@ -13,20 +13,10 @@ use tinystr::tinystr;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(tag = "name", rename_all = "snake_case")]
 pub enum AvailableAction {
-    SelectCard {
-        cards: Vec<TimedObjectId>,
-        #[serde(default)]
-        score_factor: i32,
-    },
-    Attack {
-        attackers: Vec<TimedObjectId>,
-    },
-    Block {
-        blockers: Vec<TimedObjectId>,
-    },
-    CastCard {
-        cards: Vec<TimedObjectId>,
-    },
+    SelectCard { cards: Vec<TimedObjectId> },
+    Attack { attackers: Vec<TimedObjectId> },
+    Block { blockers: Vec<TimedObjectId> },
+    CastCard { cards: Vec<TimedObjectId> },
     EndTurn,
     Continue,
 }

@@ -42,12 +42,9 @@ impl Effect for CardDef {
                 Ok(
                     EffectReport::default().with_available_actions(PlayerAvailableActions {
                         player: controller,
-                        actions: vec![AvailableAction::SelectCard {
-                            cards: candidates,
-                            score_factor: -1,
-                        }]
-                        .into_iter()
-                        .collect(),
+                        actions: vec![AvailableAction::SelectCard { cards: candidates }]
+                            .into_iter()
+                            .collect(),
                         instructions: Some(Message {
                             id: "card-laser-frog.message".to_string(),
                             ..Default::default()

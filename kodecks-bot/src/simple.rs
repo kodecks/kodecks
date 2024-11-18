@@ -17,11 +17,7 @@ impl Bot for SimpleBot {
         actions: &PlayerAvailableActions,
     ) -> Vec<(Action, ComputedScore)> {
         for action in actions.actions.as_ref() {
-            if let AvailableAction::SelectCard {
-                cards,
-                score_factor,
-            } = action
-            {
+            if let AvailableAction::SelectCard { cards } = action {
                 let best_candidate = cards
                     .iter()
                     .filter_map(|id| env.state.find_card(*id).ok())
@@ -31,7 +27,6 @@ impl Bot for SimpleBot {
                             ComputedScore {
                                 base: 0,
                                 action: card.score()
-                                    * score_factor
                                     * if card.zone().player == actions.player {
                                         1
                                     } else {

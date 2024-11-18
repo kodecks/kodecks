@@ -102,7 +102,6 @@ impl Environment {
                         .iter()
                         .map(|card| card.timed_id())
                         .collect(),
-                    score_factor: -1,
                 }]
                 .into_iter()
                 .collect(),
