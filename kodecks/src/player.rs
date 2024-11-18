@@ -5,7 +5,6 @@ use crate::{
     env::{EndgameReason, GameState},
     error::ActionError,
     field::{FieldItem, FieldState},
-    hand::HandItem,
     id::{CardId, ObjectId, TimedCardId, TimedObjectId},
     list::CardList,
     profile::DebugFlags,
@@ -160,7 +159,7 @@ pub trait PlayerItem {
 pub struct Player {
     pub id: u8,
     pub deck: CardList<Card>,
-    pub hand: CardList<HandItem<Card>>,
+    pub hand: CardList<Card>,
     pub graveyard: CardList<Card>,
     pub field: CardList<FieldItem<Card>>,
     pub shards: ShardList,
@@ -235,17 +234,16 @@ impl Player {
     ) -> impl Iterator<Item = TimedObjectId> + 'a {
         self.hand
             .items()
-            .filter(|item| {
+            .filter(|card| {
                 let castable = (state.debug.flags.contains(DebugFlags::IGNORE_COST)
-                    || item.card.computed().cost.value() == 0
-                    || self.shards.get(item.card.computed().color)
-                        >= item.card.computed().cost.value())
-                    && (!item.card.computed().is_creature()
-                        || item.card.computed().cost.value() > 0
+                    || card.computed().cost.value() == 0
+                    || self.shards.get(card.computed().color) >= card.computed().cost.value())
+                    && (!card.computed().is_creature()
+                        || card.computed().cost.value() > 0
                         || self.counters.free_casted == 0);
-                item.card.effect().is_castable(state, &item.card, castable)
+                card.effect().is_castable(state, card, castable)
             })
-            .map(|item| item.card.timed_id())
+            .map(|card| card.timed_id())
     }
 }
 
@@ -289,7 +287,7 @@ impl Zone {
 pub struct LocalPlayerState {
     pub id: u8,
     pub deck: usize,
-    pub hand: Vec<HandItem<CardSnapshot>>,
+    pub hand: Vec<CardSnapshot>,
     pub graveyard: Vec<CardSnapshot>,
     pub field: Vec<FieldItem<CardSnapshot>>,
     pub shards: ShardList,
@@ -310,11 +308,7 @@ impl LocalPlayerState {
             hand: state
                 .hand
                 .items()
-                .map(|item| {
-                    let card = item.card.snapshot().redacted(viewer);
-                    (card, item.cost_delta)
-                })
-                .map(|(card, cost_delta)| HandItem { card, cost_delta })
+                .map(|card| card.snapshot().redacted(viewer))
                 .collect(),
             graveyard: state
                 .graveyard
@@ -445,52 +439,6 @@ impl CardZone for Vec<FieldItem<CardSnapshot>> {
 
     fn iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut Self::Item> {
         (self as &mut [FieldItem<CardSnapshot>])
-            .iter_mut()
-            .map(|item| &mut item.card)
-    }
-}
-
-impl CardZone for Vec<HandItem<CardSnapshot>> {
-    type Item = CardSnapshot;
-
-    fn len(&self) -> usize {
-        self.len()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.is_empty()
-    }
-
-    fn push(&mut self, card: CardSnapshot) {
-        self.push(HandItem {
-            card,
-            cost_delta: 0,
-        });
-    }
-
-    fn remove<T>(&mut self, id: T) -> Option<Self::Item>
-    where
-        T: CardId,
-    {
-        let index = self.iter().position(|item| item.id == id.id())?;
-        Some(self.remove(index).card)
-    }
-
-    fn get<T>(&self, id: T) -> Option<&Self::Item>
-    where
-        T: CardId,
-    {
-        self.iter().find(|item| item.id == id.id())
-    }
-
-    fn iter(&self) -> impl DoubleEndedIterator<Item = &Self::Item> {
-        (self as &[HandItem<CardSnapshot>])
-            .iter()
-            .map(|item| &item.card)
-    }
-
-    fn iter_mut(&mut self) -> impl DoubleEndedIterator<Item = &mut Self::Item> {
-        (self as &mut [HandItem<CardSnapshot>])
             .iter_mut()
             .map(|item| &mut item.card)
     }

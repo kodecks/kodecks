@@ -16,7 +16,6 @@ pub mod env;
 pub mod error;
 pub mod event;
 pub mod field;
-pub mod hand;
 pub mod id;
 pub mod linear;
 pub mod list;

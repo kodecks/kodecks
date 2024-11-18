@@ -55,21 +55,11 @@ pub fn get_score(env: &Environment, side: u8) -> i32 {
     score += player.shards.len() as i32;
     score -= opponent.shards.len() as i32;
 
-    score += player
-        .hand
-        .items()
-        .map(|item| item.card.score())
-        .sum::<i32>()
-        / 2;
+    score += player.hand.items().map(|card| card.score()).sum::<i32>() / 2;
     score += player.field.items().map(|item| item.score()).sum::<i32>();
     score += player.abilities.score();
 
-    score -= opponent
-        .hand
-        .items()
-        .map(|item| item.card.score())
-        .sum::<i32>()
-        / 2;
+    score -= opponent.hand.items().map(|card| card.score()).sum::<i32>() / 2;
     score -= opponent.field.items().map(|item| item.score()).sum::<i32>();
     score -= opponent.abilities.score();
 

@@ -52,10 +52,10 @@ pub fn update_number_overlay(
                             .unwrap()
                             .hand
                             .iter()
-                            .find(|item| item.card.id == card.id)
+                            .find(|item| item.id == card.id)
                         {
                             *visibility = Visibility::Visible;
-                            *material = builder.number(overlay, &item.card);
+                            *material = builder.number(overlay, item);
                         } else {
                             *visibility = Visibility::Hidden;
                         }

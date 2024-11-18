@@ -181,7 +181,6 @@ fn initialize_card_bundles(
         player
             .hand
             .iter()
-            .map(|hand| &hand.card)
             .chain(player.field.iter().map(|item| &item.card))
             .chain(player.graveyard.last())
     });

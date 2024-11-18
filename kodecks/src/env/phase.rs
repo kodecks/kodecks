@@ -135,11 +135,11 @@ impl Environment {
                 let logs = match action {
                     Some(Action::CastCard { card }) => {
                         let item = player_in_turn.hand.get_item(card)?;
-                        let color = item.card.computed().color;
+                        let color = item.computed().color;
                         let cost = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                             0
                         } else {
-                            item.card.computed().cost.value()
+                            item.computed().cost.value()
                         };
                         if player_in_turn.shards.get(color) < cost {
                             return Err(ActionError::InsufficientShards {
@@ -147,7 +147,7 @@ impl Environment {
                                 amount: cost,
                             });
                         }
-                        if item.card.computed().is_creature()
+                        if item.computed().is_creature()
                             && cost == 0
                             && player_in_turn.counters.free_casted > 0
                         {
@@ -159,8 +159,8 @@ impl Environment {
                                 if cost > 0 {
                                     Some(Opcode::ConsumeShards {
                                         player: self.state.players.player_in_turn()?.id,
-                                        source: item.card.id(),
-                                        color: item.card.computed().color,
+                                        source: item.id(),
+                                        color: item.computed().color,
                                         amount: cost,
                                     })
                                 } else {
@@ -168,15 +168,15 @@ impl Environment {
                                 },
                                 Some(Opcode::CastCard {
                                     player: self.state.players.player_in_turn()?.id,
-                                    card: item.card.id(),
+                                    card: item.id(),
                                     cost
                                 }),
                             ],)),
-                            self.apply_event(CardEvent::Casted { from }, &item.card, &item.card)
+                            self.apply_event(CardEvent::Casted { from }, item, item)
                                 .ok()
                                 .into_iter()
                                 .flatten(),
-                            self.apply_event_any(CardEvent::AnyCasted, &item.card)
+                            self.apply_event_any(CardEvent::AnyCasted, item)
                                 .ok()
                                 .into_iter()
                                 .flatten(),
@@ -241,11 +241,11 @@ impl Environment {
                     ])])
                 } else if let Some(Action::CastCard { card }) = action {
                     let item = active_player.hand.get_item(card)?;
-                    let color = item.card.computed().color;
+                    let color = item.computed().color;
                     let cost = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                         0
                     } else {
-                        item.card.computed().cost.value()
+                        item.computed().cost.value()
                     };
                     if active_player.shards.get(color) < cost {
                         return Err(ActionError::InsufficientShards {
@@ -253,7 +253,7 @@ impl Environment {
                             amount: cost,
                         });
                     }
-                    if item.card.computed().is_creature()
+                    if item.computed().is_creature()
                         && cost == 0
                         && active_player.counters.free_casted > 0
                     {
@@ -265,8 +265,8 @@ impl Environment {
                             if cost > 0 {
                                 Some(Opcode::ConsumeShards {
                                     player: active_player.id,
-                                    source: item.card.id(),
-                                    color: item.card.computed().color,
+                                    source: item.id(),
+                                    color: item.computed().color,
                                     amount: cost,
                                 })
                             } else {
@@ -274,15 +274,15 @@ impl Environment {
                             },
                             Some(Opcode::CastCard {
                                 player: active_player.id,
-                                card: item.card.id(),
+                                card: item.id(),
                                 cost
                             }),
                         ],)),
-                        self.apply_event(CardEvent::Casted { from }, &item.card, &item.card)
+                        self.apply_event(CardEvent::Casted { from }, item, item)
                             .ok()
                             .into_iter()
                             .flatten(),
-                        self.apply_event_any(CardEvent::AnyCasted, &item.card)
+                        self.apply_event_any(CardEvent::AnyCasted, item)
                             .ok()
                             .into_iter()
                             .flatten(),

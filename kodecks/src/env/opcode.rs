@@ -49,8 +49,8 @@ impl Environment {
                     .get_mut(player)?
                     .hand
                     .items_mut()
-                    .for_each(|item| {
-                        item.cost_delta = item.cost_delta.saturating_sub(1);
+                    .for_each(|card| {
+                        card.set_hand_cost_delta(card.hand_cost_delta().saturating_sub(1));
                     });
                 Ok(vec![])
             }

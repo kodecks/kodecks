@@ -125,9 +125,9 @@ impl Environment {
             let hand_states = player
                 .hand
                 .items()
-                .map(|item| {
-                    let mut attrs = self.continuous.apply_card(&self.state, &item.card);
-                    attrs.cost.add(item.cost_delta);
+                .map(|card| {
+                    let mut attrs = self.continuous.apply_card(&self.state, card);
+                    attrs.cost.add(card.hand_cost_delta());
                     attrs
                 })
                 .collect();

@@ -121,11 +121,7 @@ impl Board {
         let player = env.players.get(env.player).unwrap();
         let opponent = env.players.next_player(env.player).unwrap();
 
-        self.player_hand = player
-            .hand
-            .iter()
-            .map(|item| item.card.timed_id())
-            .collect();
+        self.player_hand = player.hand.iter().map(|card| card.timed_id()).collect();
 
         let old_player_orders = self
             .player_field
@@ -144,11 +140,7 @@ impl Board {
                 .unwrap_or(old_player_orders.len())
         });
 
-        self.opponent_hand = opponent
-            .hand
-            .iter()
-            .map(|item| item.card.timed_id())
-            .collect();
+        self.opponent_hand = opponent.hand.iter().map(|card| card.timed_id()).collect();
 
         let old_opponent_orders = self
             .opponent_field
