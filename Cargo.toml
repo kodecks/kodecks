@@ -24,3 +24,9 @@ panic = 'abort'
 strip = true
 lto = true
 codegen-units = 1
+
+[profile.web-distribution.package.kodecks-bot]
+opt-level = 2
+
+[profile.web-distribution.package.kodecks-engine]
+opt-level = 2
