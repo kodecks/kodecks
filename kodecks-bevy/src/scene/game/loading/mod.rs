@@ -35,14 +35,8 @@ impl Plugin for GameLoadingPlugin {
             .add_plugins(board::BoardPlugin)
             .add_plugins(event::EventPlugin)
             .add_systems(OnEnter(GlobalState::GameInit), init_loading_screen)
-            .add_systems(
-                OnTransition {
-                    exited: GlobalState::GameInit,
-                    entered: GlobalState::MenuMain,
-                },
-                cleanup_loading_screen,
-            )
             .add_systems(OnExit(GlobalState::GameLoading), cleanup_loading_screen)
+            .add_systems(OnEnter(GlobalState::MenuMain), cleanup_loading_screen)
             .add_systems(
                 Update,
                 (
@@ -216,8 +210,7 @@ fn init_loading_screen(
                                     if let Some(mut next_state) =
                                         w.get_resource_mut::<NextState<GlobalState>>()
                                     {
-                                        println!("Go to main menu");
-                                        next_state.set(GlobalState::MenuMain);
+                                        next_state.set(GlobalState::GameCleanup);
                                     }
                                 });
                             }),
