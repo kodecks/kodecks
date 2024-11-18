@@ -101,7 +101,9 @@ impl Card {
     }
 
     pub fn set_zone(&mut self, zone: Zone) {
-        self.zone = zone;
+        if self.zone == zone {
+            return;
+        }
         match zone.kind {
             ZoneKind::Hand => {
                 self.revealed.set(zone.player, true);
@@ -111,6 +113,11 @@ impl Card {
             }
             _ => (),
         }
+        if self.zone.kind != ZoneKind::Field || zone.kind != ZoneKind::Field {
+            self.increment_timestamp();
+            self.reset_computed();
+        }
+        self.zone = zone;
     }
 
     pub fn archetype(&self) -> &Arc<CardArchetype> {

@@ -121,7 +121,6 @@ impl Environment {
                     let from = *card.zone();
                     let to = Zone::new(player.id, ZoneKind::Hand);
                     let controller = card.controller();
-                    card.increment_timestamp();
                     card.set_zone(to);
                     let snapshot = card.snapshot();
                     player.hand.push(card);
@@ -146,7 +145,6 @@ impl Environment {
                     let from = *card.zone();
                     let to = Zone::new(player.id, ZoneKind::Field);
                     let controller = card.controller();
-                    card.increment_timestamp();
                     card.set_zone(to);
                     let snapshot = card.snapshot();
                     player.field.push(card);
@@ -177,15 +175,13 @@ impl Environment {
                     ZoneKind::Graveyard => player.graveyard.remove(card),
                 };
                 if let Some(mut card) = card {
-                    let controller = card.controller();
                     if card.is_token() && to.kind != ZoneKind::Field {
                         return Ok(vec![GameLog::CardTokenDestroyed {
                             card: card.snapshot(),
                         }]);
                     }
-                    card.increment_timestamp();
+                    let controller = card.controller();
                     card.set_zone(to);
-                    card.reset_computed();
                     let snapshot = card.snapshot();
                     let player = self.state.players.get_mut(to.player)?;
                     match to.kind {
