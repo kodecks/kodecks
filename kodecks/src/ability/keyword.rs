@@ -44,6 +44,8 @@ pub enum KeywordAbility {
 impl Ability for KeywordAbility {}
 
 impl Score for KeywordAbility {
+    type Output = i32;
+
     fn score(&self) -> i32 {
         match self {
             KeywordAbility::Toxic => 1,

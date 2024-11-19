@@ -1,12 +1,13 @@
 use crate::{
     ability::{AbilityList, PlayerAbility},
-    card::{Card, CardSnapshot},
+    card::{Card, CardScore, CardSnapshot},
     deck::DeckList,
     env::{EndgameReason, GameState},
     error::ActionError,
     id::{CardId, ObjectId, TimedCardId, TimedObjectId},
     list::CardList,
     profile::DebugFlags,
+    score::Score,
     shard::ShardList,
     zone::{CardZone, ZoneKind},
 };
@@ -243,6 +244,40 @@ impl Player {
                 card.effect().is_castable(state, card, castable)
             })
             .map(|card| card.timed_id())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PlayerScore {
+    pub id: u8,
+    pub life: i32,
+    pub shards: i32,
+    pub hand: Vec<CardScore>,
+    pub field: Vec<CardScore>,
+}
+
+impl Score for PlayerScore {
+    type Output = i32;
+
+    fn score(&self) -> i32 {
+        self.life
+            + self.shards
+            + self.hand.iter().map(Score::score).sum::<i32>()
+            + self.field.iter().map(Score::score).sum::<i32>()
+    }
+}
+
+impl Score for Player {
+    type Output = PlayerScore;
+
+    fn score(&self) -> PlayerScore {
+        PlayerScore {
+            id: self.id,
+            life: self.stats.life as i32,
+            shards: self.shards.len() as i32,
+            hand: self.hand.items().map(Score::score).collect(),
+            field: self.field.items().map(Score::score).collect(),
+        }
     }
 }
 

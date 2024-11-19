@@ -14,9 +14,10 @@ use crate::{
     id::{CardId, ObjectId},
     log::GameLog,
     phase::Phase,
-    player::{Player, PlayerList, Zone},
+    player::{Player, PlayerList, PlayerScore, Zone},
     profile::DebugConfig,
     regulation::Regulation,
+    score::Score,
 };
 
 use super::{EndgameState, LocalEnvironment};
@@ -107,6 +108,23 @@ pub struct LocalGameState {
     pub logs: Vec<GameLog>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub available_actions: Option<PlayerAvailableActions>,
+}
+
+#[derive(Debug, Clone)]
+pub struct GameStateScore {
+    pub players: Vec<PlayerScore>,
+    pub endgame: EndgameState,
+}
+
+impl Score for GameState {
+    type Output = GameStateScore;
+
+    fn score(&self) -> GameStateScore {
+        GameStateScore {
+            players: self.players.iter().map(Player::score).collect(),
+            endgame: self.endgame,
+        }
+    }
 }
 
 #[cfg(test)]

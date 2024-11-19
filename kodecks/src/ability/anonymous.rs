@@ -24,6 +24,8 @@ pub enum AnonymousAbility {
 impl Ability for AnonymousAbility {}
 
 impl Score for AnonymousAbility {
+    type Output = i32;
+
     fn score(&self) -> i32 {
         match self {
             AnonymousAbility::Defender => -1,

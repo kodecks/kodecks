@@ -16,6 +16,8 @@ pub enum PlayerAbility {
 impl Ability for PlayerAbility {}
 
 impl Score for PlayerAbility {
+    type Output = i32;
+
     fn score(&self) -> i32 {
         match self {
             PlayerAbility::Propagate(n) => *n,

@@ -1,3 +1,4 @@
 pub trait Score {
-    fn score(&self) -> i32;
+    type Output;
+    fn score(&self) -> Self::Output;
 }

@@ -1,5 +1,5 @@
 use crate::{
-    ability::KeywordAbility,
+    ability::{AnonymousAbility, KeywordAbility},
     archetype::{ArchetypeId, CardArchetype},
     color::Color,
     computed::{ComputedAttribute, ComputedFlags},
@@ -283,18 +283,44 @@ impl AsMut<Card> for Card {
     }
 }
 
-impl Score for Card {
+#[derive(Debug, Clone, Copy)]
+pub struct CardScore {
+    pub power: i32,
+    pub shields: i32,
+    pub abilities: i32,
+}
+
+impl Score for CardScore {
+    type Output = i32;
+
     fn score(&self) -> i32 {
-        self.computed.abilities.score()
-            + self.computed.anon_abilities.score()
-            + self.computed.power.map(|power| power.value()).unwrap_or(0) as i32 / 100
+        self.power / 100 + self.shields + self.abilities
+    }
+}
+
+impl Score for Card {
+    type Output = CardScore;
+
+    fn score(&self) -> CardScore {
+        let power = self.computed.power.map(|p| p.value()).unwrap_or(0) as i32;
+        let shields = self.computed.shields.map(|s| s.value()).unwrap_or(0) as i32;
+        let abilities = self
+            .computed
+            .abilities
+            .iter()
+            .map(KeywordAbility::score)
+            .sum::<i32>()
             + self
                 .computed
-                .shields
-                .map(|shields| shields.value())
-                .unwrap_or(0) as i32
-                * 2
-            + if self.computed.is_creature() { 1 } else { 0 }
+                .anon_abilities
+                .iter()
+                .map(AnonymousAbility::score)
+                .sum::<i32>();
+        CardScore {
+            power,
+            shields,
+            abilities,
+        }
     }
 }
 

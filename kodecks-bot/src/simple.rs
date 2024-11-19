@@ -26,7 +26,7 @@ impl Bot for SimpleBot {
                             card.timed_id(),
                             ComputedScore {
                                 base: 0,
-                                action: card.score()
+                                action: card.score().score()
                                     * if card.zone().player == actions.player {
                                         1
                                     } else {
@@ -166,7 +166,7 @@ impl Bot for SimpleBot {
                             card.timed_id(),
                             ComputedScore {
                                 base: 0,
-                                action: card.score(),
+                                action: card.score().score(),
                             },
                         )
                     })

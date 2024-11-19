@@ -41,8 +41,10 @@ where
 
 impl<T> Score for AbilityList<T>
 where
-    T: Ability,
+    T: Ability + Score<Output = i32>,
 {
+    type Output = i32;
+
     fn score(&self) -> i32 {
         self.iter().map(Score::score).sum()
     }

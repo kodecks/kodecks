@@ -10,6 +10,8 @@ pub struct ComputedScore {
 }
 
 impl Score for ComputedScore {
+    type Output = i32;
+
     fn score(&self) -> i32 {
         self.action - self.base
     }
@@ -55,12 +57,30 @@ pub fn get_score(env: &Environment, side: u8) -> i32 {
     score += player.shards.len() as i32;
     score -= opponent.shards.len() as i32;
 
-    score += player.hand.items().map(|card| card.score()).sum::<i32>() / 2;
-    score += player.field.items().map(|item| item.score()).sum::<i32>();
+    score += player
+        .hand
+        .items()
+        .map(|card| card.score().score())
+        .sum::<i32>()
+        / 2;
+    score += player
+        .field
+        .items()
+        .map(|card| card.score().score())
+        .sum::<i32>();
     score += player.abilities.score();
 
-    score -= opponent.hand.items().map(|card| card.score()).sum::<i32>() / 2;
-    score -= opponent.field.items().map(|item| item.score()).sum::<i32>();
+    score -= opponent
+        .hand
+        .items()
+        .map(|card| card.score().score())
+        .sum::<i32>()
+        / 2;
+    score -= opponent
+        .field
+        .items()
+        .map(|card| card.score().score())
+        .sum::<i32>();
     score -= opponent.abilities.score();
 
     if (player.stats.life as f32) < (state.regulation.initial_life as f32 * 0.2) {
