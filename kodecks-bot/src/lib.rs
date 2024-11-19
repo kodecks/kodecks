@@ -4,7 +4,6 @@ use bitflags::bitflags;
 use kodecks::{
     action::{Action, PlayerAvailableActions},
     env::Environment,
-    
 };
 use rand::rngs::SmallRng;
 use score::ComputedScore;
@@ -13,11 +12,13 @@ use std::sync::Arc;
 mod battle;
 mod cast;
 mod default;
+mod mcts;
 mod score;
 mod select;
 mod simple;
 
 pub use default::DefaultBot;
+pub use mcts::MctsBot;
 pub use simple::SimpleBot;
 
 #[derive(Clone)]

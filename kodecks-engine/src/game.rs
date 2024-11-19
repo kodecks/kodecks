@@ -8,7 +8,7 @@ use kodecks::{
     env::{Environment, LocalGameState},
     profile::GameProfile,
 };
-use kodecks_bot::{Bot, DefaultBot};
+use kodecks_bot::{Bot, MctsBot};
 use kodecks_catalog::CATALOG;
 use std::sync::Arc;
 
@@ -26,7 +26,7 @@ pub async fn start_game(
         .map(|(id, _)| PlayerData {
             id: id as u8,
             bot: if bots.iter().any(|bot| bot.player == id as u8) {
-                Some(DefaultBot::builder().build())
+                Some(MctsBot::default())
             } else {
                 None
             },
@@ -130,8 +130,8 @@ pub async fn start_game(
 }
 
 #[derive(Debug)]
-struct PlayerData {
+struct PlayerData<T> {
     id: u8,
-    bot: Option<DefaultBot>,
+    bot: Option<T>,
     next_action: Option<Action>,
 }
