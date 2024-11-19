@@ -49,7 +49,7 @@ impl Plugin for EventPlugin {
                 recv_server_events.run_if(in_state(GlobalState::GameInit)),
             )
             .add_systems(
-                Update,
+                PreUpdate,
                 (recv_server_events.run_if(in_state(AnimationState::Idle)),)
                     .run_if(in_state(GlobalState::GameMain)),
             )
