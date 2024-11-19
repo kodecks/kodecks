@@ -19,7 +19,7 @@ use crate::{
     regulation::Regulation,
 };
 
-use super::LocalEnvironment;
+use super::{EndgameState, LocalEnvironment};
 
 #[derive(Clone)]
 pub struct GameState {
@@ -28,6 +28,7 @@ pub struct GameState {
     pub turn: u16,
     pub phase: Phase,
     pub players: PlayerList<Player>,
+    pub endgame: EndgameState,
 }
 
 impl GameState {

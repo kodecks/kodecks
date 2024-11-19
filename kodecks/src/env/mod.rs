@@ -43,7 +43,6 @@ pub struct Environment {
     opcodes: VecDeque<OpcodeList>,
     stack: Stack<StackItem>,
     continuous: ContinuousEffectList,
-    endgame: EndgameState,
     timestamp: u32,
     last_available_actions: Option<PlayerAvailableActions>,
     rng: SmallRng,
@@ -94,11 +93,11 @@ impl Environment {
                 turn: 0,
                 phase: Phase::Standby,
                 players: PlayerList::new(current_player, players),
+                endgame: EndgameState::InProgress,
             },
             opcodes: VecDeque::new(),
             stack: Stack::new(),
             continuous: Default::default(),
-            endgame: EndgameState::InProgress,
             timestamp: 0,
             last_available_actions: None,
             rng,
@@ -151,7 +150,7 @@ impl Environment {
                 Report {
                     available_actions: self.last_available_actions.clone(),
                     logs: vec![],
-                    endgame: self.endgame,
+                    endgame: self.state.endgame,
                     timestamp: self.timestamp,
                 }
             }
@@ -237,7 +236,7 @@ impl Environment {
                     }
 
                     if self.check_game_condition() {
-                        if let EndgameState::Finished { winner, reason } = self.endgame {
+                        if let EndgameState::Finished { winner, reason } = self.state.endgame {
                             logs.push(GameLog::GameEnded { winner, reason });
                         }
                     }
@@ -253,7 +252,7 @@ impl Environment {
                     return Report {
                         available_actions: report.available_actions,
                         logs,
-                        endgame: self.endgame,
+                        endgame: self.state.endgame,
                         timestamp: self.timestamp,
                     };
                 }
@@ -294,7 +293,7 @@ impl Environment {
         }
 
         if self.check_game_condition() {
-            if let EndgameState::Finished { winner, reason } = self.endgame {
+            if let EndgameState::Finished { winner, reason } = self.state.endgame {
                 logs.push(GameLog::GameEnded { winner, reason });
             }
         }
@@ -308,7 +307,7 @@ impl Environment {
         Report {
             available_actions,
             logs,
-            endgame: self.endgame,
+            endgame: self.state.endgame,
             timestamp: self.timestamp,
         }
     }
@@ -318,11 +317,11 @@ impl Environment {
     }
 
     pub fn game_condition(&self) -> EndgameState {
-        self.endgame
+        self.state.endgame
     }
 
     pub fn check_game_condition(&mut self) -> bool {
-        if self.endgame.is_ended() {
+        if self.state.endgame.is_ended() {
             return false;
         }
 
@@ -375,8 +374,8 @@ impl Environment {
                 reason: EndgameReason::SimultaneousEnd,
             }
         };
-        if self.endgame != new_condition {
-            self.endgame = new_condition;
+        if self.state.endgame != new_condition {
+            self.state.endgame = new_condition;
             true
         } else {
             false

@@ -104,7 +104,7 @@ impl Environment {
             players,
             phase: self.state.phase,
             stack,
-            endgame: self.endgame,
+            endgame: self.state.endgame,
             timestamp: self.timestamp,
         }
     }
