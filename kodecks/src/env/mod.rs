@@ -221,10 +221,10 @@ impl Environment {
 
                     for item in list {
                         for opcode in item {
-                            match self.execute(opcode) {
+                            match self.execute(opcode.clone()) {
                                 Ok(log) => logs.extend(log),
                                 Err(err) => {
-                                    error!("Error executing opcode: {:?}", err);
+                                    error!("Error executing opcode: {:?} {:?}", err, opcode);
                                 }
                             }
                         }
@@ -278,10 +278,10 @@ impl Environment {
         let mut logs = vec![];
         if let Some(log) = next {
             for opcode in log {
-                match self.execute(opcode) {
+                match self.execute(opcode.clone()) {
                     Ok(log) => logs.extend(log),
                     Err(err) => {
-                        error!("Error executing opcode: {:?}", err);
+                        error!("Error executing opcode: {:?} {:?}", err, opcode);
                     }
                 }
             }
