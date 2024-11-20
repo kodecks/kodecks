@@ -62,7 +62,7 @@ impl Bot for SimpleBot {
                     .collect::<Vec<_>>();
                 let blocker_power_sum = blockers.iter().sum::<u32>();
                 let max_blocker_power = blockers.iter().copied().max().unwrap_or_default();
-                if blocker_power_sum >= player.stats.life {
+                if blocker_power_sum as i32 >= player.stats.life {
                     return vec![(
                         Action::Attack { attackers: vec![] },
                         ComputedScore::default(),
@@ -146,7 +146,7 @@ impl Bot for SimpleBot {
                                 .map(|power| power.value())
                                 .unwrap_or_default()
                                 > attacker_power
-                                || attackers_power_sum >= player.stats.life
+                                || attackers_power_sum as i32 >= player.stats.life
                         });
                         if let Some(index) = blocker {
                             let blocker = blockers.remove(index);

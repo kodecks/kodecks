@@ -26,7 +26,7 @@ impl Environment {
             self.state.players.iter().flat_map(|player| {
                 filter_vec![Some(OpcodeList::new(vec![Opcode::SetLife {
                     player: player.id,
-                    life: initial_life,
+                    life: initial_life.try_into().unwrap_or(0),
                 }])),]
             }),
             if self.state.debug.no_deck_shuffle {

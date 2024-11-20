@@ -97,8 +97,14 @@ fn update(
     mut images: ResMut<Assets<Image>>,
     mut event_reader: EventReader<LifeUpdated>,
 ) {
-    let player_life = env.players.get(env.player).unwrap().stats.life;
-    let opponent_life = env.players.next_player(env.player).unwrap().stats.life;
+    let player_life = env.players.get(env.player).unwrap().stats.life.max(0);
+    let opponent_life = env
+        .players
+        .next_player(env.player)
+        .unwrap()
+        .stats
+        .life
+        .max(0);
 
     let ((_, mut material, transform), life, delta) = match event_reader.read().next() {
         Some(LifeUpdated { player, delta }) => {

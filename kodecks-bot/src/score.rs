@@ -51,8 +51,8 @@ pub fn get_score(env: &Environment, side: u8) -> i32 {
     };
     let mut score = 0i32;
 
-    score += player.stats.life as i32 / 100;
-    score -= opponent.stats.life as i32 / 100 * 2;
+    score += player.stats.life / 100;
+    score -= opponent.stats.life / 100 * 2;
 
     score += player.shards.len() as i32;
     score -= opponent.shards.len() as i32;
