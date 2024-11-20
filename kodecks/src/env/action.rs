@@ -61,7 +61,14 @@ impl Environment {
                 message_dialog: None,
             })
         } else if let Phase::Block = &self.state.phase {
-            active_player.field.attacking_cards().next()?;
+            let attackers = active_player
+                .field
+                .attacking_cards()
+                .map(|card| card.timed_id())
+                .collect::<Vec<_>>();
+            if attackers.is_empty() {
+                return None;
+            }
 
             let player_in_action = self.state.players.next_player(active_player.id).ok()?;
             let blockers = player_in_action
@@ -76,7 +83,10 @@ impl Environment {
             Some(PlayerAvailableActions {
                 player: player_in_action.id,
                 actions: filter_vec![
-                    Some(AvailableAction::Block { blockers }),
+                    Some(AvailableAction::Block {
+                        attackers,
+                        blockers
+                    }),
                     if castable_cards.is_empty() {
                         None
                     } else {

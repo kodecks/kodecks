@@ -86,15 +86,13 @@ impl Bot for SimpleBot {
                 }
             }
 
-            if let AvailableAction::Block { blockers } = action {
+            if let AvailableAction::Block {
+                blockers,
+                attackers,
+            } = action
+            {
                 let player = if let Ok(player) = env.state.players().get(actions.player) {
                     player
-                } else {
-                    return vec![];
-                };
-                let opponent = if let Ok(opponent) = env.state.players().next_player(actions.player)
-                {
-                    opponent
                 } else {
                     return vec![];
                 };
@@ -108,7 +106,10 @@ impl Bot for SimpleBot {
                         .map(|power| power.value())
                         .unwrap_or_default() as i32
                 });
-                let mut attackers = opponent.field.attacking_cards().collect::<Vec<_>>();
+                let mut attackers = attackers
+                    .iter()
+                    .filter_map(|id| env.state.find_card(*id).ok())
+                    .collect::<Vec<_>>();
                 attackers.sort_by_key(|card| {
                     card.computed()
                         .power

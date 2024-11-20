@@ -260,7 +260,7 @@ fn recv_server_events(
                 [AvailableAction::SelectCard { cards, .. }] if cards.len() == 1 => {
                     Some(Action::SelectCard { card: cards[0] })
                 }
-                [AvailableAction::Block { blockers }] if blockers.is_empty() => {
+                [AvailableAction::Block { blockers, .. }] if blockers.is_empty() => {
                     Some(Action::Block { pairs: vec![] })
                 }
                 [AvailableAction::EndTurn] => Some(Action::EndTurn),

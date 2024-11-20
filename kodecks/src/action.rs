@@ -13,10 +13,19 @@ use tinystr::tinystr;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]
 #[serde(tag = "name", rename_all = "snake_case")]
 pub enum AvailableAction {
-    SelectCard { cards: Vec<TimedObjectId> },
-    Attack { attackers: Vec<TimedObjectId> },
-    Block { blockers: Vec<TimedObjectId> },
-    CastCard { cards: Vec<TimedObjectId> },
+    SelectCard {
+        cards: Vec<TimedObjectId>,
+    },
+    Attack {
+        attackers: Vec<TimedObjectId>,
+    },
+    Block {
+        attackers: Vec<TimedObjectId>,
+        blockers: Vec<TimedObjectId>,
+    },
+    CastCard {
+        cards: Vec<TimedObjectId>,
+    },
     EndTurn,
     Continue,
 }
@@ -110,7 +119,7 @@ impl AvailableActionList {
             Action::Block { pairs } => {
                 self.0
                     .iter()
-                    .any(|action| matches!(action, AvailableAction::Block { blockers } if pairs.iter().all(|(_, b)| blockers.contains(b))))
+                    .any(|action| matches!(action, AvailableAction::Block { blockers, .. } if pairs.iter().all(|(_, b)| blockers.contains(b))))
             }
             Action::EndTurn => self.0.iter().any(|action| matches!(action, AvailableAction::EndTurn)),
             Action::Continue => self.0.iter().any(|action| matches!(action, AvailableAction::Continue)),
@@ -140,7 +149,7 @@ impl AvailableActionList {
     pub fn blockers(&self) -> Vec<TimedObjectId> {
         self.iter()
             .filter_map(|action| {
-                if let AvailableAction::Block { blockers } = action {
+                if let AvailableAction::Block { blockers, .. } = action {
                     Some(blockers)
                 } else {
                     None
