@@ -24,7 +24,7 @@ pub enum Opcode {
     },
     SetLife {
         player: u8,
-        life: i32,
+        life: u32,
     },
     ReduceCost {
         player: u8,

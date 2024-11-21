@@ -193,11 +193,7 @@ impl Node {
                     if winner == player {
                         1.0
                     } else {
-                        env.state
-                            .players()
-                            .get(player)
-                            .map(|player| (1000 + player.stats.life).max(0) as f64 / 100000.0)
-                            .unwrap_or(0.0)
+                        0.0
                     }
                 }
                 None => 0.5,

@@ -277,7 +277,7 @@ impl Score for Player {
     fn score(&self) -> PlayerScore {
         PlayerScore {
             id: self.id,
-            life: self.stats.life,
+            life: self.stats.life as i32,
             shards: self.shards.len() as i32,
             hand: self.hand.items().map(Score::score).collect(),
             field: self.field.items().map(Score::score).collect(),
@@ -287,7 +287,7 @@ impl Score for Player {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Encode, Decode)]
 pub struct PlayerStats {
-    pub life: i32,
+    pub life: u32,
 }
 
 impl Default for PlayerStats {

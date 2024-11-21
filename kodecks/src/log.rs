@@ -33,7 +33,7 @@ pub enum GameLog {
     },
     LifeChanged {
         player: u8,
-        life: i32,
+        life: u32,
     },
     DamageTaken {
         player: u8,
