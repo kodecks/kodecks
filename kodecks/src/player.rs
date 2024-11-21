@@ -162,6 +162,7 @@ pub struct Player {
     pub hand: CardList<Card>,
     pub graveyard: CardList<Card>,
     pub field: CardList<Card>,
+    pub limbo: CardList<Card>,
     pub shards: ShardList,
     pub stats: PlayerStats,
     pub counters: PlayerCounters,
@@ -183,6 +184,7 @@ impl Player {
             hand: CardList::default(),
             graveyard: CardList::default(),
             field: CardList::default(),
+            limbo: CardList::default(),
             shards: ShardList::new(),
             stats: PlayerStats::default(),
             counters: PlayerCounters::default(),
@@ -200,6 +202,7 @@ impl Player {
             .or_else(|| self.hand.get(card))
             .or_else(|| self.graveyard.get(card))
             .or_else(|| self.field.get(card))
+            .or_else(|| self.limbo.get(card))
     }
 
     pub fn find_card_mut(&mut self, card: ObjectId) -> Option<&mut Card> {
@@ -208,6 +211,7 @@ impl Player {
             .or_else(|| self.hand.get_mut(card))
             .or_else(|| self.graveyard.get_mut(card))
             .or_else(|| self.field.get_mut(card))
+            .or_else(|| self.limbo.get_mut(card))
     }
 
     pub fn find_zone(&self, card: ObjectId) -> Option<ZoneKind> {
@@ -324,6 +328,7 @@ pub struct LocalPlayerState {
     pub hand: Vec<CardSnapshot>,
     pub graveyard: Vec<CardSnapshot>,
     pub field: Vec<CardSnapshot>,
+    pub limbo: Vec<CardSnapshot>,
     pub shards: ShardList,
     pub stats: PlayerStats,
 }
@@ -354,6 +359,11 @@ impl LocalPlayerState {
                 .items()
                 .map(|card| card.snapshot().redacted(viewer))
                 .collect(),
+            limbo: state
+                .limbo
+                .items()
+                .map(|card| card.snapshot().redacted(viewer))
+                .collect(),
             shards: state.shards.clone(),
             stats: state.stats,
         }
@@ -365,6 +375,7 @@ impl LocalPlayerState {
             .find(|item| item.id == card)
             .or_else(|| self.graveyard.iter().find(|item| item.id == card))
             .or_else(|| self.hand.iter().find(|item| item.id == card))
+            .or_else(|| self.limbo.iter().find(|item| item.id == card))
     }
 
     pub fn cards(&self) -> impl Iterator<Item = &CardSnapshot> {
@@ -372,6 +383,7 @@ impl LocalPlayerState {
             .iter()
             .chain(self.graveyard.iter())
             .chain(self.field.iter())
+            .chain(self.limbo.iter())
     }
 
     pub fn find_zone(&self, card: ObjectId) -> Option<ZoneKind> {

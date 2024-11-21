@@ -159,6 +159,7 @@ mod tests {
                         field: vec![],
                         deck: 100,
                         graveyard: vec![],
+                        limbo: vec![],
                         shards,
                         stats: Default::default(),
                     }],

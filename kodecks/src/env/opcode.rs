@@ -176,9 +176,14 @@ impl Environment {
                 };
                 if let Some(mut card) = card {
                     if card.is_token() && to.kind != ZoneKind::Field {
-                        return Ok(vec![GameLog::CardTokenDestroyed {
-                            card: card.snapshot(),
-                        }]);
+                        let owner = self.state.players.get_mut(card.owner())?;
+                        card.set_zone(Zone {
+                            player: owner.id,
+                            ..*card.zone()
+                        });
+                        let snapshot = card.snapshot();
+                        owner.limbo.push(card);
+                        return Ok(vec![GameLog::CardTokenDestroyed { card: snapshot }]);
                     }
                     let controller = card.controller();
                     card.set_zone(to);
