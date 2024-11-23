@@ -1,5 +1,5 @@
 use super::{
-    card::{Catalog, UICardInfo},
+    card::{Catalog, UICardInfo, CARD_HEIGHT, CARD_WIDTH},
     translator::{TextPurpose, Translator},
     GlobalState,
 };
@@ -188,7 +188,7 @@ fn init(
                                 ImageBundle {
                                     style: Style {
                                         width: Val::Px(60.),
-                                        height: Val::Px(60. / 36. * 48.),
+                                        height: Val::Px(60. / CARD_WIDTH * CARD_HEIGHT),
                                         padding: UiRect::all(Val::Px(5.)),
                                         ..default()
                                     },
@@ -329,7 +329,7 @@ fn init(
                                                         flex_direction: FlexDirection::Row,
                                                         align_items: AlignItems::Center,
                                                         width: Val::Percent(100.),
-                                                        height: Val::Px(36.),
+                                                        height: Val::Px(CARD_WIDTH),
                                                         ..default()
                                                     },
                                                     ..default()
@@ -519,7 +519,7 @@ fn init(
                                                     style: Style {
                                                         flex_direction: FlexDirection::Row,
                                                         width: Val::Percent(100.),
-                                                        height: Val::Px(36.),
+                                                        height: Val::Px(CARD_WIDTH),
                                                         ..default()
                                                     },
                                                     ..default()
@@ -802,7 +802,7 @@ fn handle_deck_event(
                             style: Style {
                                 flex_direction: FlexDirection::Row,
                                 width: Val::Percent(100.),
-                                height: Val::Px(36.),
+                                height: Val::Px(CARD_WIDTH),
                                 ..default()
                             },
                             ..default()

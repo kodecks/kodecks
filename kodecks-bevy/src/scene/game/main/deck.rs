@@ -1,10 +1,11 @@
-use super::{
-    card::{CARD_HEIGHT, CARD_WIDTH},
-    ui::UIEvent,
-};
+use super::ui::UIEvent;
 use crate::{
     assets::AssetServerExt,
-    scene::{card::Catalog, game::board::Environment, GlobalState},
+    scene::{
+        card::{Catalog, CARD_HEIGHT, CARD_WIDTH},
+        game::board::Environment,
+        GlobalState,
+    },
 };
 use bevy::{prelude::*, render::mesh::VertexAttributeValues};
 use bevy_mod_picking::prelude::*;

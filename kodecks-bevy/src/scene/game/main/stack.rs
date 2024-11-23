@@ -2,7 +2,7 @@ use super::animation::RegisterAnimation;
 use crate::{
     assets::AssetServerExt,
     scene::{
-        card::Catalog,
+        card::{Catalog, CARD_HEIGHT},
         game::board::{Board, Environment},
         GlobalState,
     },
@@ -88,7 +88,7 @@ fn spawn_effect_stack(
         let entity = commands
             .spawn((
                 PbrBundle {
-                    mesh: meshes.add(Plane3d::default().mesh().size(1.0, 1.0 / 48. * 20.)),
+                    mesh: meshes.add(Plane3d::default().mesh().size(1.0, 1.0 / CARD_HEIGHT * 20.)),
                     ..default()
                 },
                 EffectStackItem {

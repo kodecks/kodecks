@@ -2,7 +2,7 @@ use super::event::PlayerEvent;
 use crate::{
     assets::AssetServerExt,
     scene::{
-        card::{Catalog, UICardInfo},
+        card::{Catalog, UICardInfo, CARD_HEIGHT, CARD_WIDTH},
         game::{
             board::{self, AvailableActionList, Board},
             event::InstructionsUpdated,
@@ -423,7 +423,7 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                         ImageBundle {
                                             style: Style {
                                                 width: Val::Px(60.),
-                                                height: Val::Px(60. / 36. * 48.),
+                                                height: Val::Px(60. / CARD_WIDTH * CARD_HEIGHT),
                                                 padding: UiRect::all(Val::Px(5.)),
                                                 ..default()
                                             },

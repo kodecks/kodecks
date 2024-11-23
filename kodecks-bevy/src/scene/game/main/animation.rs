@@ -1,5 +1,6 @@
-use super::card::{Card, CardSize, CardState, CARD_WIDTH};
+use super::card::{Card, CardSize, CardState};
 use super::event::PlayerEventFinished;
+use crate::scene::card::CARD_WIDTH;
 use crate::scene::game::board::{self, Board};
 use crate::scene::game::event::{LogEvent, LogEventQueue};
 use crate::scene::GlobalState;

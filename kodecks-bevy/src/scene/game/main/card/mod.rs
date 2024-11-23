@@ -3,7 +3,7 @@ use super::ui::UIEvent;
 use crate::assets::{AssetHandleStore, AssetServerExt};
 use crate::painter::frames::CardFramePainter;
 use crate::painter::numbers::{Alignment, DrawOptions, NumberPainter};
-use crate::scene::card::Catalog;
+use crate::scene::card::{Catalog, CARD_HEIGHT, CARD_WIDTH};
 use crate::scene::game::board::{self, AvailableActionList, Board, Environment};
 use crate::scene::GlobalState;
 use ability::AbilityOverlay;
@@ -28,9 +28,6 @@ use kodecks::zone::ZoneKind;
 use number::{NumberOverlay, NumberOverlayKey};
 use std::cmp::Ordering;
 use std::f32::consts::PI;
-
-pub const CARD_WIDTH: f32 = 36.0;
-pub const CARD_HEIGHT: f32 = 48.0;
 
 mod ability;
 mod frame;

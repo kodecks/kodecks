@@ -9,6 +9,9 @@ use kodecks::{
 use kodecks_catalog::CATALOG;
 use std::sync::Arc;
 
+pub const CARD_WIDTH: f32 = 36.0;
+pub const CARD_HEIGHT: f32 = 48.0;
+
 #[derive(Debug)]
 pub struct UICardInfo {
     pub snapshot: CardSnapshot,
