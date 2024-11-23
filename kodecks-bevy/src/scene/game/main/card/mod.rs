@@ -3,7 +3,6 @@ use super::ui::UIEvent;
 use crate::assets::{AssetHandleStore, AssetServerExt};
 use crate::painter::frames::CardFramePainter;
 use crate::painter::numbers::{Alignment, DrawOptions, NumberPainter};
-use crate::painter::shield::draw_shield;
 use crate::scene::card::Catalog;
 use crate::scene::game::board::{self, AvailableActionList, Board, Environment};
 use crate::scene::GlobalState;
@@ -684,7 +683,6 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
                 NumberOverlayKey::Field {
                     color: foreground_color,
                     power: card.power().map(|p| p.value()),
-                    shields: card.shields().map(|s| s.value()),
                     diff: card.power().map(|p| p.diff()).unwrap_or(Ordering::Equal),
                 },
                 &self.materials,
@@ -712,9 +710,6 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
                         },
                         &mut overlay,
                     );
-                }
-                if let Some(shields) = card.shields() {
-                    draw_shield(&mut overlay, 33, 23, shields.value());
                 }
                 let overlay_texture = self.images.add(Image::new_fill(
                     Extent3d {

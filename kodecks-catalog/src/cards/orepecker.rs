@@ -10,7 +10,7 @@ card_def!(
     card_type: CardType::Creature,
     creature_type: CreatureType::Robot,
     power: 100,
-    abilities: &[KeywordAbility::Piercing][..],
+    abilities: &[][..],
 );
 
 impl Effect for CardDef {}

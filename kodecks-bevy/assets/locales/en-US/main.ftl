@@ -47,8 +47,6 @@ ability-stealth = Stealth
     .description = This creature cannot be targeted by card effects.
 ability-devour = Devour
     .description = Creatures destroyed by this creature do not generate a shard.
-ability-piercing = Piercing
-    .description = This card can destroy a creature, regardless of its shield.
 
 error-failed-to-connect-server = Failed to connect to the server.
 error-client-version-outdated = Your client needs to be updated.　Supported client version: { $requirement }

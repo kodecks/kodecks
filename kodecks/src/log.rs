@@ -75,9 +75,6 @@ pub enum GameLog {
         source: CardSnapshot,
         target: CardSnapshot,
     },
-    ShieldBroken {
-        card: CardSnapshot,
-    },
 }
 
 impl GameLog {
@@ -144,9 +141,6 @@ impl GameLog {
             Self::CardTargeted { source, target } => Self::CardTargeted {
                 source: source.redacted(viewer),
                 target: target.redacted(viewer),
-            },
-            Self::ShieldBroken { card } => Self::ShieldBroken {
-                card: card.redacted(viewer),
             },
             _ => self,
         }

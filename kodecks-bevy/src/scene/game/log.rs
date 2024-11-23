@@ -272,7 +272,6 @@ pub fn translate_log<'a>(
             );
             "log-creature-attacked-player"
         }
-        _ => return None,
     };
     Some(translator.get(Request {
         id,

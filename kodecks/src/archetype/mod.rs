@@ -117,7 +117,6 @@ pub struct CardAttribute {
     pub abilities: Vec<KeywordAbility>,
     pub anon_abilities: Vec<AnonymousAbility>,
     pub power: Option<u32>,
-    pub shields: Option<u8>,
     pub is_token: bool,
     pub styles: Vec<CardStyle>,
 }
@@ -132,7 +131,6 @@ impl Default for CardAttribute {
             abilities: Vec::new(),
             anon_abilities: Vec::new(),
             power: None,
-            shields: None,
             is_token: false,
             styles: Vec::new(),
         }
@@ -153,7 +151,6 @@ impl Ord for CardAttribute {
             .then(self.card_type.cmp(&other.card_type))
             .then(self.creature_type.cmp(&other.creature_type))
             .then(self.power.cmp(&other.power))
-            .then(self.shields.cmp(&other.shields))
     }
 }
 

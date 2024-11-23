@@ -1,13 +1,12 @@
 use super::{EndgameReason, Environment};
 use crate::{
     ability::PlayerAbility,
-    effect::{ContinuousCardEffectContext, EffectActivateContext, EffectTriggerContext},
+    effect::{EffectActivateContext, EffectTriggerContext},
     error::ActionError,
     field::{FieldBattleState, FieldState},
     log::GameLog,
     opcode::Opcode,
     player::{PlayerEndgameState, Zone},
-    prelude::{ContinuousEffect, ContinuousItem},
     sequence::CardSequence,
     target::Target,
     zone::{CardZone, MoveReason, ZoneKind},
@@ -96,17 +95,6 @@ impl Environment {
                     source,
                     color,
                     amount,
-                }])
-            }
-            Opcode::BreakShield { card } => {
-                let card = self.state.find_card(card)?;
-                self.continuous.add(ContinuousItem::new(
-                    card,
-                    ShieldBroken,
-                    Target::Card(card.id()),
-                ));
-                Ok(vec![GameLog::ShieldBroken {
-                    card: card.snapshot(),
                 }])
             }
             Opcode::GenerateCardToken { card } => {
@@ -308,19 +296,5 @@ impl Environment {
                 ])
             }
         }
-    }
-}
-
-#[derive(Debug, Clone)]
-struct ShieldBroken;
-
-impl ContinuousEffect for ShieldBroken {
-    fn apply_card(&mut self, ctx: &mut ContinuousCardEffectContext) -> anyhow::Result<bool> {
-        if ctx.target.id() == ctx.source.id() {
-            if let Some(shields) = &mut ctx.computed.shields {
-                shields.add(-1);
-            }
-        }
-        Ok(true)
     }
 }

@@ -38,7 +38,6 @@ pub enum KeywordAbility {
     Volatile,
     Stealth,
     Devour,
-    Piercing,
 }
 
 impl Ability for KeywordAbility {}
@@ -52,7 +51,6 @@ impl Score for KeywordAbility {
             KeywordAbility::Volatile => -1,
             KeywordAbility::Stealth => 1,
             KeywordAbility::Devour => 1,
-            KeywordAbility::Piercing => 1,
         }
     }
 }
@@ -88,7 +86,6 @@ impl From<KeywordAbility> for Value {
             KeywordAbility::Volatile => tinystr!(32, "volatile"),
             KeywordAbility::Stealth => tinystr!(32, "stealth"),
             KeywordAbility::Devour => tinystr!(32, "devour"),
-            KeywordAbility::Piercing => tinystr!(32, "piercing"),
         };
         let mut obj = BTreeMap::new();
         obj.insert(tinystr!(32, "name"), Constant::String(name).into());

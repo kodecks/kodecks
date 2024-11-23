@@ -1,5 +1,4 @@
 use crate::{
-    ability::KeywordAbility,
     archetype::ArchetypeId,
     color::Color,
     env::Environment,
@@ -58,9 +57,6 @@ pub enum ActionCommand {
         color: Color,
         amount: u8,
     },
-    BreakShield {
-        target: TimedObjectId,
-    },
 }
 
 impl ActionCommand {
@@ -81,20 +77,6 @@ impl ActionCommand {
                 let current_target = env.state.find_card(target.id)?;
                 if current_target.timed_id() != target {
                     return Err(ActionError::TargetLost { target });
-                }
-                let piercing = source
-                    .computed()
-                    .abilities
-                    .contains(&KeywordAbility::Piercing);
-                let shields = current_target
-                    .computed()
-                    .shields
-                    .map(|shields| shields.value())
-                    .unwrap_or_default();
-                if !piercing && shields > 0 {
-                    return Ok(vec![OpcodeList::new(vec![Opcode::BreakShield {
-                        card: current_target.id(),
-                    }])]);
                 }
                 let from = *current_target.zone();
                 env.apply_event(
@@ -183,15 +165,6 @@ impl ActionCommand {
                 color,
                 amount,
             }])]),
-            ActionCommand::BreakShield { target } => {
-                let current_target = env.state.find_card(target.id)?;
-                if current_target.timed_id() != target {
-                    return Err(ActionError::TargetLost { target });
-                }
-                Ok(vec![OpcodeList::new(vec![Opcode::BreakShield {
-                    card: current_target.id(),
-                }])])
-            }
         }
     }
 }

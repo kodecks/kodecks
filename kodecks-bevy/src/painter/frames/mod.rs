@@ -1,7 +1,4 @@
-use super::{
-    numbers::{Alignment, DrawOptions, NumberPainter},
-    shield::draw_shield,
-};
+use super::numbers::{Alignment, DrawOptions, NumberPainter};
 use bevy::{ecs::system::Resource, utils::HashMap};
 use dashmap::DashMap;
 use image::{DynamicImage, GenericImage, GenericImageView, ImageReader, Rgba};
@@ -50,9 +47,6 @@ impl CardFramePainter {
                 },
                 &mut frame_base,
             );
-        }
-        if let Some(shields) = frame.shields {
-            draw_shield(&mut frame_base, 35, 47, shields);
         }
         if let Some(creature_type) = frame.creature_type {
             let image = Self::get_creature_type(creature_type);
@@ -164,7 +158,6 @@ pub struct CardFrame {
     pub color: Color,
     pub cost: u8,
     pub power: Option<u32>,
-    pub shields: Option<u8>,
     pub creature_type: Option<CreatureType>,
 }
 
@@ -174,7 +167,6 @@ impl CardFrame {
             color: attr.color,
             cost: attr.cost.value(),
             power: attr.power.map(|p| p.value()),
-            shields: attr.shields.map(|p| p.value()),
             creature_type: attr.creature_type,
         }
     }

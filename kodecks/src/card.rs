@@ -286,7 +286,6 @@ impl AsMut<Card> for Card {
 #[derive(Debug, Clone, Copy)]
 pub struct CardScore {
     pub power: i32,
-    pub shields: i32,
     pub abilities: i32,
 }
 
@@ -294,7 +293,7 @@ impl Score for CardScore {
     type Output = i32;
 
     fn score(&self) -> i32 {
-        self.power / 100 + self.shields + self.abilities
+        self.power / 100 + self.abilities
     }
 }
 
@@ -303,7 +302,6 @@ impl Score for Card {
 
     fn score(&self) -> CardScore {
         let power = self.computed.power.map(|p| p.value()).unwrap_or(0) as i32;
-        let shields = self.computed.shields.map(|s| s.value()).unwrap_or(0) as i32;
         let abilities = self
             .computed
             .abilities
@@ -316,11 +314,7 @@ impl Score for Card {
                 .iter()
                 .map(AnonymousAbility::score)
                 .sum::<i32>();
-        CardScore {
-            power,
-            shields,
-            abilities,
-        }
+        CardScore { power, abilities }
     }
 }
 
@@ -404,10 +398,6 @@ impl CardSnapshot {
 
     pub fn power(&self) -> Option<Linear<u32>> {
         self.computed.as_ref().and_then(|c| c.power)
-    }
-
-    pub fn shields(&self) -> Option<Linear<u8>> {
-        self.computed.as_ref().and_then(|c| c.shields)
     }
 }
 

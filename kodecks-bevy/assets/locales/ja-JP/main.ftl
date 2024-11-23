@@ -47,8 +47,6 @@ ability-stealth = ステルス
     .description = このクリーチャーはカード効果の対象に指定できない。
 ability-devour = 貪食
     .description = このクリーチャーによって破壊されたクリーチャーはカケラを生成しない。
-ability-piercing = 貫通
-    .description = シールドに関係なくクリーチャーを破壊する。
 
 error-failed-to-connect-server = サーバーに接続できませんでした。
 error-client-version-outdated = クライアントのアップデートが必要です。対応クライアントバージョン: { $requirement }

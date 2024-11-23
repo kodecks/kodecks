@@ -29,8 +29,6 @@ pub struct ComputedAttribute {
     pub anon_abilities: AbilityList<AnonymousAbility>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub power: Option<Linear<u32>>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub shields: Option<Linear<u8>>,
 }
 
 impl From<&CardArchetype> for ComputedAttribute {
@@ -43,7 +41,6 @@ impl From<&CardArchetype> for ComputedAttribute {
             abilities: archetype.attribute.abilities.iter().copied().collect(),
             anon_abilities: archetype.attribute.anon_abilities.iter().copied().collect(),
             power: archetype.attribute.power.map(Linear::from),
-            shields: archetype.attribute.shields.map(Linear::from),
         }
     }
 }
@@ -61,10 +58,6 @@ impl ComputedAttribute {
         self.power.map(|power| power.value()).unwrap_or(0)
     }
 
-    pub fn current_shields(&self) -> u8 {
-        self.shields.map(|shields| shields.value()).unwrap_or(0)
-    }
-
     pub fn apply_modifier(&mut self, modifier: ComputedAttributeModifier) {
         if let Some(modifier) = modifier.cost {
             self.cost.modify(modifier);
@@ -78,11 +71,6 @@ impl ComputedAttribute {
         if let Some(modifier) = modifier.power {
             if let Some(power) = self.power.as_mut() {
                 power.modify(modifier);
-            }
-        }
-        if let Some(modifier) = modifier.shields {
-            if let Some(shields) = self.shields.as_mut() {
-                shields.modify(modifier);
             }
         }
     }
@@ -140,6 +128,4 @@ pub struct ComputedAttributeModifier {
     pub anon_abilities: Option<Modifier<AnonymousAbility>>,
     #[serde(default)]
     pub power: Option<Modifier<u32>>,
-    #[serde(default)]
-    pub shields: Option<Modifier<u8>>,
 }
