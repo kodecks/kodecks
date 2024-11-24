@@ -39,7 +39,7 @@ impl CardFramePainter {
                 &format!("{power}").replace('0', "o"),
                 &DrawOptions {
                     x: 1,
-                    y: 47,
+                    y: 54,
                     foreground: [255, 255, 255, 255].into(),
                     background,
                     h_align: Alignment::Start,
@@ -52,7 +52,7 @@ impl CardFramePainter {
             let image = Self::get_creature_type(creature_type);
             for (x, y, pixel) in image.as_rgba8().unwrap().enumerate_pixels() {
                 if pixel[3] != 0 {
-                    frame_base.put_pixel(x + 26, y + 5, *pixel);
+                    frame_base.put_pixel(x + 30, y + 2, *pixel);
                 }
             }
         }

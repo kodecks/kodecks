@@ -313,7 +313,10 @@ impl<'w, 's> CardBundleBuilder<'w, 's> {
 
         self.meshes
             .get_or_insert_with(handles.shadow_mesh.id(), || {
-                Plane3d::default().mesh().size(40.0, 80.0).build()
+                Plane3d::default()
+                    .mesh()
+                    .size(CARD_WIDTH + 4.0, CARD_HEIGHT + 32.0)
+                    .build()
             });
 
         self.meshes

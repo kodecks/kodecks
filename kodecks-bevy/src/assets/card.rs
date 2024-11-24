@@ -107,8 +107,8 @@ impl AssetLoader for RenderedCardLoader {
             let attr = ComputedAttribute::from(&*archetype);
             let mut frame_image = self.painter.generate_frame(CardFrame::new(&attr));
             for (x, y, pixel) in image.enumerate_pixels() {
-                if frame_image.get_pixel(x + 2, y + 14)[3] == 0 {
-                    frame_image.put_pixel(x + 2, y + 14, *pixel);
+                if frame_image.get_pixel(x + 4, y + 14)[3] == 0 {
+                    frame_image.put_pixel(x + 4, y + 14, *pixel);
                 }
             }
 
