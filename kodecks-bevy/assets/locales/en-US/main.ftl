@@ -21,6 +21,7 @@ opponents-turn = Opponent's Turn
 
 phase-standby = Standby Phase
 phase-draw = Draw Phase
+phase-charge = Charge Phase
 phase-main = Main Phase
 phase-block = Block Phase
 phase-battle = Battle Phase
@@ -38,6 +39,7 @@ result-draw = Draw
     .reason-simultaneous-end = Both players fulfill the winning or losing condition at the same time.
 
 message-discard-excess-cards = Discard cards until you have { $maxHandSize } cards in your hand.
+message-discard = Discard a card.
 
 ability-toxic = Toxic
     .description = After the battle, destroy the creature that battled with this creature.

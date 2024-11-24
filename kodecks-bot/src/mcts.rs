@@ -76,8 +76,8 @@ impl State {
                         })
                         .chain(Some((player, Action::Block { pairs: vec![] })))
                         .collect(),
+                    AvailableAction::Continue => vec![(player, Action::Continue)],
                     AvailableAction::EndTurn => vec![(player, Action::EndTurn)],
-                    _ => vec![],
                 })
                 .collect()
         } else {

@@ -124,11 +124,7 @@ impl Environment {
             let hand_states = player
                 .hand
                 .items()
-                .map(|card| {
-                    let mut attrs = self.continuous.apply_card(&self.state, card);
-                    attrs.cost.add(card.hand_cost_delta());
-                    attrs
-                })
+                .map(|card| self.continuous.apply_card(&self.state, card))
                 .collect();
             let player = self.state.players.get_mut(side)?;
             player.abilities = abilities;

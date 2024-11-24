@@ -730,6 +730,7 @@ impl Value {
                     }
                     "cost" => Some(card.computed().cost.value().into()),
                     "power" => card.computed().power.map(|power| power.value().into()),
+                    "shards" => Some(card.computed().shards.value().into()),
                     "abilities" => Some(Value::Array(
                         card.computed()
                             .abilities

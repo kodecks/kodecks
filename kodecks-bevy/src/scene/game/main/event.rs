@@ -48,8 +48,9 @@ fn handle_player_events(
     let player_event = !events.is_empty();
     let mut action = events.read().find_map(|event| match event {
         PlayerEvent::ButtonPressed(button) => match button {
+            ActionButton::Continue => Some(Action::Continue),
             ActionButton::EndTurn => Some(Action::EndTurn),
-            ActionButton::Block(_) | ActionButton::Continue => Some(Action::Block {
+            ActionButton::Block(_) | ActionButton::NoBlock => Some(Action::Block {
                 pairs: board.blocking_pairs().copied().collect(),
             }),
             ActionButton::Attack(_) => Some(Action::Attack {
@@ -62,12 +63,11 @@ fn handle_player_events(
                 _ => None,
             }),
         },
-        PlayerEvent::CardDroppedOnField(dropped) => {
-            list
-                .castable_cards()
-                .iter()
-                .find(|card| card.id == *dropped).map(|card| Action::CastCard { card: *card })
-        }
+        PlayerEvent::CardDroppedOnField(dropped) => list
+            .castable_cards()
+            .iter()
+            .find(|card| card.id == *dropped)
+            .map(|card| Action::CastCard { card: *card }),
         PlayerEvent::CardDropped(dropped, target) => {
             if let Some(card) = list
                 .castable_cards()

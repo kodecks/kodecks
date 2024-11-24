@@ -117,6 +117,7 @@ pub struct CardAttribute {
     pub abilities: Vec<KeywordAbility>,
     pub anon_abilities: Vec<AnonymousAbility>,
     pub power: Option<u32>,
+    pub shards: u8,
     pub is_token: bool,
     pub styles: Vec<CardStyle>,
 }
@@ -131,6 +132,7 @@ impl Default for CardAttribute {
             abilities: Vec::new(),
             anon_abilities: Vec::new(),
             power: None,
+            shards: 0,
             is_token: false,
             styles: Vec::new(),
         }
