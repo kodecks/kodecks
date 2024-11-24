@@ -422,8 +422,8 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                     parent.spawn((
                                         ImageBundle {
                                             style: Style {
-                                                width: Val::Px(60.),
-                                                height: Val::Px(60. / CARD_WIDTH * CARD_HEIGHT),
+                                                width: Val::Px(80.),
+                                                height: Val::Px(80. / CARD_WIDTH * CARD_HEIGHT),
                                                 padding: UiRect::all(Val::Px(5.)),
                                                 ..default()
                                             },
