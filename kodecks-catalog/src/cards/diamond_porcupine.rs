@@ -24,7 +24,6 @@ impl Effect for CardDef {
                 let target = card.zone().player;
                 let commands = vec![ActionCommand::GenerateShards {
                     player: target,
-                    source: ctx.source().id(),
                     color: card.computed().color,
                     amount: 1,
                 }];

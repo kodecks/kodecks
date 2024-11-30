@@ -2,6 +2,7 @@ use super::Environment;
 use crate::{
     ability::KeywordAbility,
     action::Action,
+    color::Color,
     command::ActionCommand,
     error::ActionError,
     event::{CardEvent, EventReason},
@@ -47,7 +48,14 @@ impl Environment {
                     player: player.id,
                 }]))
                 .take(self.state.regulation.initial_hand_size as usize);
-                filter_vec![opcodes,]
+                filter_vec![
+                    opcodes,
+                    Some(OpcodeList::new(vec![Opcode::GenerateShards {
+                        player: player.id,
+                        color: Color::COLORLESS,
+                        amount: 3,
+                    }])),
+                ]
             }),
             Some(OpcodeList::new(vec![Opcode::ChangeTurn {
                 turn: 1,
@@ -141,17 +149,11 @@ impl Environment {
                         } else {
                             item.computed().cost.value()
                         };
-                        if player_in_turn.shards.get(color) < cost {
+                        if player_in_turn.shards.get(Color::COLORLESS) < cost {
                             return Err(ActionError::InsufficientShards {
                                 color,
                                 amount: cost,
                             });
-                        }
-                        if item.computed().is_creature()
-                            && cost == 0
-                            && player_in_turn.counters.free_casted > 0
-                        {
-                            return Err(ActionError::CreatureAlreadyFreeCasted);
                         }
                         let from = Zone::new(player_in_turn.id, ZoneKind::Hand);
                         filter_vec![
@@ -160,7 +162,7 @@ impl Environment {
                                     Some(Opcode::ConsumeShards {
                                         player: self.state.players.player_in_turn()?.id,
                                         source: item.id(),
-                                        color: item.computed().color,
+                                        color: Color::COLORLESS,
                                         amount: cost,
                                     })
                                 } else {
@@ -250,17 +252,11 @@ impl Environment {
                     } else {
                         item.computed().cost.value()
                     };
-                    if active_player.shards.get(color) < cost {
+                    if active_player.shards.get(Color::COLORLESS) < cost {
                         return Err(ActionError::InsufficientShards {
                             color,
                             amount: cost,
                         });
-                    }
-                    if item.computed().is_creature()
-                        && cost == 0
-                        && active_player.counters.free_casted > 0
-                    {
-                        return Err(ActionError::CreatureAlreadyFreeCasted);
                     }
                     let from = Zone::new(active_player.id, ZoneKind::Hand);
                     Ok(filter_vec![
@@ -269,7 +265,7 @@ impl Environment {
                                 Some(Opcode::ConsumeShards {
                                     player: active_player.id,
                                     source: item.id(),
-                                    color: item.computed().color,
+                                    color: Color::COLORLESS,
                                     amount: cost,
                                 })
                             } else {

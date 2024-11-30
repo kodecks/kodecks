@@ -23,7 +23,6 @@ impl Effect for CardDef {
                 Ok(
                     EffectReport::default().with_commands(vec![ActionCommand::GenerateShards {
                         player: ctx.source().zone().player,
-                        source: ctx.source().id(),
                         color: ctx.source().computed().color,
                         amount: 1,
                     }]),

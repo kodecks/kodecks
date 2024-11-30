@@ -2,6 +2,7 @@ use super::Environment;
 use crate::{
     ability::KeywordAbility,
     card::Card,
+    color::Color,
     error::ActionError,
     event::CardEvent,
     filter_vec,
@@ -46,8 +47,7 @@ impl Environment {
                     } else {
                         Some(OpcodeList::new(vec![Opcode::GenerateShards {
                             player: to.player,
-                            source: target.id(),
-                            color: target.archetype().attribute.color,
+                            color: Color::COLORLESS,
                             amount: 1,
                         }]))
                     },

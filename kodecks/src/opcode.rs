@@ -31,7 +31,6 @@ pub enum Opcode {
     },
     GenerateShards {
         player: u8,
-        source: ObjectId,
         color: Color,
         amount: u8,
     },

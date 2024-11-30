@@ -55,7 +55,6 @@ impl Environment {
             }
             Opcode::GenerateShards {
                 player,
-                source,
                 color,
                 amount,
             } => {
@@ -70,13 +69,11 @@ impl Environment {
                         }
                     })
                     .unwrap_or_default();
-                let source = self.state.find_card(source)?.snapshot();
                 let amount = ((amount as i32) + propagate).max(0) as u8;
                 let player = self.state.players.get_mut(player)?;
                 player.shards.add(color, amount);
                 Ok(vec![GameLog::ShardsEarned {
                     player: player.id,
-                    source,
                     color,
                     amount,
                 }])
@@ -127,7 +124,7 @@ impl Environment {
                 }
                 Ok(vec![])
             }
-            Opcode::CastCard { player, card, cost } => {
+            Opcode::CastCard { player, card, .. } => {
                 let player = self.state.players.get_mut(player)?;
                 if let Some(mut card) = player.hand.remove(card) {
                     let from = *card.zone();
@@ -136,9 +133,6 @@ impl Environment {
                     card.set_zone(to);
                     let snapshot = card.snapshot();
                     player.field.push(card);
-                    if cost == 0 {
-                        player.counters.free_casted += 1;
-                    }
                     return Ok(vec![GameLog::CardMoved {
                         player: controller,
                         card: snapshot,

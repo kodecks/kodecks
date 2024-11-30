@@ -169,7 +169,6 @@ pub fn translate_log<'a>(
             player,
             color,
             amount,
-            ..
         } => {
             args.set(
                 "player",

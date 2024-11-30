@@ -1,6 +1,7 @@
 use crate::{
     ability::{AbilityList, PlayerAbility},
     card::{Card, CardScore, CardSnapshot},
+    color::Color,
     deck::DeckList,
     env::{EndgameReason, GameState},
     error::ActionError,
@@ -241,10 +242,7 @@ impl Player {
             .filter(|card| {
                 let castable = (state.debug.flags.contains(DebugFlags::IGNORE_COST)
                     || card.computed().cost.value() == 0
-                    || self.shards.get(card.computed().color) >= card.computed().cost.value())
-                    && (!card.computed().is_creature()
-                        || card.computed().cost.value() > 0
-                        || self.counters.free_casted == 0);
+                    || self.shards.get(Color::COLORLESS) >= card.computed().cost.value());
                 card.effect().is_castable(state, card, castable)
             })
             .map(|card| card.timed_id())
@@ -306,7 +304,6 @@ pub enum PlayerEndgameState {
 #[derive(Debug, Default, Clone, Copy)]
 pub struct PlayerCounters {
     pub draw: u16,
-    pub free_casted: u16,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]

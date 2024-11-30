@@ -163,7 +163,7 @@ fn update(
                     Color::GREEN => assets.green.clone(),
                     Color::BLUE => assets.blue.clone(),
                     Color::YELLOW => assets.yellow.clone(),
-                    _ => assets.red.clone(),
+                    _ => assets.yellow.clone(),
                 };
                 *transform = Transform::from_translation(position);
                 *visibility = Visibility::Visible;

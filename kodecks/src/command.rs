@@ -47,7 +47,6 @@ pub enum ActionCommand {
     },
     GenerateShards {
         player: u8,
-        source: ObjectId,
         color: Color,
         amount: u8,
     },
@@ -145,12 +144,10 @@ impl ActionCommand {
             }
             ActionCommand::GenerateShards {
                 player,
-                source,
                 color,
                 amount,
             } => Ok(vec![OpcodeList::new(vec![Opcode::GenerateShards {
                 player,
-                source,
                 color,
                 amount,
             }])]),
