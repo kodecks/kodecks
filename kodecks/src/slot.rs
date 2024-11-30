@@ -8,7 +8,7 @@ pub struct CardSlot<T> {
 impl<T> CardSlot<T> {
     pub fn new(len: usize) -> Self {
         Self {
-            cards: (0..len).into_iter().map(|_| None).collect(),
+            cards: (0..len).map(|_| None).collect(),
         }
     }
 
