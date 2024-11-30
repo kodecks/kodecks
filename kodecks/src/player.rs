@@ -246,6 +246,7 @@ impl Player {
                     || self.shards.get(Color::COLORLESS) >= card.computed().cost.value();
                 card.effect().is_castable(state, card, castable)
             })
+            .filter(|_| self.field.has_space())
             .map(|card| card.timed_id())
     }
 }

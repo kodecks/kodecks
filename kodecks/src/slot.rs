@@ -11,6 +11,16 @@ impl<T> CardSlot<T> {
             cards: (0..len).into_iter().map(|_| None).collect(),
         }
     }
+
+    pub fn has_space(&self) -> bool {
+        self.cards.iter().any(|card| card.is_none())
+    }
+
+    pub fn put(&mut self, index: usize, card: T) {
+        if let Some(slot) = self.cards.get_mut(index) {
+            *slot = Some(card);
+        }
+    }
 }
 
 impl<T> CardZone for CardSlot<T>
