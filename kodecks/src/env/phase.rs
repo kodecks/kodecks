@@ -151,7 +151,10 @@ impl Environment {
             Phase::Main => {
                 let logs = match action {
                     Some(Action::CastCard { card }) => {
-                        let item = player_in_turn.hand.get_item(card)?;
+                        let item = player_in_turn
+                            .hand
+                            .get(card)
+                            .ok_or(ActionError::CardNotFound { id: card.id })?;
                         let color = item.computed().color;
                         let cost = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                             0
@@ -257,7 +260,10 @@ impl Environment {
                         }),
                     ])])
                 } else if let Some(Action::CastCard { card }) = action {
-                    let item = active_player.hand.get_item(card)?;
+                    let item = active_player
+                        .hand
+                        .get(card)
+                        .ok_or(ActionError::CardNotFound { id: card.id })?;
                     let color = item.computed().color;
                     let cost = if self.state.debug.flags.contains(DebugFlags::IGNORE_COST) {
                         0

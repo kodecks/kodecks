@@ -1,11 +1,11 @@
 use crate::{
     card::Card,
-    error::ActionError,
     id::{CardId, ObjectIdCounter},
     sequence::CardSequence,
     zone::CardZone,
 };
 use rand::seq::SliceRandom;
+
 #[derive(Debug, Clone)]
 pub struct CardList<T> {
     cards: Vec<T>,
@@ -14,21 +14,6 @@ pub struct CardList<T> {
 impl<T> CardList<T> {
     pub fn new() -> Self {
         Self { cards: Vec::new() }
-    }
-}
-
-impl<T> CardList<T>
-where
-    T: CardId,
-{
-    pub fn get_item<I>(&self, id: I) -> Result<&T, ActionError>
-    where
-        I: CardId,
-    {
-        self.cards
-            .iter()
-            .find(|item| item.id() == id.id())
-            .ok_or(ActionError::CardNotFound { id: id.id() })
     }
 }
 
