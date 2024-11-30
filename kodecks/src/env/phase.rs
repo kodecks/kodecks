@@ -112,22 +112,9 @@ impl Environment {
         match self.state.phase {
             Phase::Standby => {
                 let next_phase = Phase::Draw;
-                Ok(filter_vec![
-                    self.state
-                        .players
-                        .iter()
-                        .flat_map(|player| {
-                            filter_vec![Some(OpcodeList::new(vec![Opcode::GenerateShards {
-                                player: player.id,
-                                color: Color::COLORLESS,
-                                amount: 1,
-                            }])),]
-                        })
-                        .filter(|_| self.state.turn > 1),
-                    Some(OpcodeList::new(vec![Opcode::ChangePhase {
-                        phase: next_phase
-                    }],)),
-                ])
+                Ok(filter_vec![Some(OpcodeList::new(vec![
+                    Opcode::ChangePhase { phase: next_phase }
+                ],)),])
             }
             Phase::Draw => {
                 if player_in_turn.counters.draw == 0 && self.state.turn > 1 {
@@ -443,11 +430,20 @@ impl Environment {
                     .players
                     .next_id(self.state.players.player_in_turn()?.id)?;
                 let turn = self.state.turn + 1;
-                Ok(vec![OpcodeList::new(vec![Opcode::ChangeTurn {
-                    turn,
-                    player: active_player,
-                    phase: Phase::Standby,
-                }])])
+                Ok(filter_vec![
+                    self.state.players.iter().flat_map(|player| {
+                        filter_vec![Some(OpcodeList::new(vec![Opcode::GenerateShards {
+                            player: player.id,
+                            color: Color::COLORLESS,
+                            amount: 1,
+                        }])),]
+                    }),
+                    Some(OpcodeList::new(vec![Opcode::ChangeTurn {
+                        turn,
+                        player: active_player,
+                        phase: Phase::Standby,
+                    }])),
+                ])
             }
         }
     }
