@@ -131,6 +131,7 @@ impl Board {
         self.player_field = player
             .field
             .iter()
+            .filter_map(|card| card.as_ref())
             .map(|card| (card.timed_id(), card.field_state))
             .collect();
         self.player_field.sort_by_key(|(id, _)| {
@@ -150,6 +151,7 @@ impl Board {
         self.opponent_field = opponent
             .field
             .iter()
+            .filter_map(|card| card.as_ref())
             .map(|card| (card.timed_id(), card.field_state))
             .collect();
         self.opponent_field.sort_by_key(|(id, _)| {
@@ -163,6 +165,7 @@ impl Board {
             .players
             .iter()
             .flat_map(|player| player.field.iter())
+            .filter_map(|card| card.as_ref())
             .filter(|card| card.battle_state == Some(FieldBattleState::Attacking))
             .map(|card| card.timed_id())
             .collect();
@@ -171,6 +174,7 @@ impl Board {
             .players
             .iter()
             .flat_map(|player| player.field.iter())
+            .filter_map(|card| card.as_ref())
             .filter_map(|card| {
                 if let Some(FieldBattleState::Blocking { attacker }) = card.battle_state {
                     Some((attacker, card.timed_id()))

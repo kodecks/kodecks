@@ -61,7 +61,9 @@ impl LocalEnvironment {
         if let Action::CastCard { card, .. } = action {
             if let Ok(player) = self.players.get_mut(self.player) {
                 if let Some(card) = CardZone::remove(&mut player.hand, card) {
-                    player.field.push(card);
+                    if let Some(index) = player.field.iter().position(|c| c.is_none()) {
+                        player.field[index] = Some(card);
+                    }
                 }
             }
             self.timestamp += 1;

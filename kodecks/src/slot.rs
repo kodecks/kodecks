@@ -21,6 +21,14 @@ impl<T> CardSlot<T> {
             *slot = Some(card);
         }
     }
+
+    pub fn slots(&self) -> &[Option<T>] {
+        &self.cards
+    }
+
+    pub fn slots_mut(&mut self) -> &mut [Option<T>] {
+        &mut self.cards
+    }
 }
 
 impl<T> CardZone for CardSlot<T>

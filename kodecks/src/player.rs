@@ -326,7 +326,7 @@ pub struct LocalPlayerState {
     pub deck: usize,
     pub hand: Vec<CardSnapshot>,
     pub graveyard: Vec<CardSnapshot>,
-    pub field: Vec<CardSnapshot>,
+    pub field: Vec<Option<CardSnapshot>>,
     pub limbo: Vec<CardSnapshot>,
     pub shards: ShardList,
     pub stats: PlayerStats,
@@ -355,8 +355,9 @@ impl LocalPlayerState {
                 .collect(),
             field: state
                 .field
+                .slots()
                 .iter()
-                .map(|card| card.snapshot().redacted(viewer))
+                .map(|card| card.as_ref().map(|card| card.snapshot().redacted(viewer)))
                 .collect(),
             limbo: state
                 .limbo
@@ -371,6 +372,7 @@ impl LocalPlayerState {
     pub fn find_card(&self, card: ObjectId) -> Option<&CardSnapshot> {
         self.field
             .iter()
+            .filter_map(|card| card.as_ref())
             .find(|item| item.id == card)
             .or_else(|| self.graveyard.iter().find(|item| item.id == card))
             .or_else(|| self.hand.iter().find(|item| item.id == card))
@@ -381,7 +383,7 @@ impl LocalPlayerState {
         self.hand
             .iter()
             .chain(self.graveyard.iter())
-            .chain(self.field.iter())
+            .chain(self.field.iter().filter_map(|card| card.as_ref()))
             .chain(self.limbo.iter())
     }
 
@@ -389,7 +391,12 @@ impl LocalPlayerState {
         if self.hand.iter().any(|item| item.id == card) {
             return Some(ZoneKind::Hand);
         }
-        if self.field.iter().any(|item| item.id == card) {
+        if self
+            .field
+            .iter()
+            .filter_map(|card| card.as_ref())
+            .any(|item| item.id == card)
+        {
             return Some(ZoneKind::Field);
         }
         if self.graveyard.iter().any(|item| item.id == card) {
