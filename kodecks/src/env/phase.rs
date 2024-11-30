@@ -113,13 +113,17 @@ impl Environment {
             Phase::Standby => {
                 let next_phase = Phase::Draw;
                 Ok(filter_vec![
-                    if self.state.turn == 1 {
-                        None
-                    } else {
-                        Some(OpcodeList::new(vec![Opcode::ReduceCost {
-                            player: self.state.players.player_in_turn()?.id,
-                        }]))
-                    },
+                    self.state
+                        .players
+                        .iter()
+                        .flat_map(|player| {
+                            filter_vec![Some(OpcodeList::new(vec![Opcode::GenerateShards {
+                                player: player.id,
+                                color: Color::COLORLESS,
+                                amount: 1,
+                            }])),]
+                        })
+                        .filter(|_| self.state.turn > 1),
                     Some(OpcodeList::new(vec![Opcode::ChangePhase {
                         phase: next_phase
                     }],)),
