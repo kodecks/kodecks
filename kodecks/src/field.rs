@@ -2,6 +2,7 @@ use crate::{
     card::Card,
     id::{ObjectId, TimedObjectId},
     list::CardList,
+    zone::CardZone,
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
@@ -9,17 +10,17 @@ use strum::Display;
 
 impl CardList<Card> {
     pub fn active_cards(&self) -> impl Iterator<Item = &Card> {
-        self.items()
+        self.iter()
             .filter(|card| card.field_state() == FieldState::Active)
     }
 
     pub fn attacking_cards(&self) -> impl Iterator<Item = &Card> {
-        self.items()
+        self.iter()
             .filter(|card| Some(FieldBattleState::Attacking) == card.battle_state())
     }
 
     pub fn find_blocker(&self, attacker: ObjectId) -> Option<&Card> {
-        self.items().find(|card| {
+        self.iter().find(|card| {
             if let Some(FieldBattleState::Blocking { attacker: id }) = card.battle_state() {
                 id.id == attacker
             } else {
@@ -29,13 +30,13 @@ impl CardList<Card> {
     }
 
     pub fn set_card_field_state(&mut self, id: ObjectId, state: FieldState) {
-        if let Some(card) = self.items_mut().find(|card| card.id() == id) {
+        if let Some(card) = self.iter_mut().find(|card| card.id() == id) {
             card.set_field_state(state);
         }
     }
 
     pub fn set_card_battle_state(&mut self, id: ObjectId, state: Option<FieldBattleState>) -> bool {
-        if let Some(card) = self.items_mut().find(|card| card.id() == id) {
+        if let Some(card) = self.iter_mut().find(|card| card.id() == id) {
             if card.battle_state() != state {
                 card.set_battle_state(state);
                 return true;

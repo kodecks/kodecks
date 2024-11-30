@@ -15,14 +15,6 @@ impl<T> CardList<T> {
     pub fn new() -> Self {
         Self { cards: Vec::new() }
     }
-
-    pub fn items(&self) -> impl Iterator<Item = &T> {
-        self.cards.iter()
-    }
-
-    pub fn items_mut(&mut self) -> impl Iterator<Item = &mut T> {
-        self.cards.iter_mut()
-    }
 }
 
 impl<T> CardList<T>

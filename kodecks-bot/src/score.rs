@@ -1,6 +1,7 @@
 use kodecks::{
     env::{EndgameState, Environment},
     score::Score,
+    zone::CardZone,
 };
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -59,26 +60,26 @@ pub fn get_score(env: &Environment, side: u8) -> i32 {
 
     score += player
         .hand
-        .items()
+        .iter()
         .map(|card| card.score().score())
         .sum::<i32>()
         / 2;
     score += player
         .field
-        .items()
+        .iter()
         .map(|card| card.score().score())
         .sum::<i32>();
     score += player.abilities.score();
 
     score -= opponent
         .hand
-        .items()
+        .iter()
         .map(|card| card.score().score())
         .sum::<i32>()
         / 2;
     score -= opponent
         .field
-        .items()
+        .iter()
         .map(|card| card.score().score())
         .sum::<i32>();
     score -= opponent.abilities.score();

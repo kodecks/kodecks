@@ -19,7 +19,7 @@ impl Environment {
             .state
             .players
             .iter()
-            .any(|player| player.field.items().any(|card| card.computed().is_hex()));
+            .any(|player| player.field.iter().any(|card| card.computed().is_hex()));
         if used_hexes {
             return None;
         }

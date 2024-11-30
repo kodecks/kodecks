@@ -123,7 +123,7 @@ impl Environment {
                 .collect();
             let hand_states = player
                 .hand
-                .items()
+                .iter()
                 .map(|card| self.continuous.apply_card(&self.state, card))
                 .collect();
             let player = self.state.players.get_mut(side)?;

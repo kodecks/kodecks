@@ -245,7 +245,7 @@ impl Environment {
             }
             Opcode::ResetBattleState => {
                 for player in self.state.players.iter_mut() {
-                    for card in player.field.items_mut() {
+                    for card in player.field.iter_mut() {
                         if card.battle_state().is_none() {
                             card.set_field_state(FieldState::Active);
                         }

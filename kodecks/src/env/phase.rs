@@ -72,7 +72,7 @@ impl Environment {
             .flat_map(|player| {
                 player
                     .field
-                    .items()
+                    .iter()
                     .filter(|card| {
                         card.computed().is_hex()
                             && !self.stack.iter().any(|stack| stack.source == card.id())

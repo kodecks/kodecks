@@ -237,7 +237,7 @@ impl Player {
         state: &'a GameState,
     ) -> impl Iterator<Item = TimedObjectId> + 'a {
         self.hand
-            .items()
+            .iter()
             .filter(|card| {
                 let castable = (state.debug.flags.contains(DebugFlags::IGNORE_COST)
                     || card.computed().cost.value() == 0
@@ -279,8 +279,8 @@ impl Score for Player {
             id: self.id,
             life: self.stats.life as i32,
             shards: self.shards.len() as i32,
-            hand: self.hand.items().map(Score::score).collect(),
-            field: self.field.items().map(Score::score).collect(),
+            hand: self.hand.iter().map(Score::score).collect(),
+            field: self.field.iter().map(Score::score).collect(),
         }
     }
 }
@@ -346,7 +346,7 @@ impl LocalPlayerState {
             deck: state.deck.len(),
             hand: state
                 .hand
-                .items()
+                .iter()
                 .map(|card| card.snapshot().redacted(viewer))
                 .collect(),
             graveyard: state
@@ -356,12 +356,12 @@ impl LocalPlayerState {
                 .collect(),
             field: state
                 .field
-                .items()
+                .iter()
                 .map(|card| card.snapshot().redacted(viewer))
                 .collect(),
             limbo: state
                 .limbo
-                .items()
+                .iter()
                 .map(|card| card.snapshot().redacted(viewer))
                 .collect(),
             shards: state.shards.clone(),
