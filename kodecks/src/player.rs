@@ -10,6 +10,7 @@ use crate::{
     profile::DebugFlags,
     score::Score,
     shard::ShardList,
+    slot::CardSlot,
     zone::{CardZone, ZoneKind},
 };
 use bincode::{Decode, Encode};
@@ -162,7 +163,7 @@ pub struct Player {
     pub deck: CardList<Card>,
     pub hand: CardList<Card>,
     pub graveyard: CardList<Card>,
-    pub field: CardList<Card>,
+    pub field: CardSlot<Card>,
     pub limbo: CardList<Card>,
     pub shards: ShardList,
     pub stats: PlayerStats,
@@ -184,7 +185,7 @@ impl Player {
             deck: CardList::default(),
             hand: CardList::default(),
             graveyard: CardList::default(),
-            field: CardList::default(),
+            field: CardSlot::new(3),
             limbo: CardList::default(),
             shards: ShardList::new(),
             stats: PlayerStats::default(),

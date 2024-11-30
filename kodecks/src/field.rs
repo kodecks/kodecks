@@ -1,14 +1,14 @@
 use crate::{
     card::Card,
-    id::{ObjectId, TimedObjectId},
-    list::CardList,
+    id::{ObjectId, TimedObjectId}
+    slot::CardSlot,
     zone::CardZone,
 };
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
-impl CardList<Card> {
+impl CardSlot<Card> {
     pub fn active_cards(&self) -> impl Iterator<Item = &Card> {
         self.iter()
             .filter(|card| card.field_state() == FieldState::Active)
