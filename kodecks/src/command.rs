@@ -52,7 +52,6 @@ pub enum ActionCommand {
     },
     ConsumeShards {
         player: u8,
-        source: ObjectId,
         color: Color,
         amount: u8,
     },
@@ -153,12 +152,10 @@ impl ActionCommand {
             }])]),
             ActionCommand::ConsumeShards {
                 player,
-                source,
                 color,
                 amount,
             } => Ok(vec![OpcodeList::new(vec![Opcode::ConsumeShards {
                 player,
-                source,
                 color,
                 amount,
             }])]),

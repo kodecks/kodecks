@@ -46,7 +46,6 @@ pub enum GameLog {
     },
     ShardsSpent {
         player: u8,
-        source: CardSnapshot,
         color: Color,
         amount: u8,
     },
@@ -103,12 +102,10 @@ impl GameLog {
             },
             Self::ShardsSpent {
                 player,
-                source,
                 color,
                 amount,
             } => Self::ShardsSpent {
                 player,
-                source: source.redacted(viewer),
                 color,
                 amount,
             },

@@ -152,7 +152,6 @@ impl Environment {
                                 if cost > 0 {
                                     Some(Opcode::ConsumeShards {
                                         player: self.state.players.player_in_turn()?.id,
-                                        source: item.id(),
                                         color: Color::COLORLESS,
                                         amount: cost,
                                     })
@@ -190,6 +189,11 @@ impl Environment {
                             })
                             .collect::<Vec<_>>();
                         vec![
+                            OpcodeList::new(vec![Opcode::ConsumeShards {
+                                player: player_in_turn.id,
+                                color: Color::COLORLESS,
+                                amount: 2,
+                            }]),
                             OpcodeList::new(opcodes),
                             OpcodeList::new(vec![Opcode::ChangePhase {
                                 phase: Phase::Block,
@@ -255,7 +259,6 @@ impl Environment {
                             if cost > 0 {
                                 Some(Opcode::ConsumeShards {
                                     player: active_player.id,
-                                    source: item.id(),
                                     color: Color::COLORLESS,
                                     amount: cost,
                                 })

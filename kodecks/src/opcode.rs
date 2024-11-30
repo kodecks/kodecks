@@ -36,7 +36,6 @@ pub enum Opcode {
     },
     ConsumeShards {
         player: u8,
-        source: ObjectId,
         color: Color,
         amount: u8,
     },

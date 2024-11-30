@@ -80,16 +80,13 @@ impl Environment {
             }
             Opcode::ConsumeShards {
                 player,
-                source,
                 color,
                 amount,
             } => {
-                let source = self.state.find_card(source)?.snapshot();
                 let player = self.state.players.get_mut(player)?;
                 player.shards.consume(color, amount)?;
                 Ok(vec![GameLog::ShardsSpent {
                     player: player.id,
-                    source,
                     color,
                     amount,
                 }])
