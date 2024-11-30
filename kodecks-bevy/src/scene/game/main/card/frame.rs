@@ -142,6 +142,7 @@ pub fn update_frame_overlay(
             .player_field
             .iter()
             .chain(board.opponent_field.iter())
+            .filter_map(|field| field.as_ref())
             .any(|(card, state)| card.id == id && state == &FieldState::Exhausted);
         let selectable = list.selectable_cards().iter().any(|card| card.id == id);
         if *frame == CardFrame::Shadow {

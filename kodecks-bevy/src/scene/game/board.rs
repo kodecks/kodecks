@@ -64,9 +64,9 @@ impl Deref for AvailableActionList {
 #[derive(Resource, Default)]
 pub struct Board {
     pub player_hand: Vec<TimedObjectId>,
-    pub player_field: Vec<(TimedObjectId, FieldState)>,
+    pub player_field: Vec<Option<(TimedObjectId, FieldState)>>,
     pub opponent_hand: Vec<TimedObjectId>,
-    pub opponent_field: Vec<(TimedObjectId, FieldState)>,
+    pub opponent_field: Vec<Option<(TimedObjectId, FieldState)>>,
 
     attackers: Vec<TimedObjectId>,
     blocking_pairs: Vec<(TimedObjectId, TimedObjectId)>,
@@ -81,7 +81,6 @@ impl Board {
         } else {
             self.temp_attackers.push(card);
         }
-        self.update_battle_layout();
     }
 
     pub fn attackers(&self) -> impl Iterator<Item = &TimedObjectId> {
@@ -100,13 +99,11 @@ impl Board {
                 self.temp_blocking_pairs.push((attacker, blocker));
             }
         }
-        self.update_battle_layout();
     }
 
     pub fn clear_battle(&mut self) {
         self.temp_attackers.clear();
         self.temp_blocking_pairs.clear();
-        self.update_battle_layout();
     }
 
     pub fn blocking_pairs(&self) -> impl Iterator<Item = &(TimedObjectId, TimedObjectId)> {
@@ -122,44 +119,24 @@ impl Board {
         let opponent = env.players.next_player(env.player).unwrap();
 
         self.player_hand = player.hand.iter().map(|card| card.timed_id()).collect();
-
-        let old_player_orders = self
-            .player_field
-            .iter()
-            .map(|(id, _)| *id)
-            .collect::<Vec<_>>();
         self.player_field = player
             .field
             .iter()
-            .filter_map(|card| card.as_ref())
-            .map(|card| (card.timed_id(), card.field_state))
+            .map(|card| {
+                card.as_ref()
+                    .map(|card| (card.timed_id(), card.field_state))
+            })
             .collect();
-        self.player_field.sort_by_key(|(id, _)| {
-            old_player_orders
-                .iter()
-                .position(|x| x == id)
-                .unwrap_or(old_player_orders.len())
-        });
 
         self.opponent_hand = opponent.hand.iter().map(|card| card.timed_id()).collect();
-
-        let old_opponent_orders = self
-            .opponent_field
-            .iter()
-            .map(|(id, _)| *id)
-            .collect::<Vec<_>>();
         self.opponent_field = opponent
             .field
             .iter()
-            .filter_map(|card| card.as_ref())
-            .map(|card| (card.timed_id(), card.field_state))
+            .map(|card| {
+                card.as_ref()
+                    .map(|card| (card.timed_id(), card.field_state))
+            })
             .collect();
-        self.opponent_field.sort_by_key(|(id, _)| {
-            old_opponent_orders
-                .iter()
-                .position(|x| x == id)
-                .unwrap_or(old_opponent_orders.len())
-        });
 
         self.attackers = env
             .players
@@ -185,63 +162,26 @@ impl Board {
             .collect();
 
         self.temp_blocking_pairs.retain(|(attacker, blocker)| {
-            self.opponent_field.iter().any(|(id, _)| id == attacker)
-                && self.player_field.iter().any(|(id, _)| id == blocker)
+            self.opponent_field
+                .iter()
+                .filter_map(|card| card.as_ref())
+                .any(|(id, _)| id == attacker)
+                && self
+                    .player_field
+                    .iter()
+                    .filter_map(|card| card.as_ref())
+                    .any(|(id, _)| id == blocker)
         });
-        self.temp_attackers
-            .retain(|attacker| self.player_field.iter().any(|(id, _)| id == attacker));
+        self.temp_attackers.retain(|attacker| {
+            self.player_field
+                .iter()
+                .filter_map(|card| card.as_ref())
+                .any(|(id, _)| id == attacker)
+        });
 
         let battle = matches!(env.phase, Phase::Block | Phase::Battle);
         if !battle {
             self.clear_battle();
-        }
-    }
-
-    pub fn update_battle_layout(&mut self) {
-        let mut pairs = self.blocking_pairs().copied().collect::<Vec<_>>();
-        pairs.sort_by_key(|(_, blocker)| {
-            self.opponent_field
-                .iter()
-                .position(|(id, _)| id == blocker)
-                .or(self.player_field.iter().position(|(id, _)| id == blocker))
-                .unwrap_or(0)
-        });
-        for (attacker, blocker) in pairs {
-            let attacker_pos = self
-                .opponent_field
-                .iter()
-                .position(|(id, _)| *id == attacker);
-            let blocker_pos = self.player_field.iter().position(|(id, _)| *id == blocker);
-            match (attacker_pos, blocker_pos) {
-                (Some(attacker), Some(blocker)) if attacker > blocker => {
-                    let removed = self.opponent_field.remove(attacker);
-                    self.opponent_field.insert(blocker, removed);
-                }
-                (Some(attacker), Some(blocker)) if attacker < blocker => {
-                    let removed = self.opponent_field.remove(attacker);
-                    self.opponent_field
-                        .insert(blocker.min(self.opponent_field.len()), removed);
-                }
-                _ => {}
-            }
-
-            let attacker_pos = self.player_field.iter().position(|(id, _)| *id == attacker);
-            let blocker_pos = self
-                .opponent_field
-                .iter()
-                .position(|(id, _)| *id == blocker);
-            match (attacker_pos, blocker_pos) {
-                (Some(attacker), Some(blocker)) if attacker > blocker => {
-                    let removed = self.player_field.remove(attacker);
-                    self.player_field.insert(blocker, removed);
-                }
-                (Some(attacker), Some(blocker)) if attacker < blocker => {
-                    let removed = self.player_field.remove(attacker);
-                    self.player_field
-                        .insert(blocker.min(self.player_field.len()), removed);
-                }
-                _ => {}
-            }
         }
     }
 
@@ -272,11 +212,9 @@ impl Board {
                 let x_base = 0.0;
                 if let Some((index, _)) =
                     self.player_field.iter().enumerate().find_map(|(i, item)| {
-                        if item.0.id == card {
-                            Some((i, item))
-                        } else {
-                            None
-                        }
+                        item.as_ref()
+                            .filter(|item| item.0.id == card)
+                            .map(|item| (i, item))
                     })
                 {
                     let x_offset = index as f32 - (self.player_field.len() - 1) as f32 / 2.0;
@@ -316,11 +254,9 @@ impl Board {
                     .iter()
                     .enumerate()
                     .find_map(|(i, item)| {
-                        if item.0.id == card {
-                            Some((i, item))
-                        } else {
-                            None
-                        }
+                        item.as_ref()
+                            .filter(|item| item.0.id == card)
+                            .map(|item| (i, item))
                     })
             {
                 let x_offset = index as f32 - (self.opponent_field.len() - 1) as f32 / 2.0;
