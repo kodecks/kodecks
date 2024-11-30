@@ -240,9 +240,9 @@ impl Player {
         self.hand
             .iter()
             .filter(|card| {
-                let castable = (state.debug.flags.contains(DebugFlags::IGNORE_COST)
+                let castable = state.debug.flags.contains(DebugFlags::IGNORE_COST)
                     || card.computed().cost.value() == 0
-                    || self.shards.get(Color::COLORLESS) >= card.computed().cost.value());
+                    || self.shards.get(Color::COLORLESS) >= card.computed().cost.value();
                 card.effect().is_castable(state, card, castable)
             })
             .map(|card| card.timed_id())
