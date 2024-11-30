@@ -6,7 +6,7 @@ card_def!(
     "mini",
     "Minimum Bear",
     color: Color::BLUE,
-    cost: 0,
+    cost: 1,
     card_type: CardType::Creature,
     creature_type: CreatureType::Program,
     power: 100,

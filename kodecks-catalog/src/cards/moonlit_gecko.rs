@@ -6,7 +6,7 @@ card_def!(
     "moon",
     "Moonlit Gecko",
     color: Color::GREEN,
-    cost: 0,
+    cost: 1,
     card_type: CardType::Creature,
     creature_type: CreatureType::Mutant,
     power: 100,

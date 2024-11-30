@@ -125,7 +125,7 @@ impl Default for CardAttribute {
     fn default() -> Self {
         Self {
             color: Color::COLORLESS,
-            cost: 0,
+            cost: 1,
             card_type: CardType::Hex,
             creature_type: None,
             abilities: Vec::new(),

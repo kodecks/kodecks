@@ -6,7 +6,7 @@ card_def!(
     "wire",
     "Wiretap Vine",
     color: Color::BLUE,
-    cost: 1,
+    cost: 2,
     card_type: CardType::Creature,
     creature_type: CreatureType::Program,
     power: 200,

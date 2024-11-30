@@ -6,7 +6,7 @@ card_def!(
     "sola",
     "Solar Beetle",
     color: Color::RED,
-    cost: 1,
+    cost: 2,
     card_type: CardType::Creature,
     creature_type: CreatureType::Cyborg,
     power: 200,

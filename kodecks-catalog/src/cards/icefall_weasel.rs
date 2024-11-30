@@ -6,7 +6,7 @@ card_def!(
     "icef",
     "Icefall Weasel",
     color: Color::BLUE,
-    cost: 1,
+    cost: 2,
     card_type: CardType::Creature,
     creature_type: CreatureType::Mutant,
     power: 200,

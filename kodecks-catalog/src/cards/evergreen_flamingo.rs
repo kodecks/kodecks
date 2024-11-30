@@ -6,7 +6,7 @@ card_def!(
     "ever",
     "Evergreen Flamingo",
     color: Color::GREEN,
-    cost: 1,
+    cost: 2,
     card_type: CardType::Creature,
     creature_type: CreatureType::Cyborg,
     power: 200,

@@ -6,7 +6,7 @@ card_def!(
     "wast",
     "Wasteland Cobra",
     color: Color::GREEN,
-    cost: 1,
+    cost: 2,
     card_type: CardType::Creature,
     creature_type: CreatureType::Mutant,
     power: 200,
