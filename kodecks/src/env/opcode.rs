@@ -47,7 +47,7 @@ impl Environment {
                     .players
                     .get_mut(player)?
                     .hand
-                    .items_mut()
+                    .iter_mut()
                     .for_each(|card| {
                         card.set_hand_cost_delta(card.hand_cost_delta().saturating_sub(1));
                     });
