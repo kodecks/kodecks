@@ -65,7 +65,6 @@ pub enum ActionButton {
     AllAttack,
     Attack(u32),
     Block(u32),
-    NoBlock,
     Continue,
 }
 
@@ -87,7 +86,6 @@ impl ActionButton {
                     .get(Request::new("block-button").args(&args))
                     .into()
             }
-            Self::NoBlock => translator.get("continue-button").into(),
             Self::Continue => translator.get("continue-button").into(),
         }
     }
@@ -134,12 +132,11 @@ fn update_action_list(
             AvailableAction::Block { .. } => {
                 let blockers = board.blocking_pairs().count() as u32;
                 if blockers == 0 {
-                    Some(ActionButton::NoBlock)
+                    Some(ActionButton::Continue)
                 } else {
                     Some(ActionButton::Block(blockers))
                 }
             }
-            AvailableAction::Continue => Some(ActionButton::Continue),
             AvailableAction::EndTurn => Some(ActionButton::EndTurn),
             _ => None,
         })
@@ -657,41 +654,7 @@ pub fn init(mut commands: Commands, translator: Res<Translator>, asset_server: R
                                     On::<Pointer<Click>>::commands_mut(move |_, commands| {
                                         commands.add(move |w: &mut World| {
                                             w.send_event(PlayerEvent::ButtonPressed(
-                                                ActionButton::NoBlock,
-                                            ));
-                                        });
-                                    }),
-                                    ActionButton::NoBlock,
-                                ))
-                                .with_children(|parent| {
-                                    parent.spawn((
-                                        TextBundle::from_section(
-                                            "",
-                                            translator.style(TextPurpose::Button),
-                                        ),
-                                        Label,
-                                    ));
-                                });
-
-                            parent
-                                .spawn((
-                                    ImageBundle {
-                                        style: Style {
-                                            width: Val::Percent(100.),
-                                            height: Val::Px(50.),
-                                            padding: UiRect::all(Val::Px(15.)),
-                                            justify_content: JustifyContent::Center,
-                                            align_items: AlignItems::Center,
-                                            ..default()
-                                        },
-                                        image: button_red.clone().into(),
-                                        ..default()
-                                    },
-                                    ImageScaleMode::Sliced(slicer.clone()),
-                                    On::<Pointer<Click>>::commands_mut(move |_, commands| {
-                                        commands.add(move |w: &mut World| {
-                                            w.send_event(PlayerEvent::ButtonPressed(
-                                                ActionButton::Continue,
+                                                ActionButton::Block(0),
                                             ));
                                         });
                                     }),

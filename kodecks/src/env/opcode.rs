@@ -42,6 +42,17 @@ impl Environment {
                 self.state.players.get_mut(player)?.stats.life = life;
                 Ok(vec![GameLog::LifeChanged { player, life }])
             }
+            Opcode::ReduceCost { player } => {
+                self.state
+                    .players
+                    .get_mut(player)?
+                    .hand
+                    .items_mut()
+                    .for_each(|card| {
+                        card.set_hand_cost_delta(card.hand_cost_delta().saturating_sub(1));
+                    });
+                Ok(vec![])
+            }
             Opcode::GenerateShards {
                 player,
                 source,

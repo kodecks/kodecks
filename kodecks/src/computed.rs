@@ -29,7 +29,6 @@ pub struct ComputedAttribute {
     pub anon_abilities: AbilityList<AnonymousAbility>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub power: Option<Linear<u32>>,
-    pub shards: Linear<u8>,
 }
 
 impl From<&CardArchetype> for ComputedAttribute {
@@ -42,7 +41,6 @@ impl From<&CardArchetype> for ComputedAttribute {
             abilities: archetype.attribute.abilities.iter().copied().collect(),
             anon_abilities: archetype.attribute.anon_abilities.iter().copied().collect(),
             power: archetype.attribute.power.map(Linear::from),
-            shards: archetype.attribute.shards.into(),
         }
     }
 }

@@ -10,7 +10,6 @@ card_def!(
     card_type: CardType::Creature,
     creature_type: CreatureType::Cyborg,
     power: 300,
-    shards: 4,
 );
 
 impl Effect for CardDef {

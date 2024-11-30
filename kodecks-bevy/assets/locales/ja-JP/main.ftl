@@ -15,7 +15,6 @@ opponents-turn = Opponent's Turn
 
 phase-standby = スタンバイフェイズ
 phase-draw = ドローフェイズ
-phase-charge = チャージフェイズ
 phase-main = メインフェイズ
 phase-block = ブロックフェイズ
 phase-battle = バトルフェイズ
@@ -39,7 +38,6 @@ result-draw = Draw
     .reason-simultaneous-end = 両プレイヤーが同時に勝利条件または敗北条件を満たしました。
 
 message-discard-excess-cards = 手札が{ $maxHandSize }枚になるまでカードを捨ててください。
-message-discard = カードを捨ててください。
 
 ability-toxic = 有毒
     .description = 戦闘後、このクリーチャーとバトルしたクリーチャーを破壊する。

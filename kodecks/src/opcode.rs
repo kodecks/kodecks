@@ -26,6 +26,9 @@ pub enum Opcode {
         player: u8,
         life: u32,
     },
+    ReduceCost {
+        player: u8,
+    },
     GenerateShards {
         player: u8,
         source: ObjectId,

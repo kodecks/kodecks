@@ -33,6 +33,7 @@ pub struct Card {
     timestamp: u16,
     field_state: FieldState,
     battle_state: Option<FieldBattleState>,
+    hand_cost_delta: i8,
     is_token: bool,
 }
 
@@ -66,6 +67,7 @@ impl Card {
             timestamp: 0,
             field_state: FieldState::Active,
             battle_state: None,
+            hand_cost_delta: 0,
             is_token: false,
         }
     }
@@ -87,6 +89,7 @@ impl Card {
             timestamp: 0,
             field_state: FieldState::Active,
             battle_state: None,
+            hand_cost_delta: 0,
             is_token: true,
         }
     }
@@ -114,6 +117,7 @@ impl Card {
         match zone.kind {
             ZoneKind::Hand => {
                 self.revealed.set(zone.player, true);
+                self.set_hand_cost_delta(0);
             }
             ZoneKind::Field | ZoneKind::Graveyard => {
                 self.revealed.set_all(true);
@@ -200,6 +204,14 @@ impl Card {
         self.battle_state
     }
 
+    pub fn hand_cost_delta(&self) -> i8 {
+        self.hand_cost_delta
+    }
+
+    pub fn set_hand_cost_delta(&mut self, delta: i8) {
+        self.hand_cost_delta = delta;
+    }
+
     pub fn snapshot(&self) -> CardSnapshot {
         CardSnapshot {
             id: self.id,
@@ -236,6 +248,7 @@ impl Clone for Card {
             effect: self.effect(),
             revealed: self.revealed,
             timestamp: self.timestamp,
+            hand_cost_delta: self.hand_cost_delta,
             field_state: self.field_state,
             battle_state: self.battle_state,
             is_token: self.is_token,

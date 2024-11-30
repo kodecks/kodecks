@@ -102,9 +102,21 @@ impl Environment {
             .players
             .get(self.state.players.player_in_turn()?.id)?;
         match self.state.phase {
-            Phase::Standby => Ok(vec![OpcodeList::new(vec![Opcode::ChangePhase {
-                phase: Phase::Draw,
-            }])]),
+            Phase::Standby => {
+                let next_phase = Phase::Draw;
+                Ok(filter_vec![
+                    if self.state.turn == 1 {
+                        None
+                    } else {
+                        Some(OpcodeList::new(vec![Opcode::ReduceCost {
+                            player: self.state.players.player_in_turn()?.id,
+                        }]))
+                    },
+                    Some(OpcodeList::new(vec![Opcode::ChangePhase {
+                        phase: next_phase
+                    }],)),
+                ])
+            }
             Phase::Draw => {
                 if player_in_turn.counters.draw == 0 && self.state.turn > 1 {
                     Ok(vec![OpcodeList::new(vec![Opcode::DrawCard {
@@ -112,40 +124,8 @@ impl Environment {
                     }])])
                 } else {
                     Ok(vec![OpcodeList::new(vec![Opcode::ChangePhase {
-                        phase: Phase::Charge,
-                    }])])
-                }
-            }
-            Phase::Charge => {
-                if let Some(Action::SelectCard { card }) = action {
-                    let card = player_in_turn.hand.get(card).unwrap();
-                    Ok(vec![OpcodeList::new(vec![
-                        Opcode::MoveCard {
-                            card: card.id(),
-                            from: Zone::new(
-                                self.state.players.player_in_turn()?.id,
-                                ZoneKind::Hand,
-                            ),
-                            to: Zone::new(
-                                self.state.players.player_in_turn()?.id,
-                                ZoneKind::Graveyard,
-                            ),
-                            reason: MoveReason::Discarded,
-                        },
-                        Opcode::GenerateShards {
-                            player: player_in_turn.id,
-                            source: card.id(),
-                            color: card.computed().color,
-                            amount: card.computed().shards.value(),
-                        },
-                        Opcode::ChangePhase { phase: Phase::Main },
-                    ])])
-                } else if let Some(Action::Continue) = action {
-                    Ok(vec![OpcodeList::new(vec![Opcode::ChangePhase {
                         phase: Phase::Main,
                     }])])
-                } else {
-                    Ok(vec![])
                 }
             }
             Phase::Main => {

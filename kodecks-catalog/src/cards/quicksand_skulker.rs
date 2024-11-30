@@ -11,7 +11,6 @@ card_def!(
     creature_type: CreatureType::Mutant,
     power: 500,
     abilities: &[KeywordAbility::Stealth][..],
-    shards: 1,
 );
 
 impl Effect for CardDef {}

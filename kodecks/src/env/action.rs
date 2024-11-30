@@ -30,27 +30,7 @@ impl Environment {
             .active_cards()
             .map(|c| c.timed_id())
             .collect::<Vec<_>>();
-
-        if matches!(self.state.phase, Phase::Charge) {
-            Some(PlayerAvailableActions {
-                player: active_player.id,
-                actions: vec![AvailableAction::SelectCard {
-                    cards: active_player
-                        .hand
-                        .iter()
-                        .map(|card| card.timed_id())
-                        .collect(),
-                }]
-                .into_iter()
-                .chain(Some(AvailableAction::Continue))
-                .collect(),
-                instructions: Some(Message {
-                    id: "message-discard".to_string(),
-                    ..Default::default()
-                }),
-                message_dialog: None,
-            })
-        } else if let Phase::Main = &self.state.phase {
+        if let Phase::Main = &self.state.phase {
             if !self.stack.is_empty() {
                 return None;
             }

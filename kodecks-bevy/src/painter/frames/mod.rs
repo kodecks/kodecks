@@ -56,18 +56,6 @@ impl CardFramePainter {
                 }
             }
         }
-
-        for i in 0..frame.shards {
-            let image = Self::get_shard(frame.color);
-            let shards_x = 33 - (i as u32 % 3) * 5;
-            let shards_y = 48 - (i as u32 / 3) * 5;
-            for (x, y, pixel) in image.as_rgba8().unwrap().enumerate_pixels() {
-                if pixel[3] != 0 {
-                    frame_base.put_pixel(shards_x + x, shards_y + y, *pixel);
-                }
-            }
-        }
-
         frame_base
     }
 
@@ -122,23 +110,6 @@ impl CardFramePainter {
         FRAMES.get(&color).unwrap()
     }
 
-    fn get_shard(color: Color) -> &'static DynamicImage {
-        static SHARD_IMAGES: LazyLock<HashMap<Color, DynamicImage>> = LazyLock::new(|| {
-            SHARD_TYPES
-                .iter()
-                .map(|(color, data)| {
-                    let image = ImageReader::new(Cursor::new(data))
-                        .with_guessed_format()
-                        .unwrap()
-                        .decode()
-                        .unwrap();
-                    (*color, image)
-                })
-                .collect()
-        });
-        SHARD_IMAGES.get(&color).unwrap()
-    }
-
     fn get_creature_type(creature_type: CreatureType) -> &'static DynamicImage {
         static CREATURE_TYPE_IMAGES: LazyLock<HashMap<CreatureType, DynamicImage>> =
             LazyLock::new(|| {
@@ -174,14 +145,6 @@ const DECK_FRAME_IMAGES: &[(Color, &[u8])] = &[
     (Color::empty(), include_bytes!("deck_frame_colorless.png")),
 ];
 
-const SHARD_TYPES: &[(Color, &[u8])] = &[
-    (Color::RED, include_bytes!("shard_red.png")),
-    (Color::YELLOW, include_bytes!("shard_yellow.png")),
-    (Color::GREEN, include_bytes!("shard_green.png")),
-    (Color::BLUE, include_bytes!("shard_blue.png")),
-    (Color::empty(), include_bytes!("shard_colorless.png")),
-];
-
 const CREATURE_TYPES: &[(CreatureType, &[u8])] = &[
     (CreatureType::Mutant, include_bytes!("mutant.png")),
     (CreatureType::Cyborg, include_bytes!("cyborg.png")),
@@ -195,7 +158,6 @@ pub struct CardFrame {
     pub color: Color,
     pub cost: u8,
     pub power: Option<u32>,
-    pub shards: u8,
     pub creature_type: Option<CreatureType>,
 }
 
@@ -205,7 +167,6 @@ impl CardFrame {
             color: attr.color,
             cost: attr.cost.value(),
             power: attr.power.map(|p| p.value()),
-            shards: attr.shards.value(),
             creature_type: attr.creature_type,
         }
     }

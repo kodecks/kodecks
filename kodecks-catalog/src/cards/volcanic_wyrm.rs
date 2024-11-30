@@ -10,7 +10,6 @@ card_def!(
     card_type: CardType::Creature,
     creature_type: CreatureType::Mutant,
     power: 500,
-    shards: 6,
 );
 
 impl Effect for CardDef {
