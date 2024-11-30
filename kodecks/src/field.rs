@@ -1,6 +1,6 @@
 use crate::{
     card::Card,
-    id::{ObjectId, TimedObjectId}
+    id::{ObjectId, TimedObjectId},
     slot::CardSlot,
     zone::CardZone,
 };
