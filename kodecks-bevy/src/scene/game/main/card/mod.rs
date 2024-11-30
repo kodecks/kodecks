@@ -283,7 +283,7 @@ pub struct CardBundleBuilder<'w, 's> {
     catalog: Res<'w, Catalog>,
 }
 
-impl<'w, 's> CardBundleBuilder<'w, 's> {
+impl CardBundleBuilder<'_, '_> {
     pub fn spawn(&mut self, card: CardSnapshot, opponent: bool) -> Entity {
         let card_id = card.id;
         let archetype = self.catalog[card.archetype_id].clone();
