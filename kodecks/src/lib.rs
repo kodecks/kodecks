@@ -33,6 +33,7 @@ pub mod scenario;
 pub mod score;
 pub mod sequence;
 pub mod shard;
+pub mod slot;
 pub mod stack;
 pub mod target;
 pub mod text;
