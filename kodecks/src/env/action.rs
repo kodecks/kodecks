@@ -1,7 +1,6 @@
 use super::Environment;
 use crate::{
     action::{AvailableAction, PlayerAvailableActions},
-    color::Color,
     filter_vec,
     id::TimedCardId,
     message::Message,
@@ -49,7 +48,7 @@ impl Environment {
                             cards: castable_cards,
                         })
                     },
-                    if !attackers.is_empty() && active_player.shards.get(Color::COLORLESS) >= 2 {
+                    if !attackers.is_empty() {
                         Some(AvailableAction::Attack { attackers })
                     } else {
                         None
