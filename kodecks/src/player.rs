@@ -286,11 +286,19 @@ impl Score for Player {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Encode, Decode)]
 pub struct PlayerStats {
     pub life: u32,
+    pub level: u8,
+    pub mana: u8,
+    pub damage: u8,
 }
 
 impl Default for PlayerStats {
     fn default() -> Self {
-        Self { life: 20 }
+        Self {
+            life: 20,
+            level: 0,
+            mana: 0,
+            damage: 0,
+        }
     }
 }
 
