@@ -36,6 +36,10 @@ pub enum Opcode {
         color: Color,
         amount: u8,
     },
+    ConsumeManas {
+        player: u8,
+        amount: u8,
+    },
     GenerateCardToken {
         card: Card,
     },

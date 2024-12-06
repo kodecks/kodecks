@@ -80,6 +80,11 @@ impl Environment {
                     amount,
                 }])
             }
+            Opcode::ConsumeManas { player, amount } => {
+                let player = self.state.players.get_mut(player)?;
+                player.stats.manas = player.stats.manas.saturating_sub(amount);
+                Ok(vec![])
+            }
             Opcode::GenerateCardToken { card } => {
                 let snapshot = card.snapshot();
                 let player = self.state.players.get_mut(card.controller())?;

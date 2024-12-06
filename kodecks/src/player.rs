@@ -1,7 +1,6 @@
 use crate::{
     ability::{AbilityList, PlayerAbility},
     card::{Card, CardScore, CardSnapshot},
-    color::Color,
     deck::DeckList,
     env::{EndgameReason, GameState},
     error::ActionError,

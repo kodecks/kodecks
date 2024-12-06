@@ -2,7 +2,6 @@ use super::Environment;
 use crate::{
     ability::KeywordAbility,
     action::Action,
-    color::Color,
     command::ActionCommand,
     error::ActionError,
     event::{CardEvent, EventReason},
@@ -48,14 +47,7 @@ impl Environment {
                     player: player.id,
                 }]))
                 .take(self.state.regulation.initial_hand_size as usize);
-                filter_vec![
-                    opcodes,
-                    Some(OpcodeList::new(vec![Opcode::GenerateShards {
-                        player: player.id,
-                        color: Color::COLORLESS,
-                        amount: 3,
-                    }])),
-                ]
+                filter_vec![opcodes,]
             }),
             Some(OpcodeList::new(vec![Opcode::ChangeTurn {
                 turn: 1,
@@ -153,9 +145,8 @@ impl Environment {
                         filter_vec![
                             Some(OpcodeList::new(filter_vec![
                                 if cost > 0 {
-                                    Some(Opcode::ConsumeShards {
+                                    Some(Opcode::ConsumeManas {
                                         player: self.state.players.player_in_turn()?.id,
-                                        color: Color::COLORLESS,
                                         amount: cost,
                                     })
                                 } else {
@@ -192,11 +183,6 @@ impl Environment {
                             })
                             .collect::<Vec<_>>();
                         vec![
-                            OpcodeList::new(vec![Opcode::ConsumeShards {
-                                player: player_in_turn.id,
-                                color: Color::COLORLESS,
-                                amount: 2,
-                            }]),
                             OpcodeList::new(opcodes),
                             OpcodeList::new(vec![Opcode::ChangePhase {
                                 phase: Phase::Block,
@@ -260,9 +246,8 @@ impl Environment {
                     Ok(filter_vec![
                         Some(OpcodeList::new(filter_vec![
                             if cost > 0 {
-                                Some(Opcode::ConsumeShards {
+                                Some(Opcode::ConsumeManas {
                                     player: active_player.id,
-                                    color: Color::COLORLESS,
                                     amount: cost,
                                 })
                             } else {
@@ -436,20 +421,13 @@ impl Environment {
                     .players
                     .next_id(self.state.players.player_in_turn()?.id)?;
                 let turn = self.state.turn + 1;
-                Ok(filter_vec![
-                    self.state.players.iter().flat_map(|player| {
-                        filter_vec![Some(OpcodeList::new(vec![Opcode::GenerateShards {
-                            player: player.id,
-                            color: Color::COLORLESS,
-                            amount: 1,
-                        }])),]
-                    }),
-                    Some(OpcodeList::new(vec![Opcode::ChangeTurn {
+                Ok(filter_vec![Some(OpcodeList::new(vec![
+                    Opcode::ChangeTurn {
                         turn,
                         player: active_player,
                         phase: Phase::Standby,
-                    }])),
-                ])
+                    }
+                ])),])
             }
         }
     }
