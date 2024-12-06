@@ -157,6 +157,7 @@ mod tests {
                         id: player,
                         hand: vec![],
                         field: vec![],
+                        colony: vec![],
                         deck: 100,
                         graveyard: vec![],
                         limbo: vec![],

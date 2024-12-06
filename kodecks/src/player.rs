@@ -162,6 +162,7 @@ pub struct Player {
     pub hand: CardList<Card>,
     pub graveyard: CardList<Card>,
     pub field: CardList<Card>,
+    pub colony: CardList<Card>,
     pub limbo: CardList<Card>,
     pub shards: ShardList,
     pub stats: PlayerStats,
@@ -184,6 +185,7 @@ impl Player {
             hand: CardList::default(),
             graveyard: CardList::default(),
             field: CardList::default(),
+            colony: CardList::default(),
             limbo: CardList::default(),
             shards: ShardList::new(),
             stats: PlayerStats::default(),
@@ -332,6 +334,7 @@ pub struct LocalPlayerState {
     pub hand: Vec<CardSnapshot>,
     pub graveyard: Vec<CardSnapshot>,
     pub field: Vec<CardSnapshot>,
+    pub colony: Vec<CardSnapshot>,
     pub limbo: Vec<CardSnapshot>,
     pub shards: ShardList,
     pub stats: PlayerStats,
@@ -360,6 +363,11 @@ impl LocalPlayerState {
                 .collect(),
             field: state
                 .field
+                .iter()
+                .map(|card| card.snapshot().redacted(viewer))
+                .collect(),
+            colony: state
+                .colony
                 .iter()
                 .map(|card| card.snapshot().redacted(viewer))
                 .collect(),
