@@ -293,7 +293,7 @@ impl Score for CardScore {
     type Output = i32;
 
     fn score(&self) -> i32 {
-        self.power / 100 + self.abilities
+        self.power + self.abilities
     }
 }
 
@@ -396,7 +396,7 @@ impl CardSnapshot {
         self.computed.as_ref().map(|c| c.cost).unwrap_or_default()
     }
 
-    pub fn power(&self) -> Option<Linear<u32>> {
+    pub fn power(&self) -> Option<Linear<u8>> {
         self.computed.as_ref().and_then(|c| c.power)
     }
 }

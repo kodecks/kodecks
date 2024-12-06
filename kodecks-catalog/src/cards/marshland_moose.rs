@@ -9,7 +9,7 @@ card_def!(
     cost: 4,
     card_type: CardType::Creature,
     creature_type: CreatureType::Mutant,
-    power: 400,
+    power: 4,
 );
 
 impl Effect for CardDef {}

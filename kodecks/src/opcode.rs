@@ -79,7 +79,7 @@ pub enum Opcode {
     ResetBattleState,
     InflictDamage {
         player: u8,
-        amount: u32,
+        amount: u8,
     },
 }
 

@@ -116,7 +116,7 @@ pub struct CardAttribute {
     pub creature_type: Option<CreatureType>,
     pub abilities: Vec<KeywordAbility>,
     pub anon_abilities: Vec<AnonymousAbility>,
-    pub power: Option<u32>,
+    pub power: Option<u8>,
     pub is_token: bool,
     pub styles: Vec<CardStyle>,
 }

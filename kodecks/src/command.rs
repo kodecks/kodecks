@@ -18,7 +18,7 @@ use strum::Display;
 pub enum ActionCommand {
     InflictDamage {
         target: u8,
-        amount: u32,
+        amount: u8,
     },
     DestroyCard {
         source: ObjectId,

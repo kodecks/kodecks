@@ -9,7 +9,7 @@ card_def!(
     cost: 4,
     card_type: CardType::Creature,
     creature_type: CreatureType::Mutant,
-    power: 500,
+    power: 5,
     abilities: &[KeywordAbility::Stealth][..],
 );
 

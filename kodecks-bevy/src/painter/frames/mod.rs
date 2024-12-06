@@ -157,7 +157,7 @@ const CREATURE_TYPES: &[(CreatureType, &[u8])] = &[
 pub struct CardFrame {
     pub color: Color,
     pub cost: u8,
-    pub power: Option<u32>,
+    pub power: Option<u8>,
     pub creature_type: Option<CreatureType>,
 }
 

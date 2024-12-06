@@ -28,7 +28,7 @@ pub struct ComputedAttribute {
     #[serde(default, skip_serializing_if = "AbilityList::is_empty")]
     pub anon_abilities: AbilityList<AnonymousAbility>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub power: Option<Linear<u32>>,
+    pub power: Option<Linear<u8>>,
 }
 
 impl From<&CardArchetype> for ComputedAttribute {
@@ -54,7 +54,7 @@ impl ComputedAttribute {
         matches!(self.card_type, CardType::Hex)
     }
 
-    pub fn current_power(&self) -> u32 {
+    pub fn current_power(&self) -> u8 {
         self.power.map(|power| power.value()).unwrap_or(0)
     }
 
@@ -127,5 +127,5 @@ pub struct ComputedAttributeModifier {
     #[serde(default)]
     pub anon_abilities: Option<Modifier<AnonymousAbility>>,
     #[serde(default)]
-    pub power: Option<Modifier<u32>>,
+    pub power: Option<Modifier<u8>>,
 }

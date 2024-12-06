@@ -37,7 +37,7 @@ pub enum GameLog {
     },
     DamageTaken {
         player: u8,
-        amount: u32,
+        amount: u8,
     },
     ShardsEarned {
         player: u8,

@@ -30,7 +30,7 @@ pub enum CardEvent {
     ReturnedToDeck,
     DealtDamage {
         player: u8,
-        amount: u32,
+        amount: u8,
         reason: EventReason,
     },
     Attacking,

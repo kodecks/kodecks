@@ -60,7 +60,7 @@ impl Bot for SimpleBot {
                     .filter_map(|card| card.computed().power)
                     .map(|power| power.value())
                     .collect::<Vec<_>>();
-                let blocker_power_sum = blockers.iter().sum::<u32>();
+                let blocker_power_sum = blockers.iter().map(|p| *p as u32).sum::<u32>();
                 let max_blocker_power = blockers.iter().copied().max().unwrap_or_default();
                 if blocker_power_sum >= player.stats.life {
                     return vec![(
@@ -126,6 +126,7 @@ impl Bot for SimpleBot {
                                 .map(|power| power.value())
                                 .unwrap_or_default()
                         })
+                        .map(|p| p as u32)
                         .sum::<u32>();
                     let attacker = attackers.pop().unwrap();
                     let attacker_power = attacker

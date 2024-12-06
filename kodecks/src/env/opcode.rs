@@ -274,7 +274,7 @@ impl Environment {
             }
             Opcode::InflictDamage { player, amount } => {
                 let player = self.state.players.get_mut(player)?;
-                player.stats.life = player.stats.life.saturating_sub(amount);
+                player.stats.life = player.stats.life.saturating_sub(amount as u32);
                 Ok(vec![
                     GameLog::DamageTaken {
                         player: player.id,

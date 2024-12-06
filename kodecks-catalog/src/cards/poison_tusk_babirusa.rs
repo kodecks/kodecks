@@ -9,7 +9,7 @@ card_def!(
     cost: 4,
     card_type: CardType::Creature,
     creature_type: CreatureType::Mutant,
-    power: 200,
+    power: 2,
     abilities: &[KeywordAbility::Toxic][..],
 );
 

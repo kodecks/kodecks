@@ -9,7 +9,7 @@ card_def!(
     cost: 5,
     card_type: CardType::Creature,
     creature_type: CreatureType::Robot,
-    power: 500,
+    power: 5,
     abilities: &[][..],
 );
 
