@@ -113,6 +113,9 @@ impl Environment {
             Phase::Standby => {
                 let next_phase = Phase::Draw;
                 Ok(filter_vec![Some(OpcodeList::new(vec![
+                    Opcode::ResetPlayerState {
+                        player: player_in_turn.id,
+                    },
                     Opcode::ChangePhase { phase: next_phase }
                 ],)),])
             }

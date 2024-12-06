@@ -287,7 +287,7 @@ impl Score for Player {
 pub struct PlayerStats {
     pub life: u32,
     pub level: u8,
-    pub mana: u8,
+    pub manas: u8,
     pub damage: u8,
 }
 
@@ -296,7 +296,7 @@ impl Default for PlayerStats {
         Self {
             life: 20,
             level: 0,
-            mana: 0,
+            manas: 0,
             damage: 0,
         }
     }

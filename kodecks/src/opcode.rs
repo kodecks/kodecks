@@ -74,6 +74,9 @@ pub enum Opcode {
         state: Option<FieldBattleState>,
     },
     ResetBattleState,
+    ResetPlayerState {
+        player: u8,
+    },
     InflictDamage {
         player: u8,
         amount: u8,

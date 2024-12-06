@@ -245,6 +245,13 @@ impl Environment {
                 }
                 Ok(vec![])
             }
+            Opcode::ResetPlayerState { player } => {
+                let player = self.state.players.get_mut(player)?;
+                player.stats.level = 4;
+                player.stats.manas = player.stats.level;
+                player.stats.damage = 0;
+                Ok(vec![])
+            }
             Opcode::Attack { attacker, target } => {
                 let attacker = self.state.find_card(attacker)?;
                 Ok(vec![match target {
