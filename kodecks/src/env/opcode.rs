@@ -145,6 +145,7 @@ impl Environment {
                     ZoneKind::Deck => player.deck.remove(card),
                     ZoneKind::Hand => player.hand.remove(card),
                     ZoneKind::Field => player.field.remove(card),
+                    ZoneKind::Colony => player.colony.remove(card),
                     ZoneKind::Graveyard => player.graveyard.remove(card),
                 };
                 if let Some(mut card) = card {
@@ -166,6 +167,7 @@ impl Environment {
                         ZoneKind::Deck => player.deck.push(card),
                         ZoneKind::Hand => player.hand.push(card),
                         ZoneKind::Field => player.field.push(card),
+                        ZoneKind::Colony => player.colony.push(card),
                         ZoneKind::Graveyard => player.graveyard.push(card),
                     }
                     return Ok(vec![GameLog::CardMoved {

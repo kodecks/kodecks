@@ -23,6 +23,7 @@ pub enum ZoneKind {
     Deck,
     Hand,
     Field,
+    Colony,
     Graveyard,
 }
 
@@ -32,6 +33,7 @@ impl From<ZoneKind> for SmallStr {
             ZoneKind::Deck => tinystr!(32, "deck"),
             ZoneKind::Hand => tinystr!(32, "hand"),
             ZoneKind::Field => tinystr!(32, "field"),
+            ZoneKind::Colony => tinystr!(32, "colony"),
             ZoneKind::Graveyard => tinystr!(32, "graveyard"),
         }
     }
