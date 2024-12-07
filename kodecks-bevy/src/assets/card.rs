@@ -135,20 +135,6 @@ impl AssetLoader for RenderedCardLoader {
                 )
             });
 
-            load_context.labeled_asset_scope("hand".to_string(), |_| {
-                Image::new(
-                    Extent3d {
-                        width: frame_image.width(),
-                        height: frame_image.height(),
-                        depth_or_array_layers: 1,
-                    },
-                    TextureDimension::D2,
-                    frame_image.clone().into_bytes(),
-                    TextureFormat::Rgba8UnormSrgb,
-                    RenderAssetUsages::RENDER_WORLD,
-                )
-            });
-
             load_context.labeled_asset_scope("stack".to_string(), |_| {
                 let mut stack_image = STACK_FRAME_IMAGE.clone();
                 for (x, y, pixel) in image.enumerate_pixels() {
