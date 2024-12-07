@@ -43,11 +43,15 @@ impl Environment {
                     .collect::<Vec<_>>()
             },
             self.state.players.iter().flat_map(|player| {
-                let opcodes = iter::repeat(OpcodeList::new(vec![Opcode::DrawCard {
+                let draw = iter::repeat(OpcodeList::new(vec![Opcode::DrawCard {
                     player: player.id,
                 }]))
                 .take(self.state.regulation.initial_hand_size as usize);
-                filter_vec![opcodes,]
+                let fetch = iter::repeat(OpcodeList::new(vec![Opcode::FetchCard {
+                    player: player.id,
+                }]))
+                .take(3);
+                filter_vec![draw, fetch,]
             }),
             Some(OpcodeList::new(vec![Opcode::ChangeTurn {
                 turn: 1,
@@ -111,17 +115,9 @@ impl Environment {
                     Opcode::ChangePhase { phase: next_phase }
                 ],)),])
             }
-            Phase::Draw => {
-                if player_in_turn.counters.draw == 0 && self.state.turn > 1 {
-                    Ok(vec![OpcodeList::new(vec![Opcode::DrawCard {
-                        player: player_in_turn.id,
-                    }])])
-                } else {
-                    Ok(vec![OpcodeList::new(vec![Opcode::ChangePhase {
-                        phase: Phase::Main,
-                    }])])
-                }
-            }
+            Phase::Draw => Ok(vec![OpcodeList::new(vec![Opcode::ChangePhase {
+                phase: Phase::Main,
+            }])]),
             Phase::Main => {
                 let logs = match action {
                     Some(Action::CastCard { card }) => {
@@ -421,13 +417,18 @@ impl Environment {
                     .players
                     .next_id(self.state.players.player_in_turn()?.id)?;
                 let turn = self.state.turn + 1;
-                Ok(filter_vec![Some(OpcodeList::new(vec![
-                    Opcode::ChangeTurn {
+                Ok(filter_vec![
+                    self.state.players.iter().flat_map(|player| {
+                        filter_vec![Some(OpcodeList::new(vec![Opcode::FetchCard {
+                            player: player.id,
+                        }])),]
+                    }),
+                    Some(OpcodeList::new(vec![Opcode::ChangeTurn {
                         turn,
                         player: active_player,
                         phase: Phase::Standby,
-                    }
-                ])),])
+                    }])),
+                ])
             }
         }
     }

@@ -46,6 +46,9 @@ pub enum Opcode {
     DrawCard {
         player: u8,
     },
+    FetchCard {
+        player: u8,
+    },
     CastCard {
         player: u8,
         card: ObjectId,

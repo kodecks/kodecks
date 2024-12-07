@@ -313,6 +313,7 @@ pub enum PlayerEndgameState {
 #[derive(Debug, Default, Clone, Copy)]
 pub struct PlayerCounters {
     pub draw: u16,
+    pub fetch: u16,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Encode, Decode)]

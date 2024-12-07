@@ -12,6 +12,7 @@ pub enum MoveReason {
     #[default]
     Move,
     Draw,
+    Fetch,
     Casted,
     Destroyed,
     Discarded,

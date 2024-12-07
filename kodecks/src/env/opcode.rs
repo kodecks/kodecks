@@ -115,6 +115,30 @@ impl Environment {
                 }
                 Ok(vec![])
             }
+            Opcode::FetchCard { player } => {
+                let player = self.state.players.get_mut(player)?;
+                if let Some(mut card) = player.deck.remove_top() {
+                    let from = *card.zone();
+                    let to = Zone::new(player.id, ZoneKind::Colony);
+                    let controller = card.controller();
+                    card.set_zone(to);
+                    let snapshot = card.snapshot();
+                    player.colony.push(card);
+                    player.counters.fetch += 1;
+                    return Ok(vec![GameLog::CardMoved {
+                        player: controller,
+                        card: snapshot,
+                        from,
+                        to,
+                        reason: MoveReason::Fetch,
+                    }]);
+                } else {
+                    player
+                        .endgame
+                        .get_or_insert(PlayerEndgameState::Lose(EndgameReason::DeckOut));
+                }
+                Ok(vec![])
+            }
             Opcode::CastCard { player, card, .. } => {
                 let player = self.state.players.get_mut(player)?;
                 if let Some(mut card) = player.hand.remove(card) {
@@ -254,7 +278,7 @@ impl Environment {
             }
             Opcode::ResetPlayerState { player } => {
                 let player = self.state.players.get_mut(player)?;
-                player.stats.level = 4;
+                player.stats.level = player.colony.len() as u8;
                 player.stats.manas = player.stats.level;
                 player.stats.damage = 0;
                 Ok(vec![])
