@@ -62,12 +62,11 @@ fn handle_player_events(
                 _ => None,
             }),
         },
-        PlayerEvent::CardDroppedOnField(dropped) => {
-            list
-                .castable_cards()
-                .iter()
-                .find(|card| card.id == *dropped).map(|card| Action::CastCard { card: *card })
-        }
+        PlayerEvent::CardDroppedOnField(dropped) => list
+            .castable_cards()
+            .iter()
+            .find(|card| card.id == *dropped)
+            .map(|card| Action::CastCard { card: *card }),
         PlayerEvent::CardDropped(dropped, target) => {
             if let Some(card) = list
                 .castable_cards()
@@ -99,6 +98,12 @@ fn handle_player_events(
                 .find(|candidate| candidate.id == *card)
             {
                 return Some(Action::SelectCard { card: *card });
+            } else if let Some(card) = list
+                .fetchable_cards()
+                .iter()
+                .find(|candidate| candidate.id == *card)
+            {
+                return Some(Action::FetchCard { card: *card });
             }
             None
         }

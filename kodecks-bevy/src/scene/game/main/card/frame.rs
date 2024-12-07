@@ -143,7 +143,8 @@ pub fn update_frame_overlay(
             .iter()
             .chain(board.opponent_field.iter())
             .any(|(card, state)| card.id == id && state == &FieldState::Exhausted);
-        let selectable = list.selectable_cards().iter().any(|card| card.id == id);
+        let selectable = list.selectable_cards().iter().any(|card| card.id == id)
+            || list.fetchable_cards().iter().any(|card| card.id == id);
         if *frame == CardFrame::Shadow {
             let castable = list.castable_cards().iter().any(|card| card.id == id);
             *material = if castable {

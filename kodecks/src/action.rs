@@ -190,6 +190,19 @@ impl AvailableActionList {
             .collect()
     }
 
+    pub fn fetchable_cards(&self) -> Vec<TimedObjectId> {
+        self.iter()
+            .flat_map(|action| {
+                if let AvailableAction::FetchCard { cards } = action {
+                    cards
+                } else {
+                    &[][..]
+                }
+            })
+            .copied()
+            .collect()
+    }
+
     pub fn can_continue(&self) -> bool {
         self.iter()
             .any(|action| matches!(action, AvailableAction::Continue))

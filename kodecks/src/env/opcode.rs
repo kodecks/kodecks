@@ -130,7 +130,7 @@ impl Environment {
                         card: snapshot,
                         from,
                         to,
-                        reason: MoveReason::Fetch,
+                        reason: MoveReason::Load,
                     }]);
                 } else {
                     player

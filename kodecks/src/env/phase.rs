@@ -120,6 +120,18 @@ impl Environment {
             }])]),
             Phase::Main => {
                 let logs = match action {
+                    Some(Action::FetchCard { card }) => {
+                        let card = player_in_turn.colony.get(card).unwrap();
+                        return Ok(vec![OpcodeList::new(vec![Opcode::MoveCard {
+                            card: card.id(),
+                            from: Zone::new(
+                                self.state.players.player_in_turn()?.id,
+                                ZoneKind::Colony,
+                            ),
+                            to: Zone::new(self.state.players.player_in_turn()?.id, ZoneKind::Hand),
+                            reason: MoveReason::Fetch,
+                        }])]);
+                    }
                     Some(Action::CastCard { card }) => {
                         let item = player_in_turn
                             .hand
