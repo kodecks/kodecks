@@ -247,7 +247,7 @@ impl Player {
             .filter(|card| {
                 let castable = state.debug.flags.contains(DebugFlags::IGNORE_COST)
                     || card.computed().cost.value() == 0
-                    || self.stats.manas >= card.computed().cost.value();
+                    || self.stats.manas() >= card.computed().cost.value();
                 card.effect().is_castable(state, card, castable)
             })
             .map(|card| card.timed_id())
@@ -292,8 +292,14 @@ impl Score for Player {
 pub struct PlayerStats {
     pub life: u32,
     pub level: u8,
-    pub manas: u8,
+    pub consumed_manas: u8,
     pub damage: u8,
+}
+
+impl PlayerStats {
+    pub fn manas(&self) -> u8 {
+        self.level.saturating_sub(self.consumed_manas)
+    }
 }
 
 impl Default for PlayerStats {
@@ -301,7 +307,7 @@ impl Default for PlayerStats {
         Self {
             life: 20,
             level: 0,
-            manas: 0,
+            consumed_manas: 0,
             damage: 0,
         }
     }

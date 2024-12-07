@@ -82,7 +82,7 @@ impl Environment {
             }
             Opcode::ConsumeManas { player, amount } => {
                 let player = self.state.players.get_mut(player)?;
-                player.stats.manas = player.stats.manas.saturating_sub(amount);
+                player.stats.consumed_manas += amount;
                 Ok(vec![])
             }
             Opcode::GenerateCardToken { card } => {
@@ -279,7 +279,7 @@ impl Environment {
             Opcode::ResetPlayerState { player } => {
                 let player = self.state.players.get_mut(player)?;
                 player.stats.level = player.colony.len() as u8;
-                player.stats.manas = player.stats.level;
+                player.stats.consumed_manas = 0;
                 player.stats.damage = 0;
                 Ok(vec![])
             }

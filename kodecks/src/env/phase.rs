@@ -131,7 +131,7 @@ impl Environment {
                         } else {
                             item.computed().cost.value()
                         };
-                        if player_in_turn.stats.manas < cost {
+                        if player_in_turn.stats.manas() < cost {
                             return Err(ActionError::InsufficientShards {
                                 color,
                                 amount: cost,
@@ -232,7 +232,7 @@ impl Environment {
                     } else {
                         item.computed().cost.value()
                     };
-                    if active_player.stats.manas < cost {
+                    if active_player.stats.manas() < cost {
                         return Err(ActionError::InsufficientShards {
                             color,
                             amount: cost,
