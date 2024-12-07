@@ -47,7 +47,7 @@ impl Environment {
                     player: player.id,
                 }]))
                 .take(self.state.regulation.initial_hand_size as usize);
-                let fetch = iter::repeat(OpcodeList::new(vec![Opcode::FetchCard {
+                let fetch = iter::repeat(OpcodeList::new(vec![Opcode::LoadCard {
                     player: player.id,
                 }]))
                 .take(3);
@@ -419,7 +419,7 @@ impl Environment {
                 let turn = self.state.turn + 1;
                 Ok(filter_vec![
                     self.state.players.iter().flat_map(|player| {
-                        filter_vec![Some(OpcodeList::new(vec![Opcode::FetchCard {
+                        filter_vec![Some(OpcodeList::new(vec![Opcode::LoadCard {
                             player: player.id,
                         }])),]
                     }),

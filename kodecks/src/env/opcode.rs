@@ -115,7 +115,7 @@ impl Environment {
                 }
                 Ok(vec![])
             }
-            Opcode::FetchCard { player } => {
+            Opcode::LoadCard { player } => {
                 let player = self.state.players.get_mut(player)?;
                 if let Some(mut card) = player.deck.remove_top() {
                     let from = *card.zone();
