@@ -41,7 +41,7 @@ fn setup(mut commands: Commands) {
     commands.spawn(PointLightBundle {
         point_light: PointLight {
             color: Color::srgb(1.0, 1.0, 1.0),
-            intensity: 5_000_000.,
+            intensity: 1_000_000.,
             range: 40.0,
             radius: 5.0,
             ..default()
