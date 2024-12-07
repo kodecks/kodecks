@@ -608,7 +608,7 @@ impl CardBundleBuilder<'_, '_> {
         let image = match image {
             CardImage::Frame => self
                 .asset_server
-                .load(format!("cards/{}/image.main.png#hand", archetype.safe_name)),
+                .load(format!("cards/{}/image.main.png", archetype.safe_name)),
             CardImage::Image => self.asset_server.load_with_cache(format!(
                 "cards/{}/image.main.png#image",
                 archetype.safe_name
