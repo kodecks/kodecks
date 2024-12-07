@@ -67,6 +67,7 @@ pub struct Board {
     pub player_field: Vec<(TimedObjectId, FieldState)>,
     pub opponent_hand: Vec<TimedObjectId>,
     pub opponent_field: Vec<(TimedObjectId, FieldState)>,
+    pub opponent_colony: Vec<TimedObjectId>,
 
     attackers: Vec<TimedObjectId>,
     blocking_pairs: Vec<(TimedObjectId, TimedObjectId)>,
@@ -141,6 +142,7 @@ impl Board {
         });
 
         self.opponent_hand = opponent.hand.iter().map(|card| card.timed_id()).collect();
+        self.opponent_colony = opponent.colony.iter().map(|card| card.timed_id()).collect();
 
         let old_opponent_orders = self
             .opponent_field
@@ -303,6 +305,16 @@ impl Board {
                 transform.translation.y = y;
                 transform.rotate_local_x(std::f32::consts::PI / 2.0);
                 transform.rotate_local_y(std::f32::consts::PI * 2.0);
+                return Some(transform);
+            }
+        } else if zone.kind == ZoneKind::Colony {
+            if let Some(index) = self.opponent_colony.iter().position(|&y| y.id == card) {
+                let x_offset = index as f32 - (self.opponent_colony.len() - 1) as f32 / 2.0;
+                let x = 1.1 * x_offset;
+                let y = 0.2 + 0.01 * index as f32;
+                let z = -1.3;
+                let mut transform = Transform::from_xyz(x, y, z);
+                transform.rotate_local_y(std::f32::consts::PI);
                 return Some(transform);
             }
         } else if zone.kind == ZoneKind::Field {

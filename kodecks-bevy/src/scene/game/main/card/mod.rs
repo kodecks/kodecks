@@ -173,13 +173,7 @@ fn initialize_card_bundles(
     mut query: Query<&mut Card>,
     mut builder: CardBundleBuilder,
 ) {
-    let cards = env.players.iter().flat_map(|player| {
-        player
-            .hand
-            .iter()
-            .chain(&player.field)
-            .chain(player.graveyard.last())
-    });
+    let cards = env.players.iter().flat_map(|player| player.cards());
     for card in cards {
         let entry = assets.cards.entry(card.id);
         let entry = entry.or_insert_with(|| {

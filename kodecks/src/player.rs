@@ -204,6 +204,7 @@ impl Player {
             .or_else(|| self.hand.get(card))
             .or_else(|| self.graveyard.get(card))
             .or_else(|| self.field.get(card))
+            .or_else(|| self.colony.get(card))
             .or_else(|| self.limbo.get(card))
     }
 
@@ -213,6 +214,7 @@ impl Player {
             .or_else(|| self.hand.get_mut(card))
             .or_else(|| self.graveyard.get_mut(card))
             .or_else(|| self.field.get_mut(card))
+            .or_else(|| self.colony.get_mut(card))
             .or_else(|| self.limbo.get_mut(card))
     }
 
@@ -223,6 +225,8 @@ impl Player {
             Some(ZoneKind::Hand)
         } else if self.field.contains(card) {
             Some(ZoneKind::Field)
+        } else if self.colony.contains(card) {
+            Some(ZoneKind::Colony)
         } else if self.graveyard.contains(card) {
             Some(ZoneKind::Graveyard)
         } else {
@@ -386,6 +390,7 @@ impl LocalPlayerState {
         self.field
             .iter()
             .find(|item| item.id == card)
+            .or_else(|| self.colony.iter().find(|item| item.id == card))
             .or_else(|| self.graveyard.iter().find(|item| item.id == card))
             .or_else(|| self.hand.iter().find(|item| item.id == card))
             .or_else(|| self.limbo.iter().find(|item| item.id == card))
@@ -396,6 +401,7 @@ impl LocalPlayerState {
             .iter()
             .chain(self.graveyard.iter())
             .chain(self.field.iter())
+            .chain(self.colony.iter())
             .chain(self.limbo.iter())
     }
 
@@ -405,6 +411,9 @@ impl LocalPlayerState {
         }
         if self.field.iter().any(|item| item.id == card) {
             return Some(ZoneKind::Field);
+        }
+        if self.colony.iter().any(|item| item.id == card) {
+            return Some(ZoneKind::Colony);
         }
         if self.graveyard.iter().any(|item| item.id == card) {
             return Some(ZoneKind::Graveyard);
