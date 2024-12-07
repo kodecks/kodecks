@@ -41,6 +41,17 @@ impl Environment {
             Some(PlayerAvailableActions {
                 player: active_player.id,
                 actions: filter_vec![
+                    if active_player.colony.is_empty() {
+                        None
+                    } else {
+                        Some(AvailableAction::FetchCard {
+                            cards: active_player
+                                .colony
+                                .iter()
+                                .map(|card| card.timed_id())
+                                .collect(),
+                        })
+                    },
                     if castable_cards.is_empty() {
                         None
                     } else {

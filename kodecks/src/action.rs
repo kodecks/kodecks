@@ -16,6 +16,9 @@ pub enum AvailableAction {
     SelectCard {
         cards: Vec<TimedObjectId>,
     },
+    FetchCard {
+        cards: Vec<TimedObjectId>,
+    },
     Attack {
         attackers: Vec<TimedObjectId>,
     },
@@ -40,11 +43,12 @@ impl Ord for AvailableAction {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         let index = |action: &AvailableAction| match action {
             AvailableAction::SelectCard { .. } => 0,
-            AvailableAction::Attack { .. } => 1,
-            AvailableAction::Block { .. } => 2,
-            AvailableAction::CastCard { .. } => 3,
-            AvailableAction::EndTurn => 4,
-            AvailableAction::Continue => 5,
+            AvailableAction::FetchCard { .. } => 1,
+            AvailableAction::Attack { .. } => 2,
+            AvailableAction::Block { .. } => 3,
+            AvailableAction::CastCard { .. } => 4,
+            AvailableAction::EndTurn => 5,
+            AvailableAction::Continue => 6,
         };
         index(self).cmp(&index(other))
     }
@@ -204,7 +208,7 @@ impl AvailableActionList {
                         return Some(Action::SelectCard { card });
                     }
                 }
-                AvailableAction::CastCard { .. } => {
+                AvailableAction::CastCard { .. } | AvailableAction::FetchCard { .. } => {
                     continue;
                 }
                 AvailableAction::Attack { .. } => {
@@ -253,6 +257,9 @@ pub enum Action {
     SelectCard {
         card: TimedObjectId,
     },
+    FetchCard {
+        card: TimedObjectId,
+    },
     Attack {
         attackers: Vec<TimedObjectId>,
     },
@@ -278,6 +285,10 @@ impl From<Action> for Value {
             Action::SelectCard { card } => {
                 obj.insert(tinystr!(32, "card"), Value::Custom(CustomType::Card(card)));
                 "select_card"
+            }
+            Action::FetchCard { card } => {
+                obj.insert(tinystr!(32, "card"), Value::Custom(CustomType::Card(card)));
+                "fetch_card"
             }
             Action::Attack { attackers } => {
                 obj.insert(
