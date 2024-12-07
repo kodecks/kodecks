@@ -41,7 +41,10 @@ impl Environment {
             Some(PlayerAvailableActions {
                 player: active_player.id,
                 actions: filter_vec![
-                    if active_player.colony.is_empty() {
+                    if active_player.colony.is_empty()
+                        && active_player.stats.fetch == 0
+                        && active_player.stats.consumed_manas == 0
+                    {
                         None
                     } else {
                         Some(AvailableAction::FetchCard {

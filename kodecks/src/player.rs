@@ -294,6 +294,7 @@ pub struct PlayerStats {
     pub level: u8,
     pub consumed_manas: u8,
     pub damage: u8,
+    pub fetch: u8,
 }
 
 impl PlayerStats {
@@ -309,6 +310,7 @@ impl Default for PlayerStats {
             level: 0,
             consumed_manas: 0,
             damage: 0,
+            fetch: 0,
         }
     }
 }

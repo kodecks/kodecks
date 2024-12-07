@@ -124,7 +124,6 @@ impl Environment {
                     card.set_zone(to);
                     let snapshot = card.snapshot();
                     player.colony.push(card);
-                    player.counters.fetch += 1;
                     return Ok(vec![GameLog::CardMoved {
                         player: controller,
                         card: snapshot,
@@ -281,6 +280,7 @@ impl Environment {
                 player.stats.level = player.colony.len() as u8;
                 player.stats.consumed_manas = 0;
                 player.stats.damage = 0;
+                player.stats.fetch = 0;
                 Ok(vec![])
             }
             Opcode::Attack { attacker, target } => {
