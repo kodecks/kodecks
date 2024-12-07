@@ -65,6 +65,7 @@ impl Deref for AvailableActionList {
 pub struct Board {
     pub player_hand: Vec<TimedObjectId>,
     pub player_field: Vec<(TimedObjectId, FieldState)>,
+    pub player_colony: Vec<TimedObjectId>,
     pub opponent_hand: Vec<TimedObjectId>,
     pub opponent_field: Vec<(TimedObjectId, FieldState)>,
     pub opponent_colony: Vec<TimedObjectId>,
@@ -123,6 +124,7 @@ impl Board {
         let opponent = env.players.next_player(env.player).unwrap();
 
         self.player_hand = player.hand.iter().map(|card| card.timed_id()).collect();
+        self.player_colony = player.colony.iter().map(|card| card.timed_id()).collect();
 
         let old_player_orders = self
             .player_field
@@ -266,6 +268,16 @@ impl Board {
                     transform.rotate_local_y(std::f32::consts::PI);
                     return Some(transform);
                 }
+            } else if zone.kind == ZoneKind::Colony {
+                if let Some(index) = self.player_colony.iter().position(|&y| y.id == card) {
+                    let x = 3.0 - 0.5 * index as f32;
+                    let y = 0.2 + 0.01 * index as f32;
+                    let z = 2.5;
+                    let mut transform = Transform::from_xyz(x, y, z).with_scale(Vec3::splat(0.9));
+                    transform.rotate_local_y(std::f32::consts::PI * 2.0);
+                    transform.rotate_local_z(std::f32::consts::PI * 2.0);
+                    return Some(transform);
+                }
             } else if zone.kind == ZoneKind::Field {
                 let x_base = 0.0;
                 if let Some((index, _)) =
@@ -309,11 +321,10 @@ impl Board {
             }
         } else if zone.kind == ZoneKind::Colony {
             if let Some(index) = self.opponent_colony.iter().position(|&y| y.id == card) {
-                let x_offset = index as f32 - (self.opponent_colony.len() - 1) as f32 / 2.0;
-                let x = 1.1 * x_offset;
+                let x = 3.0 - 0.5 * index as f32;
                 let y = 0.2 + 0.01 * index as f32;
-                let z = -1.3;
-                let mut transform = Transform::from_xyz(x, y, z);
+                let z = -2.0;
+                let mut transform = Transform::from_xyz(x, y, z).with_scale(Vec3::splat(0.9));
                 transform.rotate_local_y(std::f32::consts::PI);
                 return Some(transform);
             }

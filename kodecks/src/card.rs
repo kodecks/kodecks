@@ -112,7 +112,7 @@ impl Card {
             return;
         }
         match zone.kind {
-            ZoneKind::Hand => {
+            ZoneKind::Hand | ZoneKind::Colony => {
                 self.revealed.set(zone.player, true);
             }
             ZoneKind::Field | ZoneKind::Graveyard => {
