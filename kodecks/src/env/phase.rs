@@ -425,11 +425,9 @@ impl Environment {
                     .next_id(self.state.players.player_in_turn()?.id)?;
                 let turn = self.state.turn + 1;
                 Ok(filter_vec![
-                    self.state.players.iter().flat_map(|player| {
-                        filter_vec![Some(OpcodeList::new(vec![Opcode::LoadCard {
-                            player: player.id,
-                        }])),]
-                    }),
+                    Some(OpcodeList::new(vec![Opcode::LoadCard {
+                        player: self.state.players.player_in_turn()?.id,
+                    }])),
                     Some(OpcodeList::new(vec![Opcode::ChangeTurn {
                         turn,
                         player: active_player,
