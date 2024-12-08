@@ -49,6 +49,10 @@ pub enum Opcode {
     LoadCard {
         player: u8,
     },
+    FetchCard {
+        player: u8,
+        card: ObjectId,
+    },
     CastCard {
         player: u8,
         card: ObjectId,

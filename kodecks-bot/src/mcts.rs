@@ -53,6 +53,10 @@ impl State {
                         .iter()
                         .map(|&card| (player, Action::SelectCard { card }))
                         .collect(),
+                    AvailableAction::FetchCard { cards } => cards
+                        .iter()
+                        .map(|&card| (player, Action::FetchCard { card }))
+                        .collect(),
                     AvailableAction::CastCard { cards } => cards
                         .iter()
                         .map(|&card| (player, Action::CastCard { card }))

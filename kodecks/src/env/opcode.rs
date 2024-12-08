@@ -138,6 +138,26 @@ impl Environment {
                 }
                 Ok(vec![])
             }
+            Opcode::FetchCard { player, card } => {
+                let player = self.state.players.get_mut(player)?;
+                if let Some(mut card) = player.colony.remove(card) {
+                    player.stats.fetch += 1;
+                    let from = *card.zone();
+                    let to = Zone::new(player.id, ZoneKind::Hand);
+                    let controller = card.controller();
+                    card.set_zone(to);
+                    let snapshot = card.snapshot();
+                    player.hand.push(card);
+                    return Ok(vec![GameLog::CardMoved {
+                        player: controller,
+                        card: snapshot,
+                        from,
+                        to,
+                        reason: MoveReason::Fetch,
+                    }]);
+                }
+                Ok(vec![])
+            }
             Opcode::CastCard { player, card, .. } => {
                 let player = self.state.players.get_mut(player)?;
                 if let Some(mut card) = player.hand.remove(card) {
