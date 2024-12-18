@@ -11,7 +11,6 @@ use tinystr::tinystr;
 pub enum Phase {
     Standby,
     Draw,
-    Charge,
     Main,
     Block,
     Battle,
@@ -23,7 +22,6 @@ impl<'a> From<Phase> for Request<'a, FluentArgs<'a>> {
         let id = match phase {
             Phase::Standby => "phase-standby",
             Phase::Draw => "phase-draw",
-            Phase::Charge => "phase-charge",
             Phase::Main => "phase-main",
             Phase::Block => "phase-block",
             Phase::Battle => "phase-battle",
@@ -42,7 +40,6 @@ impl From<Phase> for SmallStr {
         match phase {
             Phase::Standby => tinystr!(32, "standby"),
             Phase::Draw => tinystr!(32, "draw"),
-            Phase::Charge => tinystr!(32, "charge"),
             Phase::Main => tinystr!(32, "main"),
             Phase::Block => tinystr!(32, "block"),
             Phase::Battle => tinystr!(32, "battle"),

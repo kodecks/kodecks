@@ -101,6 +101,15 @@ impl Environment {
             .state
             .players
             .get(self.state.players.player_in_turn()?.id)?;
+
+        let max_life = self
+            .state
+            .players()
+            .iter()
+            .map(|player| player.stats.life)
+            .max()
+            .unwrap_or(0);
+
         match self.state.phase {
             Phase::Standby => Ok(vec![OpcodeList::new(vec![Opcode::ChangePhase {
                 phase: Phase::Draw,
@@ -112,40 +121,8 @@ impl Environment {
                     }])])
                 } else {
                     Ok(vec![OpcodeList::new(vec![Opcode::ChangePhase {
-                        phase: Phase::Charge,
-                    }])])
-                }
-            }
-            Phase::Charge => {
-                if let Some(Action::SelectCard { card }) = action {
-                    let card = player_in_turn.hand.get(card).unwrap();
-                    Ok(vec![OpcodeList::new(vec![
-                        Opcode::MoveCard {
-                            card: card.id(),
-                            from: Zone::new(
-                                self.state.players.player_in_turn()?.id,
-                                ZoneKind::Hand,
-                            ),
-                            to: Zone::new(
-                                self.state.players.player_in_turn()?.id,
-                                ZoneKind::Graveyard,
-                            ),
-                            reason: MoveReason::Discarded,
-                        },
-                        Opcode::GenerateShards {
-                            player: player_in_turn.id,
-                            source: card.id(),
-                            color: card.computed().color,
-                            amount: card.computed().shards.value(),
-                        },
-                        Opcode::ChangePhase { phase: Phase::Main },
-                    ])])
-                } else if let Some(Action::Continue) = action {
-                    Ok(vec![OpcodeList::new(vec![Opcode::ChangePhase {
                         phase: Phase::Main,
                     }])])
-                } else {
-                    Ok(vec![])
                 }
             }
             Phase::Main => {
@@ -161,7 +138,7 @@ impl Environment {
                         } else {
                             item.computed().cost.value()
                         };
-                        if player_in_turn.shards.get(color) < cost {
+                        if max_life < cost as u32 {
                             return Err(ActionError::InsufficientShards {
                                 color,
                                 amount: cost,
@@ -270,7 +247,7 @@ impl Environment {
                     } else {
                         item.computed().cost.value()
                     };
-                    if active_player.shards.get(color) < cost {
+                    if max_life < cost as u32 {
                         return Err(ActionError::InsufficientShards {
                             color,
                             amount: cost,

@@ -236,15 +236,17 @@ impl Player {
         &'a self,
         state: &'a GameState,
     ) -> impl Iterator<Item = TimedObjectId> + 'a {
+        let max_life = state
+            .players()
+            .iter()
+            .map(|player| player.stats.life)
+            .max()
+            .unwrap_or(0);
         self.hand
             .iter()
-            .filter(|card| {
-                let castable = (state.debug.flags.contains(DebugFlags::IGNORE_COST)
-                    || card.computed().cost.value() == 0
-                    || self.shards.get(card.computed().color) >= card.computed().cost.value())
-                    && (!card.computed().is_creature()
-                        || card.computed().cost.value() > 0
-                        || self.counters.free_casted == 0);
+            .filter(move |card| {
+                let castable = state.debug.flags.contains(DebugFlags::IGNORE_COST)
+                    || card.computed().cost.value() as u32 <= max_life;
                 card.effect().is_castable(state, card, castable)
             })
             .map(|card| card.timed_id())
