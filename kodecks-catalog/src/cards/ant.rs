@@ -8,7 +8,7 @@ card_def!(
     color: Color::GREEN,
     card_type: CardType::Creature,
     creature_type: CreatureType::Mutant,
-    power: 100,
+    power: 1,
     is_token: true,
     shards: 1,
 );

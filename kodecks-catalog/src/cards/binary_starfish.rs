@@ -9,7 +9,7 @@ card_def!(
     cost: 3,
     card_type: CardType::Creature,
     creature_type: CreatureType::Mutant,
-    power: 200,
+    power: 2,
     shards: 1,
 );
 

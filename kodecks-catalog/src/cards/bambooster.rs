@@ -9,7 +9,7 @@ card_def!(
     cost: 1,
     card_type: CardType::Creature,
     creature_type: CreatureType::Robot,
-    power: 300,
+    power: 3,
     shards: 1,
 );
 

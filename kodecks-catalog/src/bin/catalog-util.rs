@@ -58,7 +58,7 @@ card_def!(
     cost: 3,
     card_type: CardType::Creature,
     creature_type: CreatureType::Cyborg,
-    power: 200,
+    power: 2,
 );
 
 impl Effect for CardDef {{}}

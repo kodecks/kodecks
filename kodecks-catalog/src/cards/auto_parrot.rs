@@ -9,7 +9,7 @@ card_def!(
     cost: 2,
     card_type: CardType::Creature,
     creature_type: CreatureType::Cyborg,
-    power: 300,
+    power: 3,
     shards: 1,
 );
 

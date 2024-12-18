@@ -9,7 +9,7 @@ card_def!(
     cost: 0,
     card_type: CardType::Creature,
     creature_type: CreatureType::Program,
-    power: 100,
+    power: 1,
     abilities: &[KeywordAbility::Volatile][..],
     shards: 1,
 );
