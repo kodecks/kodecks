@@ -461,6 +461,7 @@ impl Environment {
                 let shards = player_in_turn
                     .field
                     .iter()
+                    .filter(|card| card.field_state() == FieldState::Active)
                     .fold(0, |acc, x| acc + x.computed().shards.value());
                 let active_player = self
                     .state

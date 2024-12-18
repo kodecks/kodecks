@@ -327,8 +327,8 @@ impl Environment {
             .iter_mut()
             .filter(|player| player.endgame.is_none())
         {
-            if player.stats.life == 0 {
-                player.endgame = Some(PlayerEndgameState::Lose(EndgameReason::LifeZero));
+            if player.stats.life >= 20 {
+                player.endgame = Some(PlayerEndgameState::Win(EndgameReason::LifeZero));
             }
         }
 

@@ -292,7 +292,7 @@ pub struct PlayerStats {
 
 impl Default for PlayerStats {
     fn default() -> Self {
-        Self { life: 2000 }
+        Self { life: 0 }
     }
 }
 

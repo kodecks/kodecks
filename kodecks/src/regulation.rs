@@ -28,7 +28,7 @@ impl Regulation {
         min_deck_size: 20,
         max_same_cards: 4,
         initial_hand_size: 4,
-        initial_life: 2000,
+        initial_life: 0,
         max_hand_size: 6,
         action_timeout: Duration::from_secs(30),
         phase_timeout: Duration::from_secs(60),
