@@ -10,7 +10,7 @@ card_def!(
     card_type: CardType::Creature,
     creature_type: CreatureType::Program,
     power: 100,
-    shards: 5,
+    shards: 1,
 );
 
 impl Effect for CardDef {}

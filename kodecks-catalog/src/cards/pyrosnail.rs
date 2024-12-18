@@ -11,7 +11,7 @@ card_def!(
     creature_type: CreatureType::Cyborg,
     power: 100,
     abilities: &[KeywordAbility::Volatile][..],
-    shards: 5,
+    shards: 1,
 );
 
 impl Effect for CardDef {

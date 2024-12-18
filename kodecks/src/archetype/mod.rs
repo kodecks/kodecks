@@ -132,7 +132,7 @@ impl Default for CardAttribute {
             abilities: Vec::new(),
             anon_abilities: Vec::new(),
             power: None,
-            shards: 0,
+            shards: 1,
             is_token: false,
             styles: Vec::new(),
         }

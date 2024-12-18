@@ -11,7 +11,7 @@ card_def!(
     creature_type: CreatureType::Robot,
     power: 100,
     abilities: &[][..],
-    shards: 3,
+    shards: 1,
 );
 
 impl Effect for CardDef {}
