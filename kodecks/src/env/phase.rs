@@ -458,16 +458,33 @@ impl Environment {
                 } else if player_in_turn.hand.len() > self.state.regulation.max_hand_size as usize {
                     return Ok(vec![]);
                 }
+                let shards = player_in_turn
+                    .field
+                    .iter()
+                    .fold(0, |acc, x| acc + x.computed().shards.value());
                 let active_player = self
                     .state
                     .players
                     .next_id(self.state.players.player_in_turn()?.id)?;
                 let turn = self.state.turn + 1;
-                Ok(vec![OpcodeList::new(vec![Opcode::ChangeTurn {
-                    turn,
-                    player: active_player,
-                    phase: Phase::Standby,
-                }])])
+                Ok(filter_vec![
+                    if shards > 0 {
+                        Some(OpcodeList::new(vec![Opcode::GainLife {
+                            player: player_in_turn.id,
+                            amount: shards as u32,
+                        }]))
+                    } else {
+                        Some(OpcodeList::new(vec![Opcode::GainLife {
+                            player: active_player,
+                            amount: 1,
+                        }]))
+                    },
+                    Some(OpcodeList::new(vec![Opcode::ChangeTurn {
+                        turn,
+                        player: active_player,
+                        phase: Phase::Standby,
+                    }])),
+                ])
             }
         }
     }

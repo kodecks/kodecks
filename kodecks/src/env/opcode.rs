@@ -284,6 +284,20 @@ impl Environment {
                     },
                 ])
             }
+            Opcode::GainLife { player, amount } => {
+                let player = self.state.players.get_mut(player)?;
+                player.stats.life = player.stats.life.saturating_add(amount);
+                Ok(vec![
+                    GameLog::LifeChanged {
+                        player: player.id,
+                        life: player.stats.life,
+                    },
+                    GameLog::LifeChanged {
+                        player: player.id,
+                        life: player.stats.life,
+                    },
+                ])
+            }
         }
     }
 }

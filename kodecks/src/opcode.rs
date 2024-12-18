@@ -80,6 +80,10 @@ pub enum Opcode {
         player: u8,
         amount: u32,
     },
+    GainLife {
+        player: u8,
+        amount: u32,
+    },
 }
 
 #[derive(Debug, Clone)]
